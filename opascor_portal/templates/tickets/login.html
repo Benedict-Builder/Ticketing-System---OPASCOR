@@ -1,0 +1,142 @@
+{% extends 'tickets/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+  .login-wrap {
+    min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;
+  }
+  .login-card {
+    width:880px;height:480px;
+    display:grid;grid-template-columns:1fr 1fr;
+    border-radius:12px;overflow:hidden;
+    border:1px solid rgba(100,150,255,0.4);
+    box-shadow:
+      0 0 0 1px rgba(100,150,255,0.2),
+      0 0 30px rgba(34,85,221,0.4),
+      0 0 60px rgba(34,85,221,0.2),
+      0 0 30px rgba(168,18,18,0.3);
+  }
+
+  /* LEFT */
+  .login-left {
+    background:linear-gradient(160deg,#080c20 0%,#0d1440 100%);
+    padding:50px 45px;
+    display:flex;flex-direction:column;justify-content:center;gap:28px;
+  }
+  .login-title {
+    font-size:1.8rem;font-weight:700;color:#fff;
+    font-family:'Inter',sans-serif;
+  }
+  .input-wrap { display:flex;flex-direction:column;gap:24px; }
+  .input-line {
+    display:flex;align-items:center;justify-content:space-between;
+    border-bottom:1px solid rgba(255,255,255,0.25);
+    padding-bottom:10px;gap:10px;
+  }
+  .input-line input {
+    background:transparent;border:none;outline:none;
+    color:#fff;font-size:0.95rem;width:100%;
+    font-family:'Inter',sans-serif;
+  }
+  .input-line input::placeholder { color:rgba(255,255,255,0.4); }
+  .input-icon { color:rgba(255,255,255,0.4);font-size:1rem;flex-shrink:0; }
+  .btn-login {
+    background:linear-gradient(135deg,#1a3a9f,#2255dd);
+    color:#fff;border:none;border-radius:30px;
+    padding:13px;font-size:0.95rem;font-weight:700;
+    cursor:pointer;letter-spacing:0.08em;
+    box-shadow:0 4px 20px rgba(34,85,221,0.5);
+    transition:all 0.2s;width:100%;
+  }
+  .btn-login:hover { transform:translateY(-2px); }
+  .signup-text {
+    text-align:center;font-size:0.82rem;color:rgba(255,255,255,0.4);
+  }
+  .signup-text a { color:#6ea4ff;text-decoration:none;font-weight:500; }
+
+  /* RIGHT */
+  .login-right {
+    position:relative;overflow:hidden;
+    background:linear-gradient(135deg,#990000 0%,#cc0000 40%,#ee1111 100%);
+    display:flex;align-items:center;justify-content:center;
+  }
+  /* Diagonal blue slice on left edge */
+  .login-right::before {
+    content:'';position:absolute;
+    top:0;left:-80px;width:160px;height:200%;
+    background:linear-gradient(160deg,#080c20 0%,#0d1440 100%);
+    transform:rotate(-8deg);transform-origin:top left;
+  }
+  .logo-section {
+    position:relative;z-index:2;
+    display:flex;align-items:center;gap:14px;
+    padding:16px;
+  }
+  .logo-img {
+    width:85px;height:85px;
+    object-fit:contain;flex-shrink:0;
+  }
+  .logo-info { display:flex;flex-direction:column;gap:2px; }
+  .logo-text-main {
+    font-family:'Rajdhani',sans-serif;
+    font-size:2.6rem;font-weight:900;
+    color:#0000ee;letter-spacing:0.06em;line-height:1;
+    text-shadow:1px 1px 0px rgba(0,0,100,0.3);
+  }
+  .logo-text-sub {
+    font-size:0.58rem;color:rgba(255,255,255,0.9);
+    letter-spacing:0.1em;text-transform:uppercase;
+    line-height:1.5;font-weight:600;
+  }
+</style>
+
+<div class="login-wrap">
+  <div class="login-card">
+
+    <!-- LEFT SIDE -->
+    <div class="login-left">
+      <h1 class="login-title">Login</h1>
+
+      {% for message in messages %}
+        <div style="background:rgba(204,26,26,0.15);border:1px solid rgba(204,26,26,0.4);color:#ff6b6b;padding:8px 14px;border-radius:6px;font-size:0.82rem;">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+      <form method="post" style="display:flex;flex-direction:column;gap:28px;">
+        {% csrf_token %}
+        <div class="input-wrap">
+          <div class="input-line">
+            <input type="text" name="username" placeholder="Username" required/>
+            <span class="input-icon">👤</span>
+          </div>
+          <div class="input-line">
+            <input type="password" name="password" placeholder="Password" required/>
+            <span class="input-icon">🔒</span>
+          </div>
+        </div>
+        <button type="submit" class="btn-login">Login</button>
+      </form>
+
+     <p class="signup-text" style="margin-top:-10px;">
+  <a href="{% url 'forgot_password' %}" style="color:rgba(255,255,255,0.4);font-size:0.8rem;">Forgot Password?</a>
+</p>
+<p class="signup-text">Don't have an account? <a href="{% url 'choose_department' %}">Sign Up</a></p>
+    </div>
+
+    <!-- RIGHT SIDE -->
+    <div class="login-right">
+      <div class="logo-section">
+        <img class="logo-img" src="{% static 'images/opascor_logo.png' %}"/>
+        <div class="logo-info">
+          <div class="logo-text-main">OPASCOR</div>
+          <div class="logo-text-sub">Oriental Port and Allied<br>Services Corporation</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

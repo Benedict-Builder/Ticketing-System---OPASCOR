@@ -1,0 +1,110 @@
+{% extends 'tickets/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+  .auth-wrap { min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px; }
+  .auth-card { width:100%;max-width:860px;display:grid;grid-template-columns:1fr 1fr;border-radius:16px;overflow:hidden;border:1px solid var(--border);box-shadow:0 0 60px rgba(34,85,221,0.2),0 0 30px rgba(168,18,18,0.15); }
+  .auth-left { background:linear-gradient(160deg,#0d1535 0%,#0a0e1f 100%);padding:48px 44px;display:flex;flex-direction:column;justify-content:center;gap:20px; }
+  .auth-right { background:linear-gradient(160deg,#7a0a0a 0%,#3d0505 50%,#1a0505 100%);padding:48px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+  .auth-title { font-family:'Rajdhani',sans-serif;font-size:1.9rem;font-weight:700;color:#fff; }
+  .auth-subtitle { font-size:0.83rem;color:var(--text-dim);margin-top:-16px; }
+  .input-group { display:flex;flex-direction:column;gap:6px; }
+  .input-icon-wrap { position:relative; }
+  .input-icon-wrap .form-input { padding-right:40px; }
+  .input-icon { position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--text-dim);cursor:pointer; }
+  .auth-link { font-size:0.85rem;color:var(--text-dim);text-align:center; }
+  .auth-link a { color:#6ea4ff;text-decoration:none;font-weight:500; }
+  .divider { display:flex;align-items:center;gap:12px;color:var(--text-dim);font-size:0.78rem; }
+  .divider::before,.divider::after { content:'';flex:1;height:1px;background:var(--border); }
+  .dept-chip { display:inline-block;background:rgba(34,85,221,0.15);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:0.8rem;color:#6ea4ff; }
+  .logo-circle { width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#1a3a9f,#cc1a1a);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-size:1.8rem;font-weight:700;color:#fff;border:3px solid rgba(255,255,255,0.2);box-shadow:0 0 30px rgba(204,26,26,0.4); }
+  .logo-name { font-family:'Rajdhani',sans-serif;font-size:2rem;font-weight:700;color:#fff;letter-spacing:0.1em; }
+  .logo-sub { font-size:0.65rem;color:rgba(255,255,255,0.6);text-align:center;letter-spacing:0.08em;text-transform:uppercase; }
+  .logo-tagline { font-size:0.85rem;color:rgba(255,255,255,0.8);text-align:center;margin-top:16px;line-height:1.5; }
+  @media(max-width:640px){.auth-card{grid-template-columns:1fr}.auth-right{display:none}}
+</style>
+
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-left">
+      <div>
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-subtitle">Fill in the details to register</p>
+      </div>
+      {% if request.session.selected_department %}
+        <p style="font-size:0.82rem;color:var(--text-dim);">Department: <span class="dept-chip">{{ request.session.selected_department }}</span></p>
+      {% endif %}
+      {% for message in messages %}
+        <div class="alert alert-error">{{ message }}</div>
+      {% endfor %}
+      {% if form.errors %}
+        {% for field, errors in form.errors.items %}
+          {% for error in errors %}
+            <div class="alert alert-error">{{ error }}</div>
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+      <form method="post" style="display:flex;flex-direction:column;gap:16px;">
+        {% csrf_token %}
+        <div class="input-group">
+          <label class="form-label">FULL NAME</label>
+          <div class="input-icon-wrap">
+            <input type="text" name="full_name" class="form-input" placeholder="Full Name" value="{{ form.full_name.value|default:'' }}" required/>
+            <span class="input-icon">👤</span>
+          </div>
+        </div>
+       <div class="input-group">
+  <label class="form-label">USERNAME</label>
+  <div class="input-icon-wrap">
+    <input type="text" name="username" class="form-input" placeholder="Username" value="{{ form.username.value|default:'' }}" required/>
+    <span class="input-icon">👤</span>
+  </div>
+</div>
+
+<div class="input-group">
+  <label class="form-label">EMAIL ADDRESS</label>
+  <div class="input-icon-wrap">
+    <input type="email" name="email" class="form-input" placeholder="yourname@gmail.com" value="{{ form.email.value|default:'' }}" required/>
+    <span class="input-icon">✉️</span>
+  </div>
+</div>
+
+<div class="input-group">
+  <label class="form-label">PASSWORD</label>
+          <div class="input-icon-wrap">
+            <input type="password" name="password" id="pw1" class="form-input" placeholder="Password" required/>
+            <span class="input-icon" onclick="togglePw('pw1')">👁</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <label class="form-label">CONFIRM PASSWORD</label>
+          <div class="input-icon-wrap">
+            <input type="password" name="confirm_password" id="pw2" class="form-input" placeholder="Confirm Password" required/>
+            <span class="input-icon" onclick="togglePw('pw2')">👁</span>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary btn-full">REGISTER</button>
+      </form>
+      <div class="divider">OR</div>
+      <p class="auth-link">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+    </div>
+    <div class="auth-right">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <<img src="{% static 'images/opascor_logo.png' %}" style="width:70px;height:70px;object-fit:contain;"/>
+        <div style="text-align:center;">
+          <div class="logo-name">OPASCOR</div>
+          <div class="logo-sub">Oriental Port and Allied Services Corporation</div>
+        </div>
+        <p class="logo-tagline">Join OPASCOR Portal<br/>Create your account and<br/>experience seamless access.</p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function togglePw(id) {
+  const f = document.getElementById(id);
+  f.type = f.type === 'password' ? 'text' : 'password';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,326 @@
+{% extends 'tickets/base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.shell { display: flex; height: 100vh; font-family: var(--font-sans, sans-serif); overflow: hidden; }
+.sidebar-col { width: 52px; background: #0b1f4a; display: flex; flex-direction: column; align-items: center; padding: 10px 0; gap: 4px; flex-shrink: 0; overflow: visible; z-index: 100; }
+.sidebar-exp { width: 175px; background: #0b1f4a; display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; z-index: 100; }
+.ico-btn { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; border: none; background: transparent; flex-shrink: 0; transition: background 0.15s; color: #ffffff; position: relative; text-decoration: none; }
+.ico-btn i { color: #ffffff !important; font-size: 22px; }
+.ico-btn:hover { background: rgba(255,255,255,0.12); }
+.ico-btn.active { background: rgba(255,255,255,0.14); }
+.ico-btn .sb-tip { display: none; position: absolute; left: 50px; top: 50%; transform: translateY(-50%); background: #0d1535; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 6px 14px; white-space: nowrap; color: #fff; font-size: 0.78rem; font-weight: 500; z-index: 200; box-shadow: 0 4px 16px rgba(0,0,0,0.4); pointer-events: none; }
+.ico-btn .sb-tip::before { content: ''; position: absolute; left: -6px; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: rgba(255,255,255,0.15); }
+.ico-btn:hover .sb-tip { display: block; }
+.logo-box { width: 48px; height: 48px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-bottom: 4px; }
+.admin-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1a6eb5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #fff; cursor: pointer; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.25); text-transform: uppercase; }
+.exp-top { background: #0b1f4a; height: 52px; display: flex; align-items: center; padding: 0 12px; gap: 10px; border-bottom: 0.5px solid rgba(255,255,255,0.1); flex-shrink: 0; cursor: pointer; }
+.exp-logo-box { width: 48px; height: 48px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.exp-brand { display: flex; flex-direction: column; flex: 1; justify-content: center; }
+.exp-brand-name { font-size: 13px; font-weight: 800; color: #ffffff; letter-spacing: 2.5px; line-height: 1.2; }
+.exp-brand-sub { font-size: 8.5px; color: rgba(255,255,255,0.5); line-height: 1.35; white-space: normal; }
+.exp-avatar-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px 12px; border-bottom: 0.5px solid rgba(255,255,255,0.1); flex-shrink: 0; }
+.exp-avatar { width: 34px; height: 34px; border-radius: 50%; background: #1a6eb5; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 600; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.25); text-transform: uppercase; }
+.exp-name { font-size: 12px; color: #ffffff; white-space: nowrap; }
+.exp-role { font-size: 10px; color: rgba(255,255,255,0.5); }
+.nav-items-wrap { flex: 1; overflow-y: auto; padding: 6px 0; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 14px; color: #ffffff; font-size: 12.5px; cursor: pointer; white-space: nowrap; transition: background 0.15s; text-decoration: none; }
+.nav-item:hover { background: rgba(255,255,255,0.09); color: #fff; }
+.nav-item.active { background: rgba(255,255,255,0.12); }
+.nav-item i, .nav-item svg { font-size: 18px; flex-shrink: 0; color: #ffffff !important; }
+.nav-div { height: 0.5px; background: rgba(255,255,255,0.1); margin: 4px 12px; }
+.dept-label { font-size: 9px; color: rgba(255,255,255,0.45); letter-spacing: 0.8px; padding: 8px 14px 2px; }
+.main { flex: 1; background: #0f2455; display: flex; flex-direction: column; overflow: hidden; }
+.topbar { background: #0b1f4a; height: 52px; display: flex; align-items: center; padding: 0 20px; border-bottom: 0.5px solid rgba(255,255,255,0.1); flex-shrink: 0; gap: 10px; }
+.topbar-title { font-size: 14px; font-weight: 600; color: #fff; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.admin-badge { background: #1a6eb5; color: #fff; border: none; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.05em; }
+.welcome-txt { font-size: 11px; color: rgba(255,255,255,0.75); white-space: nowrap; }
+.logout-btn { font-size: 11px; color: rgba(255,255,255,0.6); border: 0.5px solid rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s; }
+.logout-btn:hover { border-color: #cc1a1a; color: #ff6b6b; }
+.content { padding: 14px; flex: 1; overflow-y: auto; }
+.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
+.stat-card { background: #0d2257; border: 0.5px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 11px 13px; }
+.stat-label { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; margin-bottom: 4px; text-transform: uppercase; }
+.stat-val { font-size: 22px; font-weight: 600; color: #fff; }
+.stat-val.gold { color: #f1c40f; }
+.stat-val.orange { color: #e67e22; }
+.stat-val.green { color: #2ecc71; }
+.tickets-card { background: #0d2257; border: 0.5px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 13px; }
+.tickets-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.tickets-title::before { content: ''; width: 3px; height: 14px; background: #3498db; border-radius: 2px; display: inline-block; }
+.filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 11px; color: rgba(255,255,255,0.55); }
+.filter-sel { background: #0b1f4a; border: 0.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); font-size: 11px; padding: 4px 8px; border-radius: 6px; }
+.filter-sel option { background: #0d1535; color: #fff; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+.tbl th { color: rgba(255,255,255,0.4); font-weight: 500; padding: 5px 7px; text-align: left; border-bottom: 0.5px solid rgba(255,255,255,0.1); font-size: 9px; letter-spacing: 0.4px; text-transform: uppercase; }
+.tbl td { padding: 7px 7px; color: rgba(255,255,255,0.78); border-bottom: 0.5px solid rgba(255,255,255,0.06); vertical-align: middle; }
+.tbl-id { font-family: monospace; font-size: 11px; color: #6ea4ff; }
+.dept-badge { background: #1a4a8a; color: #7ab3f0; font-size: 9px; padding: 2px 6px; border-radius: 4px; }
+.status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 600; }
+.pill-progress { background: rgba(230,140,30,0.2); color: #e67e22; }
+.pill-pending { background: rgba(241,196,15,0.15); color: #f1c40f; }
+.pill-resolved { background: rgba(46,204,113,0.15); color: #2ecc71; }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.update-form { display: flex; flex-direction: column; gap: 3px; }
+.act-sel, .act-inp { background: #0b1f4a; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); font-size: 9px; padding: 4px 6px; border-radius: 4px; width: 100%; min-width: 90px; }
+.act-sel option { background: #0d1535; color: #fff; }
+.act-sel:focus, .act-inp:focus { outline: none; border-color: #3498db; background: rgba(52,152,219,0.12); }
+.act-btn { background: linear-gradient(135deg, #1a6aff, #2255dd); border: none; color: #fff; padding: 4px 0; border-radius: 4px; font-size: 9px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 1px; }
+.act-btn:hover { background: linear-gradient(135deg, #2255dd, #1a3a9f); }
+.alert { background: rgba(46,204,113,0.15); border: 0.5px solid rgba(46,204,113,0.35); color: #2ecc71; padding: 8px 14px; border-radius: 6px; font-size: 11px; margin-bottom: 12px; }
+@media (max-width: 900px) { .stat-row { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 640px) { .sidebar-col, .sidebar-exp { display: none; } .stat-row { grid-template-columns: 1fr; } }
+</style>
+
+{% with initials=request.user.get_full_name|default:request.user.username %}
+<div class="shell">
+
+  <!-- COLLAPSED SIDEBAR -->
+  <div class="sidebar-col" id="sb-col">
+    <div class="logo-box" onclick="expandSidebar()" title="Expand sidebar">
+      <img src="{% static 'images/opascor_logo.png' %}" style="width:48px;height:48px;object-fit:contain;" alt="OPASCOR">
+    </div>
+    <div class="admin-avatar" title="{{ request.user.get_full_name|default:request.user.username }}">
+      {{ request.user.get_full_name|default:request.user.username|slice:":2" }}
+    </div>
+    <div style="height:4px;"></div>
+
+    <a class="ico-btn {% if not selected_dept %}active{% endif %}" href="?">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="sb-tip">Dashboard</span>
+    </a>
+
+    {% for value, label in departments %}
+      <a class="ico-btn {% if selected_dept == value %}active{% endif %}" href="?department={{ value }}">
+        {% if value == 'Admin' %}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M5.5 19c0-2.5 2.9-4.5 6.5-4.5s6.5 2 6.5 4.5"/><path d="M3 13l2 2 4-4" stroke-width="2"/><path d="M2 17s1 4 5 4" stroke-width="1.6"/></svg>
+        {% elif value == 'Finance' %}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><circle cx="12" cy="8" r="6" stroke-width="1.4"/><path d="M9 14c-3 .5-5 2-5 3.5C4 19 7.6 20 12 20s8-1 8-2.5c0-1.5-2-3-5-3.5"/><line x1="12" y1="5" x2="12" y2="11"/><line x1="10" y1="7" x2="14" y2="7"/></svg>
+        {% elif value == 'Information Technology' or value == 'MIS' %}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="14" rx="2"/><line x1="3" y1="20" x2="21" y2="20"/><rect x="7" y="10" width="2" height="4" fill="#ffffff" stroke="none"/><rect x="11" y="7" width="2" height="7" fill="#ffffff" stroke="none"/><rect x="15" y="9" width="2" height="5" fill="#ffffff" stroke="none"/></svg>
+        {% elif value == 'Operations' or value == 'General / Operational Mgmt' %}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        {% elif value == 'Human Resources' %}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21c0-3 2.9-5.5 6.5-5.5s6.5 2.5 6.5 5.5"/></svg>
+        {% elif value == 'Security' %}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+        {% else %}
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>
+        {% endif %}
+        <span class="sb-tip">{{ label }}</span>
+      </a>
+    {% endfor %}
+
+    <div style="flex:1;"></div>
+    <a class="ico-btn" href="{% url 'logout' %}">
+      <i class="ti ti-logout"></i>
+      <span class="sb-tip">Logout</span>
+    </a>
+  </div>
+
+  <!-- EXPANDED SIDEBAR -->
+  <div class="sidebar-exp" id="sb-exp" style="display:none;">
+    <div class="exp-top" onclick="collapseSidebar()" title="Collapse sidebar">
+      <div class="exp-logo-box">
+        <img src="{% static 'images/opascor_logo.png' %}" style="width:48px;height:48px;object-fit:contain;" alt="OPASCOR">
+      </div>
+      <div class="exp-brand">
+        <span class="exp-brand-name">OPASCOR</span>
+        <span class="exp-brand-sub">Oriental Port and Allied<br>Services Corporation</span>
+      </div>
+    </div>
+    <div class="exp-avatar-row">
+      <div class="exp-avatar">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
+      <div>
+        <div class="exp-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="exp-role">Administrator</div>
+      </div>
+    </div>
+    <div class="nav-items-wrap">
+      <a class="nav-item {% if not selected_dept %}active{% endif %}" href="?">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Dashboard</span>
+      </a>
+      <div class="nav-div"></div>
+      <div class="dept-label">DEPARTMENTS</div>
+      {% for value, label in departments %}
+        <a class="nav-item {% if selected_dept == value %}active{% endif %}" href="?department={{ value }}">
+          {% if value == 'Admin' %}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M5.5 19c0-2.5 2.9-4.5 6.5-4.5s6.5 2 6.5 4.5"/><path d="M3 13l2 2 4-4" stroke-width="2"/><path d="M2 17s1 4 5 4" stroke-width="1.6"/></svg>
+          {% elif value == 'Finance' %}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><circle cx="12" cy="8" r="6" stroke-width="1.4"/><path d="M9 14c-3 .5-5 2-5 3.5C4 19 7.6 20 12 20s8-1 8-2.5c0-1.5-2-3-5-3.5"/><line x1="12" y1="5" x2="12" y2="11"/><line x1="10" y1="7" x2="14" y2="7"/></svg>
+          {% elif value == 'Information Technology' or value == 'MIS' %}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="14" rx="2"/><line x1="3" y1="20" x2="21" y2="20"/><rect x="7" y="10" width="2" height="4" fill="#ffffff" stroke="none"/><rect x="11" y="7" width="2" height="7" fill="#ffffff" stroke="none"/><rect x="15" y="9" width="2" height="5" fill="#ffffff" stroke="none"/></svg>
+          {% elif value == 'Operations' or value == 'General / Operational Mgmt' %}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          {% elif value == 'Human Resources' %}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21c0-3 2.9-5.5 6.5-5.5s6.5 2.5 6.5 5.5"/></svg>
+          {% elif value == 'Security' %}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          {% else %}
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>
+          {% endif %}
+          <span>{{ label }}</span>
+        </a>
+      {% endfor %}
+      <div class="nav-div"></div>
+      <a class="nav-item" href="{% url 'logout' %}">
+        <i class="ti ti-logout"></i>
+        <span>Logout</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="topbar">
+      <span class="topbar-title">Admin Dashboard</span>
+      <div class="topbar-right">
+        <span class="admin-badge">ADMIN</span>
+        <span class="welcome-txt">Welcome, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong></span>
+        <a href="{% url 'logout' %}"><button class="logout-btn">Logout</button></a>
+      </div>
+    </div>
+
+    <div class="content">
+      {% for message in messages %}
+        <div class="alert">{{ message }}</div>
+      {% endfor %}
+
+      <div class="stat-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Concerns</div>
+          <div class="stat-val">{{ total }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending</div>
+          <div class="stat-val gold">{{ pending }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-val orange">{{ progress }}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Resolved</div>
+          <div class="stat-val green">{{ resolved }}</div>
+        </div>
+      </div>
+
+      <div class="tickets-card">
+        <div class="tickets-title">All Concern Tickets</div>
+        <div class="filter-row">
+          Filter by Department:
+          <form method="get" style="display:inline;">
+            <select name="department" class="filter-sel" onchange="this.form.submit()">
+              <option value="">All Departments</option>
+              {% for value, label in departments %}
+                <option value="{{ value }}" {% if selected_dept == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="tbl">
+            <thead>
+              <tr>
+  <th style="width:32px;">ID</th>
+  <th style="width:90px;">User</th>
+  <th style="width:60px;">Dept</th>
+  <th>Category</th>
+  <th>Sub-Category</th>
+  <th style="width:120px;">Message</th>
+  <th style="width:70px;">Attachment</th>
+  <th style="width:70px;">Date</th>
+  <th style="width:80px;">Status</th>
+  <th style="width:80px;">Assigned To</th>
+  <th style="width:90px;">Remarks</th>
+  <th style="width:100px;">Action</th>
+</tr>
+            </thead>
+            <tbody>
+              {% for c in concerns %}
+              <tr>
+                <td class="tbl-id">#{{ c.id }}</td>
+<td>{{ c.user.get_full_name|default:c.user.username }}</td>
+<td><span class="dept-badge">{{ c.user.userprofile.department }}</span></td>
+<td>{{ c.category }}</td>
+<td>{{ c.sub_category }}</td>
+<td style="font-size:10px;color:rgba(255,255,255,0.6);max-width:120px;">
+  {% if c.description %}
+    <span title="{{ c.description }}" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;cursor:default;">
+      {{ c.description }}
+    </span>
+  {% else %}
+    <span style="color:rgba(255,255,255,0.3);">—</span>
+  {% endif %}
+</td>
+<td style="text-align:center;">
+  {% if c.attachment %}
+    <a href="{{ c.attachment.url }}" target="_blank" title="View Attachment" style="color:#6ea4ff;font-size:18px;text-decoration:none;">
+      <i class="ti ti-paperclip"></i>
+    </a>
+  {% else %}
+    <span style="color:rgba(255,255,255,0.3);font-size:10px;">—</span>
+  {% endif %}
+</td>
+<td>{{ c.date_submitted|date:"m/d/Y" }}</td>
+                <td>
+                  {% if c.status == 'Pending' %}
+                    <span class="status-pill pill-pending"><span class="dot"></span>Pending</span>
+                  {% elif c.status == 'In Progress' %}
+                    <span class="status-pill pill-progress"><span class="dot"></span>In Progress</span>
+                  {% else %}
+                    <span class="status-pill pill-resolved"><span class="dot"></span>Resolved</span>
+                  {% endif %}
+                </td>
+                <td style="font-size:10px;color:rgba(255,255,255,0.6);">{{ c.assigned_to|default:"—" }}</td>
+                <td style="font-size:10px;color:rgba(255,255,255,0.6);">{{ c.remarks|default:"—" }}</td>
+                <td>
+                  <form method="post" action="{% url 'update_concern' c.id %}" class="update-form">
+                    {% csrf_token %}
+                    <select name="status" class="act-sel">
+                      <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
+                      <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                      <option value="Resolved" {% if c.status == 'Resolved' %}selected{% endif %}>Resolved</option>
+                    </select>
+                    <input type="text" name="assigned_to" class="act-inp" placeholder="Assign to" value="{{ c.assigned_to }}">
+                    <input type="text" name="remarks" class="act-inp" placeholder="Remarks" value="{{ c.remarks }}">
+                    <button type="submit" class="act-btn">Save</button>
+                  </form>
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="10" style="text-align:center;color:rgba(255,255,255,0.35);padding:32px;font-size:12px;">
+                  No concerns found.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endwith %}
+
+<script>
+function expandSidebar() {
+  document.getElementById('sb-col').style.display = 'none';
+  var e = document.getElementById('sb-exp');
+  e.style.display = 'flex';
+  e.style.flexDirection = 'column';
+}
+function collapseSidebar() {
+  document.getElementById('sb-exp').style.display = 'none';
+  document.getElementById('sb-col').style.display = 'flex';
+}
+</script>
+
+{% endblock %}
