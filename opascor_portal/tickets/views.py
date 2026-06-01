@@ -3,28 +3,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from .models import Concern, UserProfile, DEPARTMENT_CHOICES, CATEGORY_CHOICES, SUBCATEGORY_CHOICES
+from django.db.models import Case, When, IntegerField, Count
+from .models import Concern, UserProfile, Message, DEPARTMENT_CHOICES, CATEGORY_CHOICES, SUBCATEGORY_CHOICES
 from .forms import ConcernForm, RegisterForm, SUBCATEGORY_MAP
 import json
-
-# ─────────────────────────────────────────
-# LOGIN
-# ─────────────────────────────────────────
-def login_view(request):
-    if request.user.is_authenticated:
-        return redirect_by_role(request.user)
-
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user:
-            login(request, user)
-            return redirect_by_role(user)
-        messages.error(request, 'Invalid username or password.')
-
-    return render(request, 'tickets/login.html')
-
 
 # ─────────────────────────────────────────
 # HELPER — redirects admin or regular user
@@ -38,40 +20,106 @@ def redirect_by_role(user):
         pass
     return redirect('user_dashboard')
 
+# ─────────────────────────────────────────
+# LOGIN
+# ─────────────────────────────────────────
+def login_view(request):
 
 # ─────────────────────────────────────────
-# CHOOSE DEPARTMENT (before register)
-# ─────────────────────────────────────────
-def choose_department_view(request):
+    if request.user.is_authenticated:
+        return redirect_by_role(request.user)
+
     if request.method == 'POST':
-        dept = request.POST.get('department')
-        request.session['selected_department'] = dept
-        return redirect('register')
-    return render(request, 'tickets/choose_department.html', {
-        'departments': DEPARTMENT_CHOICES
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect_by_role(user)
+        messages.error(request, 'Invalid username or password.')
+
+    return render(request, 'tickets/login.html', {
+        'total_users': User.objects.count(),
+        'total_tickets': Concern.objects.count(),
+        'pending_tickets': Concern.objects.filter(status='Pending').count(),
+    })
+# ─────────────────────────────────────────
+# SEND MESSAGE (user)
+# ─────────────────────────────────────────
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        subject = request.POST.get('subject', '').strip()
+        body = request.POST.get('body', '').strip()
+        if subject and body:
+            Message.objects.create(
+                sender=request.user,
+                subject=subject,
+                body=body,
+            )
+            messages.success(request, 'Message sent successfully!')
+        else:
+            messages.error(request, 'Please fill in all fields.')
+    return redirect('user_dashboard')
+
+
+# ─────────────────────────────────────────
+# INBOX (admin)
+# ─────────────────────────────────────────
+@login_required
+def admin_inbox(request):
+    profile = get_object_or_404(UserProfile, user=request.user)
+    if not profile.is_admin:
+        return redirect('user_dashboard')
+
+    msg_id = request.GET.get('read')
+    if msg_id:
+        Message.objects.filter(id=msg_id).update(is_read=True)
+
+    inbox = Message.objects.order_by('-date_sent').select_related('sender')
+    unread_count = inbox.filter(is_read=False).count()
+
+    return render(request, 'tickets/admin_inbox.html', {
+        'inbox': inbox,
+        'unread_count': unread_count,
+        'profile': profile,
     })
 
 
 # ─────────────────────────────────────────
+## ─────────────────────────────────────────
 # REGISTER
 # ─────────────────────────────────────────
 def register_view(request):
-    if not request.session.get('selected_department'):
-        return redirect('choose_department')
-
     form = RegisterForm(request.POST or None)
 
     if request.method == 'POST':
+        department = request.POST.get('department')
+        if not department:
+            messages.error(request, 'Please select a department.')
+            return render(request, 'tickets/register.html', {
+                'form': form,
+                'total_users': User.objects.count(),
+                'total_tickets': Concern.objects.count(),
+                'pending_tickets': Concern.objects.filter(status='Pending').count(),
+            })
         if form.is_valid():
-            # check if username already exists
             if User.objects.filter(username=form.cleaned_data['username']).exists():
                 messages.error(request, 'Username already taken. Please choose another.')
-                return render(request, 'tickets/register.html', {'form': form})
-
-            # check if email already exists
+                return render(request, 'tickets/register.html', {
+                    'form': form,
+                    'total_users': User.objects.count(),
+                    'total_tickets': Concern.objects.count(),
+                    'pending_tickets': Concern.objects.filter(status='Pending').count(),
+                })
             if User.objects.filter(email=form.cleaned_data['email']).exists():
                 messages.error(request, 'Email already registered. Please use another.')
-                return render(request, 'tickets/register.html', {'form': form})
+                return render(request, 'tickets/register.html', {
+                    'form': form,
+                    'total_users': User.objects.count(),
+                    'total_tickets': Concern.objects.count(),
+                    'pending_tickets': Concern.objects.filter(status='Pending').count(),
+                })
 
             full_name = form.cleaned_data['full_name'].split()
             user = User.objects.create_user(
@@ -82,18 +130,27 @@ def register_view(request):
                 last_name=' '.join(full_name[1:]) if len(full_name) > 1 else '',
             )
             UserProfile.objects.get_or_create(
-    user=user,
-    defaults={
-        'department': request.session['selected_department'],
-        'is_admin': False
-    }
-)
-            del request.session['selected_department']
+                user=user,
+                defaults={
+                    'department': department,
+                    'is_admin': False
+                }
+            )
             messages.success(request, 'Account created! Please log in.')
             return redirect('login')
 
-    return render(request, 'tickets/register.html', {'form': form})
+    return render(request, 'tickets/register.html', {
+        'form': form,
+        'total_users': User.objects.count(),
+        'total_tickets': Concern.objects.count(),
+        'pending_tickets': Concern.objects.filter(status='Pending').count(),
+    })
 
+# ─────────────────────────────────────────
+# CHOOSE DEPARTMENT (kept for url compatibility)
+# ─────────────────────────────────────────
+def choose_department_view(request):
+    return redirect('register')
 
 # ─────────────────────────────────────────
 # LOGOUT
@@ -126,7 +183,7 @@ def user_dashboard(request):
             messages.success(request, 'Concern submitted successfully!')
             return redirect('user_dashboard')
 
-    from django.db.models import Case, When, IntegerField
+    from django.db.models import Case, When, IntegerField, Count
 
     notifications = concerns.all().annotate(
         status_order=Case(
@@ -215,6 +272,12 @@ def admin_dashboard(request):
     pending = Concern.objects.filter(status='Pending').count()
     progress = Concern.objects.filter(status='In Progress').count()
     resolved = Concern.objects.filter(status='Resolved').count()
+    unread_messages = Message.objects.filter(is_read=False).count()
+
+    dept_counts = dict(
+        Concern.objects.values_list('user__userprofile__department')
+                       .annotate(count=Count('id'))
+    )
 
     return render(request, 'tickets/admin_dashboard.html', {
         'concerns': concerns,
@@ -225,6 +288,8 @@ def admin_dashboard(request):
         'pending': pending,
         'progress': progress,
         'resolved': resolved,
+        'unread_messages': unread_messages,
+        'dept_counts': dept_counts,
     })
 
 

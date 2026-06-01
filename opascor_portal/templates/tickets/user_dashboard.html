@@ -3,53 +3,89 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 body, html { height: 100%; }
-.shell { display: flex; height: 100vh; font-family: var(--font-sans, sans-serif); overflow: hidden; background: #0f2455; }
+
+:root {
+  --bg-deep:    #080f1e;
+  --bg-base:    #0c1528;
+  --bg-panel:   #101d35;
+  --bg-card:    #0e1a30;
+  --bg-input:   #091422;
+  --accent:     #3b82f6;
+  --accent-dim: rgba(59,130,246,0.15);
+  --accent-glow:rgba(59,130,246,0.35);
+  --border:     rgba(255,255,255,0.07);
+  --border-md:  rgba(255,255,255,0.12);
+  --text-1:     #f0f4ff;
+  --text-2:     rgba(200,215,255,0.7);
+  --text-3:     rgba(160,185,230,0.45);
+  --gold:       #f59e0b;
+  --orange:     #f97316;
+  --green:      #22c55e;
+  --red:        #ef4444;
+  --font:       'DM Sans', sans-serif;
+  --mono:       'JetBrains Mono', monospace;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+}
+
+.shell { display:flex; height:100vh; font-family:var(--font); overflow:hidden; background:var(--bg-deep); }
 
 /* ── SIDEBAR ── */
 .sidebar {
-  width: 200px;
-  background: #0b1f4a;
+  width: 210px;
+  background: var(--bg-base);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  border-right: 0.5px solid rgba(255,255,255,0.08);
+  border-right: 1px solid var(--border);
   z-index: 100;
-  transition: width 0.2s ease;
+  transition: width 0.25s cubic-bezier(.4,0,.2,1);
+  position: relative;
 }
-.sidebar.collapsed { width: 52px; }
+.sidebar.collapsed { width: 56px; }
 
 .sb-logo-row {
-  height: 64px;
+  height: 60px;
   display: flex;
   align-items: center;
-  padding: 0 10px;
+  padding: 0 12px;
   gap: 10px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.08);
-  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
   cursor: pointer;
   overflow: hidden;
+  flex-shrink: 0;
 }
-.sb-logo-img { width: 38px; height: 38px; object-fit: contain; flex-shrink: 0; }
+.sb-logo-row:hover { background: rgba(255,255,255,0.03); }
+.sb-logo-img { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; border-radius: 8px; }
 .sb-brand { display: flex; flex-direction: column; white-space: nowrap; overflow: hidden; }
-.sb-brand-name { font-size: 13px; font-weight: 800; color: #fff; letter-spacing: 2px; }
-.sb-brand-sub { font-size: 8px; color: rgba(255,255,255,0.45); line-height: 1.4; }
+.sb-brand-name { font-size: 12px; font-weight: 700; color: var(--text-1); letter-spacing: 2.5px; }
+.sb-brand-sub { font-size: 7.5px; color: var(--text-3); line-height: 1.4; margin-top: 1px; }
 .sidebar.collapsed .sb-brand { display: none; }
 
-.sb-nav { flex: 1; overflow-y: auto; padding: 8px 0; }
+.sb-nav { flex: 1; overflow-y: auto; padding: 10px 8px; display: flex; flex-direction: column; gap: 2px; }
+.sb-nav::-webkit-scrollbar { display: none; }
+
 .sb-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 11px 14px;
-  color: rgba(255,255,255,0.65);
+  gap: 10px;
+  padding: 10px 10px;
+  color: var(--text-2);
   font-size: 12.5px;
+  font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-decoration: none;
+  border-radius: var(--radius-md);
   transition: background 0.15s, color 0.15s;
   position: relative;
   border: none;
@@ -57,23 +93,36 @@ body, html { height: 100%; }
   width: 100%;
   text-align: left;
 }
-.sb-item i { font-size: 19px; flex-shrink: 0; color: rgba(255,255,255,0.65); transition: color 0.15s; }
-.sb-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
-.sb-item:hover i { color: #fff; }
-.sb-item.active { background: #1a6eb5; color: #fff; }
-.sb-item.active i { color: #fff; }
+.sb-item i { font-size: 18px; flex-shrink: 0; color: var(--text-3); transition: color 0.15s; }
+.sb-item:hover { background: rgba(255,255,255,0.05); color: var(--text-1); }
+.sb-item:hover i { color: var(--text-1); }
+.sb-item.active {
+  background: var(--accent-dim);
+  color: #7db8ff;
+  border: 1px solid rgba(59,130,246,0.2);
+}
+.sb-item.active i { color: #7db8ff; }
+.sb-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 25%; bottom: 25%;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
 .sb-item-label { white-space: nowrap; overflow: hidden; flex: 1; }
 .sidebar.collapsed .sb-item-label { display: none; }
-.sidebar.collapsed .sb-item { justify-content: center; padding: 11px 0; }
+.sidebar.collapsed .sb-item { justify-content: center; padding: 10px; }
+.sidebar.collapsed .sb-item.active::before { display: none; }
 
 .notif-badge {
-  background: #e74c3c;
+  background: var(--red);
   color: #fff;
   font-size: 9px;
   font-weight: 700;
-  min-width: 16px;
-  height: 16px;
-  border-radius: 8px;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 9px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -82,305 +131,309 @@ body, html { height: 100%; }
 }
 .sidebar.collapsed .notif-badge { display: none; }
 
-.sb-tip { display: none; }
-
-.sidebar.collapsed .sb-item .sb-tip {
+.sb-tip {
   position: absolute;
-  left: 58px;
+  left: 62px;
   top: 50%;
   transform: translateY(-50%);
-  background: #0d1535;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 8px;
+  background: #1a2845;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-sm);
   padding: 5px 12px;
   white-space: nowrap;
-  color: #fff;
+  color: var(--text-1);
   font-size: 11px;
   z-index: 300;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
   pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
 }
-.sidebar.collapsed .sb-item:hover .sb-tip { display: block; }
+.sidebar.collapsed .sb-item:hover .sb-tip { opacity: 1; }
 
-.sb-div { height: 0.5px; background: rgba(255,255,255,0.08); margin: 4px 14px; }
-.sb-bottom { padding: 8px 0; border-top: 0.5px solid rgba(255,255,255,0.08); flex-shrink: 0; }
+.sb-bottom { padding: 8px 8px 12px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+.sb-avatar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+.sb-avatar-circle {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.sb-avatar-info { overflow: hidden; }
+.sb-avatar-name { font-size: 11.5px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-avatar-dept { font-size: 9.5px; color: var(--text-3); white-space: nowrap; }
+.sidebar.collapsed .sb-avatar-info { display: none; }
+.sidebar.collapsed .sb-avatar { justify-content: center; padding: 8px; }
 
 /* ── TOPBAR ── */
 .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 .topbar {
-  background: #0b1f4a;
-  height: 64px;
+  background: var(--bg-base);
+  height: 60px;
   display: flex;
   align-items: center;
-  padding: 0 20px;
-  border-bottom: 0.5px solid rgba(255,255,255,0.08);
+  padding: 0 22px;
+  border-bottom: 1px solid var(--border);
   flex-shrink: 0;
-  gap: 12px;
+  gap: 14px;
 }
-.topbar-title { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: 0.02em; }
-.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
-.topbar-welcome { font-size: 12px; color: rgba(255,255,255,0.7); }
-.topbar-welcome strong { color: #fff; }
-.topbar-divider { color: rgba(255,255,255,0.2); }
-.topbar-dept { font-size: 11px; color: rgba(255,255,255,0.5); }
+.topbar-breadcrumb { display: flex; align-items: center; gap: 6px; }
+.topbar-breadcrumb-home { font-size: 11px; color: var(--text-3); }
+.topbar-breadcrumb-sep { color: var(--text-3); font-size: 11px; }
+.topbar-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.topbar-time {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-3);
+  background: rgba(255,255,255,0.04);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.topbar-welcome { font-size: 12px; color: var(--text-2); }
+.topbar-welcome strong { color: var(--text-1); font-weight: 600; }
+.topbar-dept {
+  font-size: 10px;
+  color: #7db8ff;
+  background: var(--accent-dim);
+  border: 1px solid rgba(59,130,246,0.2);
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 500;
+}
 .logout-btn {
   font-size: 11px;
-  color: rgba(255,255,255,0.65);
-  border: 0.5px solid rgba(255,255,255,0.25);
+  color: var(--text-3);
+  border: 1px solid var(--border-md);
   padding: 5px 14px;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
   background: transparent;
   transition: all 0.2s;
   text-decoration: none;
+  font-family: var(--font);
 }
-.logout-btn:hover { border-color: #cc1a1a; color: #ff6b6b; }
+.logout-btn:hover { border-color: var(--red); color: #ff8080; background: rgba(239,68,68,0.06); }
 
 /* ── CONTENT ── */
-.content { flex: 1; overflow-y: auto; padding: 16px; display: flex; gap: 16px; }
+.content { flex: 1; overflow-y: auto; padding: 18px; display: flex; gap: 16px; }
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 4px; }
 
 /* ── PANELS ── */
 .panel {
-  background: #0d2257;
-  border: 0.5px solid rgba(255,255,255,0.1);
-  border-radius: 10px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
-.panel-left { width: 340px; flex-shrink: 0; }
+.panel-left { width: 320px; flex-shrink: 0; }
 .panel-right { flex: 1; min-width: 0; }
 .panel-title {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-1);
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 9px;
+  letter-spacing: 0.02em;
   flex-shrink: 0;
 }
-.panel-title-bar { width: 4px; height: 16px; background: #3498db; border-radius: 2px; flex-shrink: 0; }
+.panel-title-bar {
+  width: 3px; height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
 
 /* ── VIEWS ── */
-.view { display: none; width: 100%; }
-.view.active { display: flex; gap: 16px; flex: 1; }
+.view { display: none; width: 100%; opacity: 0; transform: translateY(6px); }
+.view.active { display: flex; gap: 16px; flex: 1; animation: fadeUp 0.2s ease forwards; }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
 
 /* ── FORM ── */
 .form-group { display: flex; flex-direction: column; gap: 5px; }
-.form-label { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.6px; }
+.form-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
 .form-sel, .form-inp {
-  background: #091840;
-  border: 0.5px solid rgba(255,255,255,0.18);
-  color: rgba(255,255,255,0.9);
-  font-size: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-md);
+  color: var(--text-1);
+  font-size: 12.5px;
+  font-family: var(--font);
   padding: 9px 12px;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   width: 100%;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(160,185,230,0.5)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
   padding-right: 30px;
 }
 .form-sel option { background: #0d1535; color: #fff; }
-.form-sel:focus, .form-inp:focus { outline: none; border-color: #3498db; background-color: rgba(52,152,219,0.08); }
+.form-sel:focus, .form-inp:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
 .form-textarea {
-  background: #091840;
-  border: 0.5px solid rgba(255,255,255,0.18);
-  color: rgba(255,255,255,0.9);
-  font-size: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-md);
+  color: var(--text-1);
+  font-size: 12.5px;
+  font-family: var(--font);
   padding: 10px 12px;
-  border-radius: 7px;
+  border-radius: var(--radius-sm);
   width: 100%;
-  min-height: 100px;
+  min-height: 96px;
   resize: vertical;
-  font-family: inherit;
-  transition: border-color 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  line-height: 1.6;
 }
-.form-textarea:focus { outline: none; border-color: #3498db; background: rgba(52,152,219,0.08); }
-.form-textarea::placeholder { color: rgba(255,255,255,0.22); }
-.char-count { font-size: 9px; color: rgba(255,255,255,0.28); text-align: right; }
+.form-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.form-textarea::placeholder { color: var(--text-3); }
+.char-count { font-size: 9px; color: var(--text-3); text-align: right; font-family: var(--mono); }
+.char-count.near { color: var(--orange); }
+.char-count.full { color: var(--red); }
 
 /* ── ATTACH ── */
 .attach-zone {
-  border: 1.5px dashed rgba(255,255,255,0.18);
-  border-radius: 8px;
-  padding: 16px 12px;
+  border: 1.5px dashed var(--border-md);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
   display: flex;
   align-items: center;
   gap: 12px;
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s;
 }
-.attach-zone:hover { border-color: #3498db; background: rgba(52,152,219,0.06); }
+.attach-zone:hover { border-color: var(--accent); background: var(--accent-dim); }
 .attach-zone input[type="file"] { display: none; }
-.attach-icon-wrap {
-  width: 34px; height: 34px;
-  background: rgba(52,152,219,0.12);
-  border-radius: 6px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-.attach-icon-wrap i { font-size: 18px; color: #6ea4ff; }
-.attach-text { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.5; }
-.attach-text span { color: #6ea4ff; }
-.attach-btn-label {
-  background: rgba(255,255,255,0.08);
-  border: 0.5px solid rgba(255,255,255,0.2);
-  color: rgba(255,255,255,0.75);
-  font-size: 10px;
-  padding: 5px 12px;
-  border-radius: 5px;
-  margin-left: auto;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-.file-preview {
-  display: none;
-  align-items: center;
-  gap: 8px;
-  background: rgba(52,152,219,0.1);
-  border: 0.5px solid rgba(52,152,219,0.3);
-  border-radius: 7px;
-  padding: 8px 12px;
-  font-size: 11px;
-  color: rgba(255,255,255,0.75);
-}
-.file-preview i { color: #6ea4ff; font-size: 16px; flex-shrink: 0; }
+.attach-icon-wrap { width: 32px; height: 32px; background: var(--accent-dim); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.attach-icon-wrap i { font-size: 17px; color: var(--accent); }
+.attach-text { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.attach-text span { color: #7db8ff; font-weight: 500; }
+.attach-btn-label { background: rgba(255,255,255,0.06); border: 1px solid var(--border-md); color: var(--text-2); font-size: 10px; padding: 5px 11px; border-radius: var(--radius-sm); margin-left: auto; white-space: nowrap; flex-shrink: 0; font-family: var(--font); }
+.file-preview { display: none; align-items: center; gap: 8px; background: var(--accent-dim); border: 1px solid rgba(59,130,246,0.25); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 11px; color: var(--text-2); }
+.file-preview i { color: var(--accent); font-size: 16px; flex-shrink: 0; }
 .file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.file-remove { background: none; border: none; color: rgba(255,255,255,0.3); cursor: pointer; font-size: 18px; line-height: 1; flex-shrink: 0; }
-.file-remove:hover { color: #ff6b6b; }
+.file-remove { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 18px; line-height: 1; flex-shrink: 0; }
+.file-remove:hover { color: var(--red); }
 
 /* ── SUBMIT ── */
 .submit-btn {
-  background: #1a6aff;
+  background: var(--accent);
   border: none;
   color: #fff;
   padding: 11px 0;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   width: 100%;
   letter-spacing: 0.04em;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  font-family: var(--font);
 }
-.submit-btn:hover { background: #1558d6; }
+.submit-btn:hover { background: #2563eb; box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
+.submit-btn:active { transform: scale(0.99); }
 
 /* ── ALERTS ── */
-.alert-success { background: rgba(46,204,113,0.12); border: 0.5px solid rgba(46,204,113,0.35); color: #2ecc71; padding: 9px 14px; border-radius: 7px; font-size: 11px; }
-.alert-error { background: rgba(231,76,60,0.12); border: 0.5px solid rgba(231,76,60,0.35); color: #e74c3c; padding: 9px 14px; border-radius: 7px; font-size: 11px; }
+.alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; display: flex; align-items: center; gap: 8px; }
+.alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; display: flex; align-items: center; gap: 8px; }
 
 /* ── TABLE ── */
 .tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
-.tbl th {
-  color: rgba(255,255,255,0.38);
-  font-weight: 500;
-  padding: 6px 10px;
-  text-align: left;
-  border-bottom: 0.5px solid rgba(255,255,255,0.1);
-  font-size: 9.5px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-.tbl td {
-  padding: 9px 10px;
-  color: rgba(255,255,255,0.8);
-  border-bottom: 0.5px solid rgba(255,255,255,0.05);
-  vertical-align: middle;
-}
+.tbl th { color: var(--text-3); font-weight: 600; padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; }
+.tbl td { padding: 10px 10px; color: var(--text-2); border-bottom: 1px solid var(--border); vertical-align: middle; }
 .tbl tr:last-child td { border-bottom: none; }
 .tbl tr:hover td { background: rgba(255,255,255,0.02); }
-.tbl-id { font-family: monospace; color: #6ea4ff; font-size: 11px; }
-.dept-badge { background: #1a4a8a; color: #7ab3f0; font-size: 9px; padding: 2px 7px; border-radius: 4px; white-space: nowrap; }
-.status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 9px; font-weight: 700; white-space: nowrap; }
-.pill-pending { background: rgba(241,196,15,0.15); color: #f1c40f; }
-.pill-progress { background: rgba(230,126,34,0.18); color: #e67e22; }
-.pill-resolved { background: rgba(46,204,113,0.15); color: #2ecc71; }
+.tbl-id { font-family: var(--mono); color: var(--accent); font-size: 10.5px; font-weight: 600; }
+.status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 9px; font-weight: 700; white-space: nowrap; letter-spacing: 0.3px; }
+.pill-pending { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid rgba(245,158,11,0.2); }
+.pill-progress { background: rgba(249,115,22,0.12); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
+.pill-resolved { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
 .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.empty-row { text-align: center; color: rgba(255,255,255,0.25); padding: 40px; font-size: 12px; }
+.empty-row { text-align: center; color: var(--text-3); padding: 40px; font-size: 12px; }
 
-/* ── CONCERN HISTORY CARDS ── */
+/* ── HISTORY CARDS ── */
 .history-card {
-  background: #091840;
-  border: 0.5px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
   padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s;
 }
-.history-card-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.history-card-id { font-family: monospace; color: #6ea4ff; font-size: 11px; }
-.history-card-date { font-size: 10px; color: rgba(255,255,255,0.35); }
-.history-card-cat { font-size: 12px; font-weight: 600; color: #fff; }
-.history-card-sub { font-size: 11px; color: rgba(255,255,255,0.5); }
-.history-card-desc { font-size: 11px; color: rgba(255,255,255,0.6); line-height: 1.5; border-top: 0.5px solid rgba(255,255,255,0.06); padding-top: 8px; margin-top: 2px; }
-.history-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 4px; }
-.assigned-txt { font-size: 10px; color: rgba(255,255,255,0.4); }
-.remarks-txt { font-size: 10px; color: rgba(255,255,255,0.4); font-style: italic; }
+.history-card:hover { border-color: var(--border-md); }
+.history-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.history-card.status-pending::before { background: var(--gold); }
+.history-card.status-progress::before { background: var(--orange); }
+.history-card.status-resolved::before { background: var(--green); }
+.history-card-top { display: flex; align-items: center; gap: 8px; }
+.history-card-id { font-family: var(--mono); color: var(--accent); font-size: 10.5px; font-weight: 600; }
+.history-card-date { font-size: 10px; color: var(--text-3); margin-left: auto; }
+.history-card-desc { font-size: 11.5px; color: var(--text-2); line-height: 1.6; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 2px; }
+.history-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; padding-top: 6px; border-top: 1px solid var(--border); }
+.assigned-txt { font-size: 10px; color: var(--text-3); display: flex; align-items: center; gap: 4px; }
+.assigned-txt i { font-size: 12px; }
+.remarks-txt { font-size: 10px; color: var(--text-3); font-style: italic; max-width: 55%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-/* ── NOTIFICATION ITEMS ── */
-.notif-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 14px;
-  background: #091840;
-  border: 0.5px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-}
-.notif-item.unread { border-left: 3px solid #3498db; }
-.notif-icon {
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-  font-size: 16px;
-}
-.notif-icon.pending { background: rgba(241,196,15,0.15); color: #f1c40f; }
-.notif-icon.progress { background: rgba(230,126,34,0.15); color: #e67e22; }
-.notif-icon.resolved { background: rgba(46,204,113,0.15); color: #2ecc71; }
+/* ── STAT CARDS ── */
+.stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; position: relative; overflow: hidden; }
+.stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+.stat-card.gold-card::after { background: var(--gold); }
+.stat-card.orange-card::after { background: var(--orange); }
+.stat-card.green-card::after { background: var(--green); }
+.stat-label { font-size: 9px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-weight: 600; }
+.stat-val { font-size: 28px; font-weight: 700; font-family: var(--mono); line-height: 1; }
+.stat-val.gold { color: var(--gold); }
+.stat-val.orange { color: var(--orange); }
+.stat-val.green { color: var(--green); }
+
+/* ── NOTIFICATIONS ── */
+.notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 15px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); transition: border-color 0.15s; }
+.notif-item:hover { border-color: var(--border-md); }
+.notif-item.unread { border-left: 3px solid var(--accent); }
+.notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 17px; }
+.notif-icon.pending { background: rgba(245,158,11,0.12); color: var(--gold); }
+.notif-icon.progress { background: rgba(249,115,22,0.12); color: var(--orange); }
+.notif-icon.resolved { background: rgba(34,197,94,0.12); color: var(--green); }
 .notif-body { flex: 1; }
-.notif-title { font-size: 12px; font-weight: 600; color: #fff; margin-bottom: 2px; }
-.notif-sub { font-size: 11px; color: rgba(255,255,255,0.5); line-height: 1.4; }
-.notif-time { font-size: 10px; color: rgba(255,255,255,0.3); margin-top: 4px; }
+.notif-title { font-size: 12.5px; font-weight: 600; color: var(--text-1); margin-bottom: 3px; }
+.notif-sub { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.notif-remarks { font-size: 11px; color: var(--text-2); margin-top: 4px; font-style: italic; }
+.notif-time { font-size: 10px; color: var(--text-3); margin-top: 5px; font-family: var(--mono); }
 
 /* ── HELP ── */
-.help-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px 16px;
-  background: #091840;
-  border: 0.5px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.help-item:hover { background: rgba(52,152,219,0.08); border-color: rgba(52,152,219,0.3); }
-.help-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(52,152,219,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.help-icon i { font-size: 18px; color: #6ea4ff; }
-.help-title { font-size: 12.5px; font-weight: 600; color: #fff; margin-bottom: 3px; }
-.help-desc { font-size: 11px; color: rgba(255,255,255,0.45); line-height: 1.5; }
-
-/* ── STATS ROW (on history) ── */
-.stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
-.stat-card { background: #091840; border: 0.5px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 14px; }
-.stat-label { font-size: 9px; color: rgba(255,255,255,0.38); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-.stat-val { font-size: 22px; font-weight: 700; }
-.stat-val.gold { color: #f1c40f; }
-.stat-val.orange { color: #e67e22; }
-.stat-val.green { color: #2ecc71; }
+.help-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.help-item:hover { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.25); }
+.help-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.help-icon i { font-size: 18px; color: var(--accent); }
+.help-title { font-size: 12.5px; font-weight: 600; color: var(--text-1); margin-bottom: 3px; }
+.help-desc { font-size: 11px; color: var(--text-3); line-height: 1.5; }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) { .view.active { flex-direction: column; } .panel-left { width: 100%; } }
@@ -401,19 +454,17 @@ body, html { height: 100%; }
     </div>
 
     <div class="sb-nav">
-      <button class="sb-item active" onclick="switchView('report')">
+      <button class="sb-item active" onclick="switchView('report', this)">
         <i class="ti ti-clipboard-list"></i>
         <span class="sb-item-label">Report a Problem</span>
         <span class="sb-tip">Report a Problem</span>
       </button>
-
-      <button class="sb-item" onclick="switchView('history')">
+      <button class="sb-item" onclick="switchView('history', this)">
         <i class="ti ti-clock-hour-4"></i>
         <span class="sb-item-label">Concern History</span>
         <span class="sb-tip">Concern History</span>
       </button>
-
-      <button class="sb-item" onclick="switchView('notifications')">
+      <button class="sb-item" onclick="switchView('notifications', this)">
         <i class="ti ti-bell"></i>
         <span class="sb-item-label">Notifications</span>
         {% if pending_count or inprogress_count %}
@@ -421,8 +472,7 @@ body, html { height: 100%; }
         {% endif %}
         <span class="sb-tip">Notifications</span>
       </button>
-
-      <button class="sb-item" onclick="switchView('help')">
+      <button class="sb-item" onclick="switchView('help', this)">
         <i class="ti ti-help-circle"></i>
         <span class="sb-item-label">Help &amp; Support</span>
         <span class="sb-tip">Help &amp; Support</span>
@@ -430,6 +480,13 @@ body, html { height: 100%; }
     </div>
 
     <div class="sb-bottom">
+      <div class="sb-avatar">
+        <div class="sb-avatar-circle">{{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}</div>
+        <div class="sb-avatar-info">
+          <div class="sb-avatar-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+          <div class="sb-avatar-dept">{{ user_dept }}</div>
+        </div>
+      </div>
       <a class="sb-item" href="{% url 'logout' %}">
         <i class="ti ti-logout"></i>
         <span class="sb-item-label">Logout</span>
@@ -441,12 +498,18 @@ body, html { height: 100%; }
   <!-- ── MAIN ── -->
   <div class="main">
     <div class="topbar">
-      <span class="topbar-title">OPASCOR Portal</span>
+      <div class="topbar-breadcrumb">
+        <span class="topbar-breadcrumb-home">OPASCOR Portal</span>
+        <span class="topbar-breadcrumb-sep"><i class="ti ti-chevron-right" style="font-size:11px;"></i></span>
+        <span class="topbar-title" id="topbar-page">Report a Problem</span>
+      </div>
       <div class="topbar-right">
+        <span class="topbar-time" id="topbar-clock">--:--</span>
         <span class="topbar-welcome">Welcome, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong></span>
-        <span class="topbar-divider">|</span>
         <span class="topbar-dept">{{ user_dept }}</span>
-        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+        <a href="{% url 'logout' %}" class="logout-btn">
+          <i class="ti ti-logout" style="font-size:13px;vertical-align:-2px;margin-right:4px;"></i>Logout
+        </a>
       </div>
     </div>
 
@@ -454,26 +517,27 @@ body, html { height: 100%; }
 
       {% for message in messages %}
         {% if 'error' in message.tags %}
-          <div class="alert-error" style="position:absolute;top:70px;left:220px;right:16px;z-index:50;">{{ message }}</div>
+          <div class="alert-error" style="position:absolute;top:66px;left:226px;right:18px;z-index:50;">
+            <i class="ti ti-alert-circle" style="font-size:15px;flex-shrink:0;"></i>{{ message }}
+          </div>
         {% else %}
-          <div class="alert-success" style="position:absolute;top:70px;left:220px;right:16px;z-index:50;">{{ message }}</div>
+          <div class="alert-success" style="position:absolute;top:66px;left:226px;right:18px;z-index:50;">
+            <i class="ti ti-circle-check" style="font-size:15px;flex-shrink:0;"></i>{{ message }}
+          </div>
         {% endif %}
       {% endfor %}
 
       <!-- ══ VIEW: REPORT A PROBLEM ══ -->
       <div class="view active" id="view-report">
-
         <div class="panel panel-left">
           <div class="panel-title">
             <span class="panel-title-bar"></span>
             Report a Problem
           </div>
-
           <form method="post" action="{% url 'submit_concern' %}" enctype="multipart/form-data" id="concern-form">
             {% csrf_token %}
-
             <div class="form-group">
-              <label class="form-label">Category:</label>
+              <label class="form-label">Category</label>
               <select name="category" id="cat-sel" class="form-sel" required>
                 <option value="">— Select a category —</option>
                 {% for cat, subcats in categories.items %}
@@ -481,9 +545,8 @@ body, html { height: 100%; }
                 {% endfor %}
               </select>
             </div>
-
             <div class="form-group" style="margin-top:10px;">
-              <label class="form-label">Sub-Category:</label>
+              <label class="form-label">Sub-Category</label>
               <select name="sub_category" id="subcat-sel" class="form-sel" required>
                 <option value="">— Select sub-category —</option>
                 {% for cat, subcats in categories.items %}
@@ -493,17 +556,16 @@ body, html { height: 100%; }
                 {% endfor %}
               </select>
             </div>
-
             <div class="form-group" style="margin-top:10px;">
-              <textarea name="description" id="desc-area" class="form-textarea" placeholder="Describe the issue..." maxlength="1000" required></textarea>
+              <label class="form-label">Description</label>
+              <textarea name="description" id="desc-area" class="form-textarea" placeholder="Describe your concern in detail..." maxlength="1000" required></textarea>
               <div class="char-count"><span id="char-num">0</span> / 1000</div>
             </div>
-
             <div class="form-group" style="margin-top:4px;">
               <label class="attach-zone" id="attach-zone" for="file-input">
                 <input type="file" name="attachment" id="file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
                 <div class="attach-icon-wrap"><i class="ti ti-paperclip"></i></div>
-                <div class="attach-text"><span>Attach File</span><br>Upload Screenshot or Document</div>
+                <div class="attach-text"><span>Attach File</span><br>Screenshot or Document</div>
                 <span class="attach-btn-label">Browse</span>
               </label>
               <div class="file-preview" id="file-preview">
@@ -512,8 +574,7 @@ body, html { height: 100%; }
                 <button type="button" class="file-remove" id="file-remove">&times;</button>
               </div>
             </div>
-
-            <button type="submit" class="submit-btn" style="margin-top:6px;">
+            <button type="submit" class="submit-btn" style="margin-top:8px;">
               <i class="ti ti-send" style="font-size:15px;"></i>
               Submit Report
             </button>
@@ -540,9 +601,9 @@ body, html { height: 100%; }
                 {% for c in my_concerns|slice:":8" %}
                 <tr>
                   <td class="tbl-id">#{{ c.id }}</td>
-                  <td>{{ c.category }}</td>
-                  <td style="color:rgba(255,255,255,0.6);">{{ c.sub_category }}</td>
-                  <td style="color:rgba(255,255,255,0.5);font-size:10px;">{{ c.date_submitted|date:"m/d/Y" }}</td>
+                  <td style="color:var(--text-1);font-weight:500;">{{ c.category }}</td>
+                  <td style="color:var(--text-3);">{{ c.sub_category }}</td>
+                  <td style="color:var(--text-3);font-family:var(--mono);font-size:10px;">{{ c.date_submitted|date:"m/d/Y" }}</td>
                   <td>
                     {% if c.status == 'Pending' %}
                       <span class="status-pill pill-pending"><span class="dot"></span>Pending</span>
@@ -554,7 +615,10 @@ body, html { height: 100%; }
                   </td>
                 </tr>
                 {% empty %}
-                <tr><td colspan="5" class="empty-row">No concerns submitted yet.</td></tr>
+                <tr><td colspan="5" class="empty-row">
+                  <i class="ti ti-inbox" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4;"></i>
+                  No concerns submitted yet.
+                </td></tr>
                 {% endfor %}
               </tbody>
             </table>
@@ -569,25 +633,23 @@ body, html { height: 100%; }
             <span class="panel-title-bar"></span>
             Concern History
           </div>
-
           <div class="stat-row">
-            <div class="stat-card">
+            <div class="stat-card gold-card">
               <div class="stat-label">Pending</div>
               <div class="stat-val gold">{{ pending_count }}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card orange-card">
               <div class="stat-label">In Progress</div>
               <div class="stat-val orange">{{ inprogress_count }}</div>
             </div>
-            <div class="stat-card">
+            <div class="stat-card green-card">
               <div class="stat-label">Resolved</div>
               <div class="stat-val green">{{ resolved_count }}</div>
             </div>
           </div>
-
           <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
             {% for c in my_concerns %}
-            <div class="history-card">
+            <div class="history-card {% if c.status == 'Pending' %}status-pending{% elif c.status == 'In Progress' %}status-progress{% else %}status-resolved{% endif %}">
               <div class="history-card-top">
                 <span class="history-card-id">#{{ c.id }}</span>
                 {% if c.status == 'Pending' %}
@@ -599,20 +661,22 @@ body, html { height: 100%; }
                 {% endif %}
                 <span class="history-card-date">{{ c.date_submitted|date:"M d, Y" }}</span>
               </div>
-              <div class="history-card-cat">{{ c.category }}</div>
-              <div class="history-card-sub">{{ c.sub_category }}</div>
+              <div style="font-size:13px;font-weight:600;color:var(--text-1);">{{ c.category }}</div>
+              <div style="font-size:11px;color:var(--text-3);">{{ c.sub_category }}</div>
               {% if c.description %}
                 <div class="history-card-desc">{{ c.description }}</div>
               {% endif %}
               <div class="history-card-footer">
                 <span class="assigned-txt">
-                  {% if c.assigned_to %}Assigned to: {{ c.assigned_to }}{% else %}Not yet assigned{% endif %}
+                  <i class="ti ti-user"></i>
+                  {% if c.assigned_to %}{{ c.assigned_to }}{% else %}Not yet assigned{% endif %}
                 </span>
                 <span class="remarks-txt">{{ c.remarks|default:"No remarks yet" }}</span>
               </div>
             </div>
             {% empty %}
-            <div style="text-align:center;color:rgba(255,255,255,0.25);padding:40px;font-size:12px;">
+            <div style="text-align:center;color:var(--text-3);padding:48px;font-size:12px;">
+              <i class="ti ti-history" style="font-size:28px;display:block;margin-bottom:10px;opacity:0.4;"></i>
               No concerns submitted yet.
             </div>
             {% endfor %}
@@ -627,38 +691,34 @@ body, html { height: 100%; }
             <span class="panel-title-bar"></span>
             Notifications
           </div>
-          <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
+          <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;">
             {% for c in notifications %}
             <div class="notif-item {% if c.status != 'Resolved' %}unread{% endif %}">
               <div class="notif-icon {% if c.status == 'Pending' %}pending{% elif c.status == 'In Progress' %}progress{% else %}resolved{% endif %}">
-                {% if c.status == 'Pending' %}
-                  <i class="ti ti-clock"></i>
-                {% elif c.status == 'In Progress' %}
-                  <i class="ti ti-loader"></i>
-                {% else %}
-                  <i class="ti ti-circle-check"></i>
-                {% endif %}
+                {% if c.status == 'Pending' %}<i class="ti ti-clock"></i>
+                {% elif c.status == 'In Progress' %}<i class="ti ti-loader"></i>
+                {% else %}<i class="ti ti-circle-check"></i>{% endif %}
               </div>
               <div class="notif-body">
                 <div class="notif-title">
                   Concern #{{ c.id }} —
                   {% if c.status == 'Pending' %}Awaiting review
                   {% elif c.status == 'In Progress' %}Being handled
-                  {% else %}Resolved
-                  {% endif %}
+                  {% else %}Resolved{% endif %}
                 </div>
                 <div class="notif-sub">
                   {{ c.category }} › {{ c.sub_category }}
-                  {% if c.assigned_to %} · Assigned to {{ c.assigned_to }}{% endif %}
+                  {% if c.assigned_to %} · <strong style="color:var(--text-2);">{{ c.assigned_to }}</strong>{% endif %}
                 </div>
                 {% if c.remarks %}
-                  <div class="notif-sub" style="margin-top:3px;color:rgba(255,255,255,0.4);">Remarks: {{ c.remarks }}</div>
+                  <div class="notif-remarks">Remarks: {{ c.remarks }}</div>
                 {% endif %}
                 <div class="notif-time">{{ c.date_submitted|date:"M d, Y" }}</div>
               </div>
             </div>
             {% empty %}
-            <div style="text-align:center;color:rgba(255,255,255,0.25);padding:40px;font-size:12px;">
+            <div style="text-align:center;color:var(--text-3);padding:48px;font-size:12px;">
+              <i class="ti ti-bell-off" style="font-size:28px;display:block;margin-bottom:10px;opacity:0.4;"></i>
               No notifications yet.
             </div>
             {% endfor %}
@@ -667,146 +727,146 @@ body, html { height: 100%; }
       </div>
 
       <!-- ══ VIEW: HELP & SUPPORT ══ -->
-      <!-- ══ VIEW: HELP & SUPPORT ══ -->
-<div class="view" id="view-help">
-  <div class="panel" style="flex:1;">
-    <div class="panel-title">
-      <span class="panel-title-bar"></span>
-      Help &amp; Support
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-
-      <!-- Contact IT Support -->
-      <a href="tel:+63XXXXXXXXXX" class="help-item" style="text-decoration:none;">
-        <div class="help-icon"><i class="ti ti-phone-call"></i></div>
-        <div>
-          <div class="help-title">Contact IT Support</div>
-          <div class="help-desc">
-            For urgent technical issues, call our IT helpdesk directly.<br>
-            📞 <strong style="color:#6ea4ff;">+63 XXX XXX XXXX</strong><br>
-            <span style="font-size:10px;color:rgba(255,255,255,0.35);">Available Monday to Friday, 8AM – 5PM.</span>
+      <div class="view" id="view-help">
+        <div class="panel" style="flex:1;">
+          <div class="panel-title">
+            <span class="panel-title-bar"></span>
+            Help &amp; Support
           </div>
-        </div>
-      </a>
+          <div style="display:flex;flex-direction:column;gap:8px;">
 
-      <!-- Email Support -->
-      <a href="mailto:support@opascor.com" class="help-item" style="text-decoration:none;">
-        <div class="help-icon"><i class="ti ti-mail"></i></div>
-        <div>
-          <div class="help-title">Email Support</div>
-          <div class="help-desc">
-            Send us an email for non-urgent concerns.<br>
-            ✉️ <strong style="color:#6ea4ff;">support@opascor.com</strong><br>
-            <span style="font-size:10px;color:rgba(255,255,255,0.35);">Expect a response within 1–2 business days.</span>
-          </div>
-        </div>
-      </a>
+            <a href="tel:+63XXXXXXXXXX" class="help-item" style="text-decoration:none;">
+              <div class="help-icon"><i class="ti ti-phone-call"></i></div>
+              <div>
+                <div class="help-title">Contact IT Support</div>
+                <div class="help-desc">
+                  For urgent technical issues, call our IT helpdesk directly.<br>
+                  <strong style="color:#7db8ff;font-size:12px;">+63 XXX XXX XXXX</strong><br>
+                  <span style="font-size:10px;">Available Monday to Friday, 8AM – 5PM.</span>
+                </div>
+              </div>
+            </a>
 
-      <!-- How to Submit a Concern -->
-      <!-- How to Submit a Concern -->
-<div class="help-item" onclick="toggleHelp('guide-submit')">
-  <div class="help-icon"><i class="ti ti-file-text"></i></div>
-  <div style="width:100%;">
-    <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
-      How to Submit a Concern
-      <i class="ti ti-chevron-down help-chevron" id="chev-guide-submit" style="font-size:14px;color:rgba(255,255,255,0.4);transition:transform 0.2s;"></i>
-    </div>
-    <div class="help-desc">Step-by-step guide on how to report a problem.</div>
-    <div class="help-expand" id="guide-submit" style="display:none;margin-top:10px;border-top:0.5px solid rgba(255,255,255,0.08);padding-top:10px;">
-      <ol style="padding-left:16px;display:flex;flex-direction:column;gap:7px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.6;">
-        <li>On the left sidebar, click <strong style="color:#fff;">Report a Problem.</strong></li>
-        <li>Select a <strong style="color:#fff;">Category</strong> from the dropdown that best fits your concern (e.g. IT, HR, Maintenance).</li>
-        <li>Select the appropriate <strong style="color:#fff;">Sub-Category</strong> under your chosen category.</li>
-        <li>In the description box, <strong style="color:#fff;">clearly describe your concern</strong> with as much detail as possible. You may type up to 1,000 characters.</li>
-        <li>If applicable, <strong style="color:#fff;">attach a file</strong> such as a screenshot or document by clicking the attachment area or dragging the file into it.</li>
-        <li>Once everything is filled out, click the <strong style="color:#fff;">Submit Report</strong> button.</li>
-        <li>Your concern will be submitted and will appear in the <strong style="color:#fff;">Recent Reports</strong> table on the right side of the dashboard.</li>
-      </ol>
-    </div>
-  </div>
-</div>
+            <div class="help-item" onclick="if(event.target.closest('form')||event.target.closest('input')||event.target.closest('textarea')||event.target.closest('button[type=submit]'))return; toggleHelp('msg-form')">
+              <div class="help-icon"><i class="ti ti-mail"></i></div>
+              <div style="width:100%;">
+                <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  Send a Message to Admin
+                  <i class="ti ti-chevron-down help-chevron" id="chev-msg-form" style="font-size:14px;color:var(--text-3);transition:transform 0.2s;"></i>
+                </div>
+                <div class="help-desc">Send a direct message to the admin team.</div>
+                <div class="help-expand" id="msg-form" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+                  <form method="post" action="{% url 'send_message' %}">
+                    {% csrf_token %}
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                      <input type="text" name="subject" placeholder="Subject" required
+                        style="background:var(--bg-input);border:1px solid var(--border-md);color:var(--text-1);font-size:12px;padding:9px 12px;border-radius:var(--radius-sm);width:100%;outline:none;font-family:var(--font);">
+                      <textarea name="body" placeholder="Type your message here..." required rows="4"
+                        style="background:var(--bg-input);border:1px solid var(--border-md);color:var(--text-1);font-size:12px;padding:9px 12px;border-radius:var(--radius-sm);width:100%;outline:none;font-family:var(--font);resize:vertical;"></textarea>
+                      <button type="submit" style="background:var(--accent);border:none;color:#fff;padding:9px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;width:100%;font-family:var(--font);">
+                        <i class="ti ti-send"></i> Send Message
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
 
-      <!-- Tracking Your Concern -->
-     <!-- Tracking Your Concern -->
-<div class="help-item" onclick="toggleHelp('guide-track')">
-  <div class="help-icon"><i class="ti ti-refresh"></i></div>
-  <div style="width:100%;">
-    <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
-      Tracking Your Concern
-      <i class="ti ti-chevron-down help-chevron" id="chev-guide-track" style="font-size:14px;color:rgba(255,255,255,0.4);transition:transform 0.2s;"></i>
-    </div>
-    <div class="help-desc">Learn how to monitor the status of your submitted concerns.</div>
-    <div class="help-expand" id="guide-track" style="display:none;margin-top:10px;border-top:0.5px solid rgba(255,255,255,0.08);padding-top:10px;">
-      <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.7;">
-        <p>To track your concern, click the <strong style="color:#fff;">Notifications</strong> tab on the left sidebar.</p>
-        <p>Inside Notifications, you will be able to see:</p>
-        <ul style="padding-left:16px;display:flex;flex-direction:column;gap:5px;">
-          <li>The <strong style="color:#fff;">current status</strong> of each concern you have submitted.</li>
-          <li>The <strong style="color:#fff;">name of the staff member</strong> assigned to handle your concern.</li>
-          <li>Any <strong style="color:#fff;">remarks or updates</strong> added by the assigned personnel.</li>
-        </ul>
-        <div style="display:flex;flex-direction:column;gap:6px;margin:6px 0 2px 0;">
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="status-pill pill-pending"><span class="dot"></span>Pending</span>
-            <span>— Concern received, awaiting assignment.</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="status-pill pill-progress"><span class="dot"></span>In Progress</span>
-            <span>— A staff member is actively handling your concern.</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="status-pill pill-resolved"><span class="dot"></span>Resolved</span>
-            <span>— Your concern has been addressed and closed.</span>
+            <div class="help-item" onclick="toggleHelp('guide-submit')">
+              <div class="help-icon"><i class="ti ti-file-text"></i></div>
+              <div style="width:100%;">
+                <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  How to Submit a Concern
+                  <i class="ti ti-chevron-down help-chevron" id="chev-guide-submit" style="font-size:14px;color:var(--text-3);transition:transform 0.2s;"></i>
+                </div>
+                <div class="help-desc">Step-by-step guide on how to report a problem.</div>
+                <div class="help-expand" id="guide-submit" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+                  <ol style="padding-left:16px;display:flex;flex-direction:column;gap:7px;font-size:11px;color:var(--text-2);line-height:1.7;">
+                    <li>On the left sidebar, click <strong style="color:var(--text-1);">Report a Problem.</strong></li>
+                    <li>Select a <strong style="color:var(--text-1);">Category</strong> from the dropdown.</li>
+                    <li>Select the appropriate <strong style="color:var(--text-1);">Sub-Category.</strong></li>
+                    <li><strong style="color:var(--text-1);">Describe your concern</strong> clearly (up to 1,000 characters).</li>
+                    <li>Optionally <strong style="color:var(--text-1);">attach a file</strong> (screenshot or document).</li>
+                    <li>Click <strong style="color:var(--text-1);">Submit Report.</strong></li>
+                    <li>Your concern appears in the <strong style="color:var(--text-1);">Recent Reports</strong> table.</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            <div class="help-item" onclick="toggleHelp('guide-track')">
+              <div class="help-icon"><i class="ti ti-refresh"></i></div>
+              <div style="width:100%;">
+                <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  Tracking Your Concern
+                  <i class="ti ti-chevron-down help-chevron" id="chev-guide-track" style="font-size:14px;color:var(--text-3);transition:transform 0.2s;"></i>
+                </div>
+                <div class="help-desc">Learn how to monitor the status of your submitted concerns.</div>
+                <div class="help-expand" id="guide-track" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+                  <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text-2);line-height:1.7;">
+                    <p>Click the <strong style="color:var(--text-1);">Notifications</strong> tab to track your concerns.</p>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+                      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill pill-pending"><span class="dot"></span>Pending</span><span>Concern received, awaiting assignment.</span></div>
+                      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill pill-progress"><span class="dot"></span>In Progress</span><span>Staff actively handling your concern.</span></div>
+                      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill pill-resolved"><span class="dot"></span>Resolved</span><span>Concern addressed and closed.</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="help-item" onclick="toggleHelp('guide-about')">
+              <div class="help-icon"><i class="ti ti-info-circle"></i></div>
+              <div style="width:100%;">
+                <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  About OPASCOR Portal
+                  <i class="ti ti-chevron-down help-chevron" id="chev-guide-about" style="font-size:14px;color:var(--text-3);transition:transform 0.2s;"></i>
+                </div>
+                <div class="help-desc">Learn more about the OPASCOR Ticketing System.</div>
+                <div class="help-expand" id="guide-about" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+                  <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text-2);line-height:1.8;">
+                    <p>The <strong style="color:var(--text-1);">OPASCOR Ticketing System</strong> is an internal concern management portal for employees of <strong style="color:var(--text-1);">Oriental Port and Allied Services Corporation</strong>.</p>
+                    <p>Built to provide a <strong style="color:var(--text-1);">fast, organized, and transparent</strong> way to report and resolve workplace concerns.</p>
+                    <ul style="padding-left:16px;display:flex;flex-direction:column;gap:5px;">
+                      <li>Submit concerns across IT, HR, Maintenance, and Operations.</li>
+                      <li>Automatically routes concerns to the right department.</li>
+                      <li>Real-time status updates and notifications.</li>
+                      <li>Complete concern history for accountability.</li>
+                    </ul>
+                    <p style="margin-top:4px;color:var(--text-3);">Developed and maintained by the <strong style="color:var(--text-2);">MIS Department</strong> of OPASCOR.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>
-    </div>
-  </div>
-</div>
-      <!-- About OPASCOR Portal -->
-      <!-- About OPASCOR Portal -->
-<div class="help-item" onclick="toggleHelp('guide-about')">
-  <div class="help-icon"><i class="ti ti-info-circle"></i></div>
-  <div style="width:100%;">
-    <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
-      About OPASCOR Portal
-      <i class="ti ti-chevron-down help-chevron" id="chev-guide-about" style="font-size:14px;color:rgba(255,255,255,0.4);transition:transform 0.2s;"></i>
-    </div>
-    <div class="help-desc">Learn more about the OPASCOR Ticketing System.</div>
-    <div class="help-expand" id="guide-about" style="display:none;margin-top:10px;border-top:0.5px solid rgba(255,255,255,0.08);padding-top:10px;">
-      <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:rgba(255,255,255,0.6);line-height:1.8;">
-        <p>The <strong style="color:#fff;">OPASCOR Ticketing System</strong> is an internal concern management portal developed exclusively for the employees of <strong style="color:#fff;">Oriental Port and Allied Services Corporation (OPASCOR)</strong>.</p>
-        <p>This system was built to provide a <strong style="color:#fff;">fast, organized, and transparent</strong> way for employees to report workplace concerns and for departments to respond to them efficiently.</p>
-        <p><strong style="color:#fff;">What this system does:</strong></p>
-        <ul style="padding-left:16px;display:flex;flex-direction:column;gap:5px;">
-          <li>Allows employees to submit concerns across different departments such as IT, HR, Maintenance, and Operations.</li>
-          <li>Automatically routes each concern to the appropriate department for action.</li>
-          <li>Enables department staff to assign, update, and resolve concerns.</li>
-          <li>Keeps employees informed through real-time status updates and notifications.</li>
-          <li>Maintains a complete history of all submitted concerns for reference and accountability.</li>
-        </ul>
-        <p style="margin-top:4px;">This portal is developed and maintained by the <strong style="color:#fff;">MIS Department</strong> of OPASCOR. For any system-related issues or feedback, please reach out via the Contact IT Support or Email Support options above.</p>
-      </div>
+
     </div>
   </div>
 </div>
 {% endwith %}
 
 <script>
-  /* ── Help expand toggle ── */
-function toggleHelp(id) {
-  var el = document.getElementById(id);
-  var chev = document.getElementById('chev-' + id);
-  var isOpen = el.style.display === 'block';
-  el.style.display = isOpen ? 'none' : 'block';
-  chev.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+/* ── Clock ── */
+function updateClock() {
+  var now = new Date();
+  var h = now.getHours().toString().padStart(2,'0');
+  var m = now.getMinutes().toString().padStart(2,'0');
+  document.getElementById('topbar-clock').textContent = h + ':' + m;
 }
+updateClock();
+setInterval(updateClock, 10000);
+
 /* ── View switcher ── */
-function switchView(name) {
+var pageNames = { report: 'Report a Problem', history: 'Concern History', notifications: 'Notifications', help: 'Help & Support' };
+function switchView(name, btn) {
   document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
   document.querySelectorAll('.sb-item').forEach(function(b) { b.classList.remove('active'); });
   document.getElementById('view-' + name).classList.add('active');
-  event.currentTarget.classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbar-page').textContent = pageNames[name] || name;
 }
 
 /* ── Sidebar toggle ── */
@@ -818,23 +878,16 @@ function toggleSidebar() {
 var catSel = document.getElementById('cat-sel');
 var subcatSel = document.getElementById('subcat-sel');
 var allOpts = Array.from(subcatSel.querySelectorAll('option[data-parent]'));
-
 function filterSubcats() {
   var chosen = catSel.value;
   allOpts.forEach(function(opt) {
-    if (!chosen || opt.dataset.parent === chosen) {
-      opt.style.display = '';
-    } else {
-      opt.style.display = 'none';
-      if (opt.selected) opt.selected = false;
-    }
+    opt.style.display = (!chosen || opt.dataset.parent === chosen) ? '' : 'none';
+    if (opt.dataset.parent !== chosen && opt.selected) opt.selected = false;
   });
   if (chosen) {
     var first = allOpts.find(function(o) { return o.dataset.parent === chosen; });
     if (first) first.selected = true;
-  } else {
-    subcatSel.value = '';
-  }
+  } else { subcatSel.value = ''; }
 }
 catSel.addEventListener('change', filterSubcats);
 filterSubcats();
@@ -842,7 +895,12 @@ filterSubcats();
 /* ── Char counter ── */
 var descArea = document.getElementById('desc-area');
 var charNum = document.getElementById('char-num');
-function updateChar() { charNum.textContent = descArea.value.length; }
+var charCount = descArea.closest('.form-group').querySelector('.char-count');
+function updateChar() {
+  var len = descArea.value.length;
+  charNum.textContent = len;
+  charCount.className = 'char-count' + (len > 900 ? ' full' : len > 700 ? ' near' : '');
+}
 descArea.addEventListener('input', updateChar);
 
 /* ── File attach ── */
@@ -851,7 +909,6 @@ var attachZone = document.getElementById('attach-zone');
 var filePreview = document.getElementById('file-preview');
 var fileNameEl = document.getElementById('file-name');
 var fileRemove = document.getElementById('file-remove');
-
 fileInput.addEventListener('change', function() {
   if (fileInput.files && fileInput.files[0]) {
     fileNameEl.textContent = fileInput.files[0].name;
@@ -865,16 +922,10 @@ fileRemove.addEventListener('click', function() {
   filePreview.style.display = 'none';
   attachZone.style.display = 'flex';
 });
-attachZone.addEventListener('dragover', function(e) {
-  e.preventDefault();
-  attachZone.style.borderColor = '#3498db';
-});
-attachZone.addEventListener('dragleave', function() {
-  attachZone.style.borderColor = '';
-});
+attachZone.addEventListener('dragover', function(e) { e.preventDefault(); attachZone.style.borderColor = '#3b82f6'; });
+attachZone.addEventListener('dragleave', function() { attachZone.style.borderColor = ''; });
 attachZone.addEventListener('drop', function(e) {
-  e.preventDefault();
-  attachZone.style.borderColor = '';
+  e.preventDefault(); attachZone.style.borderColor = '';
   if (e.dataTransfer.files && e.dataTransfer.files[0]) {
     fileInput.files = e.dataTransfer.files;
     fileNameEl.textContent = e.dataTransfer.files[0].name;
@@ -883,7 +934,16 @@ attachZone.addEventListener('drop', function(e) {
   }
 });
 
-/* ── Auto-switch to notifications if redirected with ?tab=notifications ── */
+/* ── Help accordion ── */
+function toggleHelp(id) {
+  var el = document.getElementById(id);
+  var chev = document.getElementById('chev-' + id);
+  var isOpen = el.style.display === 'block';
+  el.style.display = isOpen ? 'none' : 'block';
+  chev.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+/* ── Auto-switch via URL param ── */
 var urlParams = new URLSearchParams(window.location.search);
 if (urlParams.get('tab') === 'notifications') {
   document.querySelectorAll('.sb-item')[2].click();

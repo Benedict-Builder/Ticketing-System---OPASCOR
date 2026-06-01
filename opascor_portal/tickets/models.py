@@ -73,30 +73,39 @@ class Concern(models.Model):
 
     def __str__(self):
         return f"Concern #{self.id} - {self.user.username}"
+    def __str__(self):
+        return f"Concern #{self.id} - {self.user.username}"
+
+class Message(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    subject = models.CharField(max_length=200)
+    body = models.TextField()
+    date_sent = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Message from {self.sender.username} - {self.subject}"
+
+# Create your models here.
+from django.db.models.signals import post_save
 
 # Create your models here.
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.get_or_create(
-            user=instance,
-            defaults={'department': 'Admin', 'is_admin': instance.is_staff}
-        )
-
-@receiver(post_save, sender=User)
+ 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, 'userprofile'):
         instance.userprofile.is_admin = instance.is_staff
         instance.userprofile.save()
     else:
-        UserProfile.objects.get_or_create(
-            user=instance,
-            defaults={
-                'department': 'Admin',
-                'is_admin': instance.is_staff
-            }
-        )
+        # Auto-create profile for superusers/staff with no profile
+        if instance.is_staff or instance.is_superuser:
+            UserProfile.objects.get_or_create(
+                user=instance,
+                defaults={
+                    'department': 'Admin',
+                    'is_admin': True
+                }
+            )

@@ -1,326 +1,1155 @@
 {% extends 'tickets/base.html' %}
 {% load static %}
+{% load dict_extras %}
 {% block content %}
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-.shell { display: flex; height: 100vh; font-family: var(--font-sans, sans-serif); overflow: hidden; }
-.sidebar-col { width: 52px; background: #0b1f4a; display: flex; flex-direction: column; align-items: center; padding: 10px 0; gap: 4px; flex-shrink: 0; overflow: visible; z-index: 100; }
-.sidebar-exp { width: 175px; background: #0b1f4a; display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden; z-index: 100; }
-.ico-btn { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 22px; cursor: pointer; border: none; background: transparent; flex-shrink: 0; transition: background 0.15s; color: #ffffff; position: relative; text-decoration: none; }
-.ico-btn i { color: #ffffff !important; font-size: 22px; }
-.ico-btn:hover { background: rgba(255,255,255,0.12); }
-.ico-btn.active { background: rgba(255,255,255,0.14); }
-.ico-btn .sb-tip { display: none; position: absolute; left: 50px; top: 50%; transform: translateY(-50%); background: #0d1535; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; padding: 6px 14px; white-space: nowrap; color: #fff; font-size: 0.78rem; font-weight: 500; z-index: 200; box-shadow: 0 4px 16px rgba(0,0,0,0.4); pointer-events: none; }
-.ico-btn .sb-tip::before { content: ''; position: absolute; left: -6px; top: 50%; transform: translateY(-50%); border: 6px solid transparent; border-right-color: rgba(255,255,255,0.15); }
-.ico-btn:hover .sb-tip { display: block; }
-.logo-box { width: 48px; height: 48px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; margin-bottom: 4px; }
-.admin-avatar { width: 36px; height: 36px; border-radius: 50%; background: #1a6eb5; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #fff; cursor: pointer; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.25); text-transform: uppercase; }
-.exp-top { background: #0b1f4a; height: 52px; display: flex; align-items: center; padding: 0 12px; gap: 10px; border-bottom: 0.5px solid rgba(255,255,255,0.1); flex-shrink: 0; cursor: pointer; }
-.exp-logo-box { width: 48px; height: 48px; background: transparent; border: none; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.exp-brand { display: flex; flex-direction: column; flex: 1; justify-content: center; }
-.exp-brand-name { font-size: 13px; font-weight: 800; color: #ffffff; letter-spacing: 2.5px; line-height: 1.2; }
-.exp-brand-sub { font-size: 8.5px; color: rgba(255,255,255,0.5); line-height: 1.35; white-space: normal; }
-.exp-avatar-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px 12px; border-bottom: 0.5px solid rgba(255,255,255,0.1); flex-shrink: 0; }
-.exp-avatar { width: 34px; height: 34px; border-radius: 50%; background: #1a6eb5; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #fff; font-weight: 600; flex-shrink: 0; border: 2px solid rgba(255,255,255,0.25); text-transform: uppercase; }
-.exp-name { font-size: 12px; color: #ffffff; white-space: nowrap; }
-.exp-role { font-size: 10px; color: rgba(255,255,255,0.5); }
-.nav-items-wrap { flex: 1; overflow-y: auto; padding: 6px 0; }
-.nav-item { display: flex; align-items: center; gap: 10px; padding: 8px 14px; color: #ffffff; font-size: 12.5px; cursor: pointer; white-space: nowrap; transition: background 0.15s; text-decoration: none; }
-.nav-item:hover { background: rgba(255,255,255,0.09); color: #fff; }
-.nav-item.active { background: rgba(255,255,255,0.12); }
-.nav-item i, .nav-item svg { font-size: 18px; flex-shrink: 0; color: #ffffff !important; }
-.nav-div { height: 0.5px; background: rgba(255,255,255,0.1); margin: 4px 12px; }
-.dept-label { font-size: 9px; color: rgba(255,255,255,0.45); letter-spacing: 0.8px; padding: 8px 14px 2px; }
-.main { flex: 1; background: #0f2455; display: flex; flex-direction: column; overflow: hidden; }
-.topbar { background: #0b1f4a; height: 52px; display: flex; align-items: center; padding: 0 20px; border-bottom: 0.5px solid rgba(255,255,255,0.1); flex-shrink: 0; gap: 10px; }
-.topbar-title { font-size: 14px; font-weight: 600; color: #fff; }
-.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
-.admin-badge { background: #1a6eb5; color: #fff; border: none; font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.05em; }
-.welcome-txt { font-size: 11px; color: rgba(255,255,255,0.75); white-space: nowrap; }
-.logout-btn { font-size: 11px; color: rgba(255,255,255,0.6); border: 0.5px solid rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 6px; cursor: pointer; background: transparent; transition: all 0.2s; }
-.logout-btn:hover { border-color: #cc1a1a; color: #ff6b6b; }
-.content { padding: 14px; flex: 1; overflow-y: auto; }
-.stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
-.stat-card { background: #0d2257; border: 0.5px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 11px 13px; }
-.stat-label { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 0.5px; margin-bottom: 4px; text-transform: uppercase; }
-.stat-val { font-size: 22px; font-weight: 600; color: #fff; }
-.stat-val.gold { color: #f1c40f; }
-.stat-val.orange { color: #e67e22; }
-.stat-val.green { color: #2ecc71; }
-.tickets-card { background: #0d2257; border: 0.5px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 13px; }
-.tickets-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-.tickets-title::before { content: ''; width: 3px; height: 14px; background: #3498db; border-radius: 2px; display: inline-block; }
-.filter-row { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 11px; color: rgba(255,255,255,0.55); }
-.filter-sel { background: #0b1f4a; border: 0.5px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.8); font-size: 11px; padding: 4px 8px; border-radius: 6px; }
-.filter-sel option { background: #0d1535; color: #fff; }
-.tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
-.tbl th { color: rgba(255,255,255,0.4); font-weight: 500; padding: 5px 7px; text-align: left; border-bottom: 0.5px solid rgba(255,255,255,0.1); font-size: 9px; letter-spacing: 0.4px; text-transform: uppercase; }
-.tbl td { padding: 7px 7px; color: rgba(255,255,255,0.78); border-bottom: 0.5px solid rgba(255,255,255,0.06); vertical-align: middle; }
-.tbl-id { font-family: monospace; font-size: 11px; color: #6ea4ff; }
-.dept-badge { background: #1a4a8a; color: #7ab3f0; font-size: 9px; padding: 2px 6px; border-radius: 4px; }
-.status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 600; }
-.pill-progress { background: rgba(230,140,30,0.2); color: #e67e22; }
-.pill-pending { background: rgba(241,196,15,0.15); color: #f1c40f; }
-.pill-resolved { background: rgba(46,204,113,0.15); color: #2ecc71; }
-.dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
-.update-form { display: flex; flex-direction: column; gap: 3px; }
-.act-sel, .act-inp { background: #0b1f4a; border: 0.5px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); font-size: 9px; padding: 4px 6px; border-radius: 4px; width: 100%; min-width: 90px; }
-.act-sel option { background: #0d1535; color: #fff; }
-.act-sel:focus, .act-inp:focus { outline: none; border-color: #3498db; background: rgba(52,152,219,0.12); }
-.act-btn { background: linear-gradient(135deg, #1a6aff, #2255dd); border: none; color: #fff; padding: 4px 0; border-radius: 4px; font-size: 9px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 1px; }
-.act-btn:hover { background: linear-gradient(135deg, #2255dd, #1a3a9f); }
-.alert { background: rgba(46,204,113,0.15); border: 0.5px solid rgba(46,204,113,0.35); color: #2ecc71; padding: 8px 14px; border-radius: 6px; font-size: 11px; margin-bottom: 12px; }
-@media (max-width: 900px) { .stat-row { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 640px) { .sidebar-col, .sidebar-exp { display: none; } .stat-row { grid-template-columns: 1fr; } }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg-base:    #0b0f1a;
+  --bg-surface: #111827;
+  --bg-card:    #151d2e;
+  --bg-hover:   #1a2540;
+  --bg-input:   #1e2a3d;
+  --border:     rgba(255,255,255,0.07);
+  --border-2:   rgba(255,255,255,0.12);
+  --accent:     #3b82f6;
+  --accent-glow:rgba(59,130,246,0.25);
+  --amber:      #f59e0b;
+  --orange:     #f97316;
+  --green:      #10b981;
+  --purple:     #8b5cf6;
+  --text-1:     #f1f5f9;
+  --text-2:     #94a3b8;
+  --text-3:     #64748b;
+  --font:       'Plus Jakarta Sans', sans-serif;
+  --mono:       'JetBrains Mono', monospace;
+  --sb-w:       220px;
+  --radius:     12px;
+}
+
+html, body { height: 100%; overflow: hidden; background: var(--bg-base); }
+
+.shell {
+  display: flex; height: 100vh;
+  font-family: var(--font);
+  background: var(--bg-base);
+  overflow: hidden;
+}
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: var(--sb-w);
+  background: var(--bg-surface);
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  flex-shrink: 0; overflow: hidden;
+  transition: width 0.25s ease;
+  position: relative; z-index: 50;
+}
+.sidebar.collapsed { width: 60px; }
+.sidebar.collapsed .sb-brand,
+.sidebar.collapsed .sb-user-info,
+.sidebar.collapsed .nav-lbl,
+.sidebar.collapsed .nav-badge,
+.sidebar.collapsed .nav-sec,
+.sidebar.collapsed .sb-foot-label { display: none; }
+
+.sb-head {
+  padding: 16px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+  cursor: pointer; user-select: none; flex-shrink: 0;
+}
+.sb-logo {
+  width: 36px; height: 36px; border-radius: 9px;
+  background: var(--accent); display: flex;
+  align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.sb-logo img { width: 36px; height: 36px; object-fit: contain; }
+.sb-brand-name { font-size: 13px; font-weight: 800; color: var(--text-1); letter-spacing: 1px; }
+.sb-brand-sub  { font-size: 9px; color: var(--text-3); margin-top: 1px; }
+
+.sb-user {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sb-av {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0; text-transform: uppercase;
+}
+.sb-uname { font-size: 12px; color: var(--text-1); font-weight: 600; white-space: nowrap; }
+.sb-urole  { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+
+.sb-nav { flex: 1; overflow-y: auto; padding: 10px 8px; overflow-x: hidden; }
+.sb-nav::-webkit-scrollbar { width: 0; }
+
+.nav-sec {
+  font-size: 9px; color: var(--text-3);
+  letter-spacing: 1.2px; padding: 12px 8px 5px;
+  text-transform: uppercase; white-space: nowrap; font-weight: 600;
+}
+.nav-a {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; color: var(--text-3);
+  font-size: 12px; font-weight: 500;
+  cursor: pointer; text-decoration: none;
+  border-radius: 8px; transition: all 0.15s;
+  position: relative; margin-bottom: 1px;
+  white-space: nowrap; overflow: hidden;
+}
+.nav-a:hover { background: var(--bg-hover); color: var(--text-1); }
+.nav-a.active {
+  background: rgba(59,130,246,0.15);
+  color: #93c5fd;
+}
+.nav-a.active::before {
+  content: '';
+  position: absolute; left: 0; top: 20%; bottom: 20%;
+  width: 3px; border-radius: 0 3px 3px 0;
+  background: var(--accent);
+}
+.nav-a i { font-size: 16px; flex-shrink: 0; }
+.nav-lbl { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.nav-badge {
+  background: #ef4444; color: #fff;
+  font-size: 9px; font-weight: 700;
+  min-width: 17px; height: 17px; border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 4px; flex-shrink: 0;
+}
+.nav-div { height: 1px; background: var(--border); margin: 6px 4px; }
+
+.sb-foot { padding: 8px 8px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.sb-collapse-btn {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 10px; color: var(--text-3);
+  font-size: 12px; font-weight: 500;
+  cursor: pointer; border-radius: 8px;
+  transition: all 0.15s; margin-bottom: 2px;
+  user-select: none;
+}
+.sb-collapse-btn:hover { background: var(--bg-hover); color: var(--text-1); }
+.sb-collapse-btn i { font-size: 16px; flex-shrink: 0; transition: transform 0.25s; }
+.sidebar.collapsed .sb-collapse-btn i { transform: rotate(180deg); }
+
+/* ── MAIN ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+
+/* ── TOPBAR ── */
+.topbar {
+  background: var(--bg-surface);
+  height: 58px;
+  display: flex; align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0; gap: 10px;
+}
+.tb-menu {
+  width: 34px; height: 34px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-2); font-size: 17px;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.tb-menu:hover { background: var(--bg-hover); color: var(--text-1); }
+.tb-breadcrumb { display: flex; align-items: center; gap: 6px; }
+.tb-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
+.tb-sep { color: var(--text-3); font-size: 13px; }
+.tb-crumb { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-3); }
+.tb-crumb i { font-size: 14px; }
+.tb-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.tb-icon {
+  width: 36px; height: 36px; border-radius: 9px;
+  border: 1px solid var(--border); background: var(--bg-card);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-2); font-size: 17px;
+  position: relative; text-decoration: none;
+  transition: all 0.15s;
+}
+.tb-icon:hover { background: var(--bg-hover); color: var(--text-1); }
+.tb-icon .nd {
+  position: absolute; top: 7px; right: 7px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #ef4444; border: 1.5px solid var(--bg-surface);
+}
+.notif-badge {
+  position: absolute; top: -4px; right: -4px;
+  background: #ef4444; color: #fff;
+  font-size: 8px; font-weight: 700;
+  min-width: 16px; height: 16px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0 3px; border: 1.5px solid var(--bg-surface);
+}
+.admin-tag {
+  background: var(--bg-card); color: var(--text-1);
+  font-size: 10px; font-weight: 700;
+  padding: 5px 12px; border-radius: 7px;
+  border: 1px solid var(--border); letter-spacing: 0.5px;
+}
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 10px 5px 5px;
+  border-radius: 9px; border: 1px solid var(--border);
+  background: var(--bg-card); cursor: pointer;
+  transition: background 0.15s;
+}
+.user-chip:hover { background: var(--bg-hover); }
+.chip-av {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; color: #fff; font-weight: 700; text-transform: uppercase;
+}
+.chip-name { font-size: 11px; color: var(--text-2); font-weight: 500; }
+.chip-role { font-size: 9px; color: var(--text-3); }
+.chip-caret { color: var(--text-3); font-size: 13px; }
+
+/* ── CONTENT ── */
+.content {
+  padding: 20px; flex: 1;
+  overflow-y: auto; display: flex;
+  flex-direction: column; gap: 18px;
+}
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 2px; }
+
+/* ── ALERTS ── */
+.alert {
+  background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
+  color: #6ee7b7; padding: 10px 16px;
+  border-radius: var(--radius); font-size: 12px;
+}
+
+/* ── STAT CARDS ── */
+.sg { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+
+.sc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 18px 0;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  min-height: 130px;
+}
+.sc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.sc-label {
+  font-size: 10px; font-weight: 600;
+  color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px;
+  margin-bottom: 6px;
+}
+.sc-val { font-size: 36px; font-weight: 800; color: var(--text-1); line-height: 1; }
+.sc-hint { font-size: 10px; color: var(--text-3); margin-top: 4px; }
+.sc-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+}
+.si-b { background: rgba(59,130,246,0.15); color: var(--accent); }
+.si-a { background: rgba(245,158,11,0.15); color: var(--amber); }
+.si-o { background: rgba(249,115,22,0.15); color: var(--orange); }
+.si-g { background: rgba(16,185,129,0.15); color: var(--green); }
+
+.sc-wave {
+  margin-top: auto; height: 48px; width: calc(100% + 36px);
+  margin-left: -18px; display: block;
+}
+
+/* ── MIDDLE GRID ── */
+.mid-grid { display: grid; grid-template-columns: 1fr 300px 260px; gap: 14px; }
+
+/* ── CHART CARD ── */
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.chart-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.chart-title { font-size: 13px; font-weight: 700; color: var(--text-1); }
+.chart-filter {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--bg-input); border: 1px solid var(--border);
+  border-radius: 8px; padding: 5px 10px;
+  font-size: 11px; color: var(--text-2); cursor: pointer;
+}
+.chart-filter i { font-size: 13px; }
+
+/* ── DONUT CARD ── */
+.donut-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex; flex-direction: column;
+}
+.donut-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 12px; }
+.donut-center {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+}
+.donut-val { font-size: 26px; font-weight: 800; color: var(--text-1); }
+.donut-lbl { font-size: 10px; color: var(--text-3); }
+.donut-legend { display: flex; flex-direction: column; gap: 6px; }
+.dl-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.dl-dot-name { display: flex; align-items: center; gap: 7px; }
+.dl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dl-name { font-size: 11px; color: var(--text-2); }
+.dl-pct { font-size: 11px; color: var(--text-3); font-family: var(--mono); }
+
+/* ── ACTIVITY CARD ── */
+.activity-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  display: flex; flex-direction: column;
+}
+.act-list { flex: 1; display: flex; flex-direction: column; gap: 12px; margin-top: 4px; overflow: hidden; }
+.act-item { display: flex; align-items: flex-start; gap: 10px; }
+.act-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0; margin-top: 1px;
+}
+.act-icon.ai-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
+.act-icon.ai-blue  { background: rgba(59,130,246,0.15);  color: var(--accent); }
+.act-icon.ai-green { background: rgba(16,185,129,0.15);  color: var(--green); }
+.act-icon.ai-purple{ background: rgba(139,92,246,0.15);  color: var(--purple); }
+.act-body { flex: 1; min-width: 0; }
+.act-text { font-size: 11px; color: var(--text-2); line-height: 1.4; }
+.act-text strong { color: var(--text-1); font-weight: 600; }
+.act-time { font-size: 10px; color: var(--text-3); margin-top: 2px; }
+.view-all {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  margin-top: 14px; padding: 9px;
+  border: 1px solid var(--border); border-radius: 8px;
+  font-size: 11px; color: var(--text-3); cursor: pointer;
+  transition: all 0.15s; text-decoration: none; font-weight: 500;
+}
+.view-all:hover { background: var(--bg-hover); color: var(--text-1); }
+
+/* ── TABLE CARD ── */
+.tc {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.tc-hd {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+  flex-wrap: wrap; gap: 8px;
+}
+.tc-title { font-size: 13px; font-weight: 700; color: var(--text-1); }
+.tc-count {
+  font-size: 11px; color: var(--text-3);
+  background: rgba(255,255,255,0.06); padding: 3px 10px;
+  border-radius: 20px; font-weight: 600;
+  border: 1px solid var(--border);
+}
+.tc-spacer { flex: 1; }
+.sw {
+  display: flex; align-items: center; gap: 7px;
+  border: 1px solid var(--border); border-radius: 8px;
+  padding: 0 12px; height: 34px;
+  background: var(--bg-input); transition: border-color 0.15s;
+}
+.sw:focus-within { border-color: var(--accent); }
+.sw i { font-size: 14px; color: var(--text-3); }
+.sw input {
+  border: none; background: transparent;
+  font-size: 12px; color: var(--text-1);
+  outline: none; width: 160px;
+  font-family: var(--font);
+}
+.sw input::placeholder { color: var(--text-3); }
+.ds {
+  height: 34px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--bg-input);
+  color: var(--text-2); font-size: 12px;
+  padding: 0 10px; outline: none;
+  font-family: var(--font); cursor: pointer;
+}
+.ds:focus { border-color: var(--accent); }
+.ds option { background: var(--bg-surface); }
+.btn-new {
+  display: flex; align-items: center; gap: 6px;
+  height: 34px; padding: 0 14px;
+  background: var(--accent); border: none;
+  color: #fff; font-size: 12px; font-weight: 600;
+  border-radius: 8px; cursor: pointer;
+  font-family: var(--font); transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn-new:hover { background: #2563eb; }
+.btn-cal {
+  width: 34px; height: 34px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-input);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-2); font-size: 16px;
+  transition: all 0.15s;
+}
+.btn-cal:hover { background: var(--bg-hover); color: var(--text-1); }
+
+.tc-body { overflow-x: auto; }
+
+/* ── TABLE ── */
+.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.tbl th {
+  color: var(--text-3); font-weight: 600;
+  padding: 10px 14px; text-align: left;
+  border-bottom: 1px solid var(--border);
+  font-size: 10px; letter-spacing: 0.6px;
+  text-transform: uppercase; background: rgba(255,255,255,0.02);
+  white-space: nowrap;
+}
+.tbl td {
+  padding: 12px 14px; color: var(--text-2);
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.tbl tbody tr:hover td { background: var(--bg-hover); }
+.tbl tbody tr:last-child td { border-bottom: none; }
+
+.tid { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 600; }
+
+.dp {
+  display: inline-flex; align-items: center;
+  padding: 3px 8px; border-radius: 5px;
+  font-size: 10px; font-weight: 700; white-space: nowrap;
+}
+.dp-admin   { background: rgba(59,130,246,0.15);  color: #93c5fd; }
+.dp-finance { background: rgba(245,158,11,0.15);  color: #fcd34d; }
+.dp-mis     { background: rgba(139,92,246,0.15);  color: #c4b5fd; }
+.dp-ops     { background: rgba(249,115,22,0.15);  color: #fdba74; }
+.dp-hr      { background: rgba(16,185,129,0.15);  color: #6ee7b7; }
+.dp-security{ background: rgba(239,68,68,0.15);   color: #fca5a5; }
+.dp-default { background: rgba(255,255,255,0.07); color: var(--text-2); }
+
+.sp {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 20px;
+  font-size: 10px; font-weight: 700; white-space: nowrap;
+}
+.sp-p { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
+.sp-i { background: rgba(59,130,246,0.15);  color: #93c5fd;  border: 1px solid rgba(59,130,246,0.25); }
+.sp-r { background: rgba(16,185,129,0.15);  color: #6ee7b7;  border: 1px solid rgba(16,185,129,0.25); }
+.sdot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+.trunc {
+  max-width: 120px; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
+  display: block; color: var(--text-2); font-size: 11px;
+}
+.muted { color: var(--text-3); font-size: 11px; }
+.fw { font-weight: 600; color: var(--text-1); font-size: 12px; }
+
+.eb {
+  width: 28px; height: 28px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--bg-input);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-3); font-size: 14px;
+  transition: all 0.15s;
+}
+.eb:hover { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); color: var(--accent); }
+
+.empty-state { text-align: center; padding: 52px 20px; color: var(--text-3); }
+.empty-state i { font-size: 44px; display: block; margin-bottom: 10px; opacity: 0.3; }
+.empty-state p { font-size: 13px; }
+
+/* ── PAGINATION ── */
+.tc-foot {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 18px; border-top: 1px solid var(--border);
+  flex-wrap: wrap; gap: 8px;
+}
+.pg-info { font-size: 11px; color: var(--text-3); }
+.pg-controls { display: flex; align-items: center; gap: 6px; }
+.pg-btn {
+  width: 30px; height: 30px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--bg-input);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-2); font-size: 13px;
+  transition: all 0.15s;
+}
+.pg-btn:hover { background: var(--bg-hover); color: var(--text-1); }
+.pg-num {
+  width: 30px; height: 30px; border-radius: 7px;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+}
+.pg-size {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--text-3);
+}
+.pg-size select {
+  background: var(--bg-input); border: 1px solid var(--border);
+  color: var(--text-2); border-radius: 7px;
+  padding: 4px 8px; font-size: 11px;
+  font-family: var(--font); outline: none; cursor: pointer;
+}
+
+/* ── MODAL ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 300; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border-radius: 16px; border: 1px solid var(--border-2);
+  padding: 24px; width: 430px; max-width: 95vw;
+  animation: modal-in 0.2s ease;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.md-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; }
+.md-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
+.md-id    { font-size: 11px; color: var(--text-3); margin-top: 3px; font-family: var(--mono); }
+.md-close {
+  width: 30px; height: 30px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--bg-input);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-3); font-size: 16px;
+  transition: all 0.15s; flex-shrink: 0;
+}
+.md-close:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #ef4444; }
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.field     { display: flex; flex-direction: column; gap: 5px; }
+.field-full{ display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+.field label, .field-full label {
+  font-size: 10px; font-weight: 700;
+  color: var(--text-3); text-transform: uppercase; letter-spacing: 0.6px;
+}
+.field select,
+.field input,
+.field-full input {
+  height: 38px; border: 1px solid var(--border);
+  border-radius: 9px; background: var(--bg-input);
+  color: var(--text-1); font-size: 13px;
+  padding: 0 12px; outline: none; width: 100%;
+  font-family: var(--font); transition: all 0.15s;
+}
+.field select option { background: var(--bg-surface); }
+.field select:focus,
+.field input:focus,
+.field-full input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.modal-actions { display: flex; gap: 8px; margin-top: 22px; }
+.btn-cancel {
+  height: 40px; padding: 0 18px; border-radius: 9px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--text-3); font-size: 13px; cursor: pointer;
+  font-family: var(--font); transition: all 0.15s;
+}
+.btn-cancel:hover { background: var(--bg-hover); color: var(--text-2); }
+.btn-save {
+  flex: 1; height: 40px; border-radius: 9px;
+  background: var(--accent); border: none;
+  color: #fff; font-size: 13px; font-weight: 700;
+  cursor: pointer; font-family: var(--font);
+  transition: background 0.15s;
+}
+.btn-save:hover { background: #2563eb; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1100px) {
+  .mid-grid { grid-template-columns: 1fr 1fr; }
+  .activity-card { display: none; }
+}
+@media (max-width: 900px) {
+  .sg { grid-template-columns: 1fr 1fr; }
+  .mid-grid { grid-template-columns: 1fr; }
+  .sidebar { width: 60px; }
+  .sb-brand, .sb-user-info, .nav-lbl, .nav-badge, .nav-sec, .sb-foot-label { display: none; }
+}
+@media (max-width: 640px) {
+  .sg { grid-template-columns: 1fr; }
+  .tb-breadcrumb .tb-sub, .tc-count { display: none; }
+  .content { padding: 12px; }
+}
 </style>
 
 {% with initials=request.user.get_full_name|default:request.user.username %}
 <div class="shell">
 
-  <!-- COLLAPSED SIDEBAR -->
-  <div class="sidebar-col" id="sb-col">
-    <div class="logo-box" onclick="expandSidebar()" title="Expand sidebar">
-      <img src="{% static 'images/opascor_logo.png' %}" style="width:48px;height:48px;object-fit:contain;" alt="OPASCOR">
-    </div>
-    <div class="admin-avatar" title="{{ request.user.get_full_name|default:request.user.username }}">
-      {{ request.user.get_full_name|default:request.user.username|slice:":2" }}
-    </div>
-    <div style="height:4px;"></div>
-
-    <a class="ico-btn {% if not selected_dept %}active{% endif %}" href="?">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span class="sb-tip">Dashboard</span>
-    </a>
-
-    {% for value, label in departments %}
-      <a class="ico-btn {% if selected_dept == value %}active{% endif %}" href="?department={{ value }}">
-        {% if value == 'Admin' %}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M5.5 19c0-2.5 2.9-4.5 6.5-4.5s6.5 2 6.5 4.5"/><path d="M3 13l2 2 4-4" stroke-width="2"/><path d="M2 17s1 4 5 4" stroke-width="1.6"/></svg>
-        {% elif value == 'Finance' %}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><circle cx="12" cy="8" r="6" stroke-width="1.4"/><path d="M9 14c-3 .5-5 2-5 3.5C4 19 7.6 20 12 20s8-1 8-2.5c0-1.5-2-3-5-3.5"/><line x1="12" y1="5" x2="12" y2="11"/><line x1="10" y1="7" x2="14" y2="7"/></svg>
-        {% elif value == 'Information Technology' or value == 'MIS' %}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="14" rx="2"/><line x1="3" y1="20" x2="21" y2="20"/><rect x="7" y="10" width="2" height="4" fill="#ffffff" stroke="none"/><rect x="11" y="7" width="2" height="7" fill="#ffffff" stroke="none"/><rect x="15" y="9" width="2" height="5" fill="#ffffff" stroke="none"/></svg>
-        {% elif value == 'Operations' or value == 'General / Operational Mgmt' %}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-        {% elif value == 'Human Resources' %}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21c0-3 2.9-5.5 6.5-5.5s6.5 2.5 6.5 5.5"/></svg>
-        {% elif value == 'Security' %}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-        {% else %}
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>
-        {% endif %}
-        <span class="sb-tip">{{ label }}</span>
-      </a>
-    {% endfor %}
-
-    <div style="flex:1;"></div>
-    <a class="ico-btn" href="{% url 'logout' %}">
-      <i class="ti ti-logout"></i>
-      <span class="sb-tip">Logout</span>
-    </a>
-  </div>
-
-  <!-- EXPANDED SIDEBAR -->
-  <div class="sidebar-exp" id="sb-exp" style="display:none;">
-    <div class="exp-top" onclick="collapseSidebar()" title="Collapse sidebar">
-      <div class="exp-logo-box">
-        <img src="{% static 'images/opascor_logo.png' %}" style="width:48px;height:48px;object-fit:contain;" alt="OPASCOR">
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-head" onclick="toggleSidebar()" title="Toggle sidebar">
+      <div class="sb-logo">
+        <img src="{% static 'images/opascor_logo.png' %}" alt="OPASCOR">
       </div>
-      <div class="exp-brand">
-        <span class="exp-brand-name">OPASCOR</span>
-        <span class="exp-brand-sub">Oriental Port and Allied<br>Services Corporation</span>
+      <div class="sb-brand">
+        <div class="sb-brand-name">OPASCOR</div>
+        <div class="sb-brand-sub">Oriental Port & Allied Services</div>
       </div>
     </div>
-    <div class="exp-avatar-row">
-      <div class="exp-avatar">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
-      <div>
-        <div class="exp-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-        <div class="exp-role">Administrator</div>
+
+    <div class="sb-user">
+      <div class="sb-av">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
+      <div class="sb-user-info">
+        <div class="sb-uname">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="sb-urole">Administrator</div>
       </div>
     </div>
-    <div class="nav-items-wrap">
-      <a class="nav-item {% if not selected_dept %}active{% endif %}" href="?">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Dashboard</span>
+
+    <div class="sb-nav">
+      <div class="nav-sec">Main Menu</div>
+      <a class="nav-a {% if not selected_dept %}active{% endif %}" href="?">
+        <i class="ti ti-layout-dashboard"></i>
+        <span class="nav-lbl">Dashboard</span>
       </a>
       <div class="nav-div"></div>
-      <div class="dept-label">DEPARTMENTS</div>
+      <div class="nav-sec">Departments</div>
+
       {% for value, label in departments %}
-        <a class="nav-item {% if selected_dept == value %}active{% endif %}" href="?department={{ value }}">
+        <a class="nav-a {% if selected_dept == value %}active{% endif %}" href="?department={{ value }}">
           {% if value == 'Admin' %}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="3"/><path d="M5.5 19c0-2.5 2.9-4.5 6.5-4.5s6.5 2 6.5 4.5"/><path d="M3 13l2 2 4-4" stroke-width="2"/><path d="M2 17s1 4 5 4" stroke-width="1.6"/></svg>
+            <i class="ti ti-shield-check"></i>
           {% elif value == 'Finance' %}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3"/><circle cx="12" cy="8" r="6" stroke-width="1.4"/><path d="M9 14c-3 .5-5 2-5 3.5C4 19 7.6 20 12 20s8-1 8-2.5c0-1.5-2-3-5-3.5"/><line x1="12" y1="5" x2="12" y2="11"/><line x1="10" y1="7" x2="14" y2="7"/></svg>
+            <i class="ti ti-coins"></i>
           {% elif value == 'Information Technology' or value == 'MIS' %}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="14" rx="2"/><line x1="3" y1="20" x2="21" y2="20"/><rect x="7" y="10" width="2" height="4" fill="#ffffff" stroke="none"/><rect x="11" y="7" width="2" height="7" fill="#ffffff" stroke="none"/><rect x="15" y="9" width="2" height="5" fill="#ffffff" stroke="none"/></svg>
+            <i class="ti ti-device-desktop"></i>
           {% elif value == 'Operations' or value == 'General / Operational Mgmt' %}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <i class="ti ti-settings"></i>
           {% elif value == 'Human Resources' %}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"/><path d="M5.5 21c0-3 2.9-5.5 6.5-5.5s6.5 2.5 6.5 5.5"/></svg>
+            <i class="ti ti-users"></i>
           {% elif value == 'Security' %}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            <i class="ti ti-lock"></i>
           {% else %}
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/></svg>
+            <i class="ti ti-building"></i>
           {% endif %}
-          <span>{{ label }}</span>
+          <span class="nav-lbl">{{ label }}</span>
+          {% with count=dept_counts|get_item:value %}
+            {% if count %}<span class="nav-badge">{{ count }}</span>{% endif %}
+          {% endwith %}
         </a>
       {% endfor %}
+
       <div class="nav-div"></div>
-      <a class="nav-item" href="{% url 'logout' %}">
+    </div>
+
+    <div class="sb-foot">
+      <a class="nav-a" href="{% url 'logout' %}" style="color:var(--text-3)">
         <i class="ti ti-logout"></i>
-        <span>Logout</span>
+        <span class="nav-lbl sb-foot-label">Logout</span>
       </a>
+      <div class="sb-collapse-btn" onclick="toggleSidebar()">
+        <i class="ti ti-layout-sidebar-left-collapse"></i>
+        <span class="sb-foot-label">Collapse</span>
+      </div>
     </div>
   </div>
 
-  <!-- MAIN CONTENT -->
+  <!-- ── MAIN ── -->
   <div class="main">
+
+    <!-- TOPBAR -->
     <div class="topbar">
-      <span class="topbar-title">Admin Dashboard</span>
-      <div class="topbar-right">
-        <span class="admin-badge">ADMIN</span>
-        <span class="welcome-txt">Welcome, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong></span>
-        <a href="{% url 'logout' %}"><button class="logout-btn">Logout</button></a>
+      <div class="tb-menu" onclick="toggleSidebar()">
+        <i class="ti ti-menu-2"></i>
+      </div>
+      <div class="tb-breadcrumb">
+        <span class="tb-title">Admin Dashboard</span>
+        <span class="tb-sep">/</span>
+        <span class="tb-crumb">
+          <i class="ti ti-home"></i>
+          {% if selected_dept %}{{ selected_dept }}{% else %}Overview{% endif %}
+        </span>
+      </div>
+      <div class="tb-right">
+        <a href="{% url 'admin_inbox' %}" class="tb-icon" aria-label="Messages">
+          <i class="ti ti-mail"></i>
+          {% if unread_messages %}<span class="nd"></span>{% endif %}
+        </a>
+        <div class="tb-icon" style="position:relative">
+          <i class="ti ti-bell"></i>
+          <span class="notif-badge">3</span>
+        </div>
+        <span class="admin-tag">ADMIN</span>
+        <div class="user-chip">
+          <div class="chip-av">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
+          <div>
+            <div class="chip-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+            <div class="chip-role">Administrator</div>
+          </div>
+          <i class="ti ti-chevron-down chip-caret"></i>
+        </div>
+        <a href="{% url 'logout' %}" style="color:var(--text-3);font-size:18px;text-decoration:none;display:flex;align-items:center;">
+          <i class="ti ti-logout"></i>
+        </a>
       </div>
     </div>
 
+    <!-- CONTENT -->
     <div class="content">
+
       {% for message in messages %}
         <div class="alert">{{ message }}</div>
       {% endfor %}
 
-      <div class="stat-row">
-        <div class="stat-card">
-          <div class="stat-label">Total Concerns</div>
-          <div class="stat-val">{{ total }}</div>
+      <!-- STAT CARDS -->
+      <div class="sg">
+        <div class="sc">
+          <div class="sc-top">
+            <div class="sc-left">
+              <div class="sc-label">Total Concerns</div>
+              <div class="sc-val">{{ total }}</div>
+              <div class="sc-hint">All time tickets</div>
+            </div>
+            <div class="sc-icon si-b"><i class="ti ti-ticket"></i></div>
+          </div>
+          <svg class="sc-wave" viewBox="0 0 200 48" preserveAspectRatio="none" fill="none">
+            <path d="M0 32 C30 20, 50 40, 80 28 C110 16, 130 36, 160 24 C180 16, 190 28, 200 20 L200 48 L0 48 Z" fill="rgba(59,130,246,0.15)"/>
+            <path d="M0 32 C30 20, 50 40, 80 28 C110 16, 130 36, 160 24 C180 16, 190 28, 200 20" stroke="rgba(59,130,246,0.6)" stroke-width="1.5" fill="none"/>
+          </svg>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Pending</div>
-          <div class="stat-val gold">{{ pending }}</div>
+        <div class="sc">
+          <div class="sc-top">
+            <div class="sc-left">
+              <div class="sc-label">Pending</div>
+              <div class="sc-val" style="color:var(--amber)">{{ pending }}</div>
+              <div class="sc-hint">Awaiting action</div>
+            </div>
+            <div class="sc-icon si-a"><i class="ti ti-clock"></i></div>
+          </div>
+          <svg class="sc-wave" viewBox="0 0 200 48" preserveAspectRatio="none" fill="none">
+            <path d="M0 28 C25 36, 45 18, 70 30 C95 42, 120 22, 150 32 C170 38, 185 24, 200 28 L200 48 L0 48 Z" fill="rgba(245,158,11,0.15)"/>
+            <path d="M0 28 C25 36, 45 18, 70 30 C95 42, 120 22, 150 32 C170 38, 185 24, 200 28" stroke="rgba(245,158,11,0.6)" stroke-width="1.5" fill="none"/>
+          </svg>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">In Progress</div>
-          <div class="stat-val orange">{{ progress }}</div>
+        <div class="sc">
+          <div class="sc-top">
+            <div class="sc-left">
+              <div class="sc-label">In Progress</div>
+              <div class="sc-val" style="color:var(--orange)">{{ progress }}</div>
+              <div class="sc-hint">Being handled</div>
+            </div>
+            <div class="sc-icon si-o"><i class="ti ti-loader"></i></div>
+          </div>
+          <svg class="sc-wave" viewBox="0 0 200 48" preserveAspectRatio="none" fill="none">
+            <path d="M0 36 C20 28, 40 40, 60 30 C80 20, 110 38, 140 26 C165 18, 185 32, 200 24 L200 48 L0 48 Z" fill="rgba(249,115,22,0.15)"/>
+            <path d="M0 36 C20 28, 40 40, 60 30 C80 20, 110 38, 140 26 C165 18, 185 32, 200 24" stroke="rgba(249,115,22,0.6)" stroke-width="1.5" fill="none"/>
+          </svg>
         </div>
-        <div class="stat-card">
-          <div class="stat-label">Resolved</div>
-          <div class="stat-val green">{{ resolved }}</div>
+        <div class="sc">
+          <div class="sc-top">
+            <div class="sc-left">
+              <div class="sc-label">Resolved</div>
+              <div class="sc-val" style="color:var(--green)">{{ resolved }}</div>
+              <div class="sc-hint">Closed tickets</div>
+            </div>
+            <div class="sc-icon si-g"><i class="ti ti-circle-check"></i></div>
+          </div>
+          <svg class="sc-wave" viewBox="0 0 200 48" preserveAspectRatio="none" fill="none">
+            <path d="M0 34 C30 26, 55 42, 85 30 C115 18, 140 38, 165 26 C182 18, 194 30, 200 24 L200 48 L0 48 Z" fill="rgba(16,185,129,0.15)"/>
+            <path d="M0 34 C30 26, 55 42, 85 30 C115 18, 140 38, 165 26 C182 18, 194 30, 200 24" stroke="rgba(16,185,129,0.6)" stroke-width="1.5" fill="none"/>
+          </svg>
         </div>
       </div>
 
-      <div class="tickets-card">
-        <div class="tickets-title">All Concern Tickets</div>
-        <div class="filter-row">
-          Filter by Department:
+      <!-- MIDDLE ROW -->
+      <div class="mid-grid">
+
+        <!-- LINE CHART -->
+        <div class="chart-card">
+          <div class="chart-hd">
+            <span class="chart-title">Ticket Overview</span>
+            <div class="chart-filter">Last 7 days <i class="ti ti-chevron-down"></i></div>
+          </div>
+          <canvas id="lineChart" height="130"></canvas>
+        </div>
+
+        <!-- DONUT CHART -->
+        <div class="donut-card">
+          <div class="chart-hd" style="margin-bottom:12px">
+            <span class="chart-title">Concerns by Department</span>
+          </div>
+          <div class="donut-wrap">
+            <canvas id="donutChart"></canvas>
+            <div class="donut-center">
+              <div class="donut-val">{{ total }}</div>
+              <div class="donut-lbl">Total</div>
+            </div>
+          </div>
+          <div class="donut-legend" id="donutLegend"></div>
+        </div>
+
+        <!-- RECENT ACTIVITY -->
+        <div class="activity-card">
+          <div class="chart-hd" style="margin-bottom:0">
+            <span class="chart-title">Recent Activity</span>
+          </div>
+          <div class="act-list">
+            <div class="act-item">
+              <div class="act-icon ai-amber"><i class="ti ti-clock"></i></div>
+              <div class="act-body">
+                <div class="act-text"><strong>Ticket #MIS-2024-005</strong> updated to Pending</div>
+                <div class="act-time">2 minutes ago</div>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-icon ai-blue"><i class="ti ti-plus"></i></div>
+              <div class="act-body">
+                <div class="act-text">New ticket <strong>#FIN-2024-004</strong> created</div>
+                <div class="act-time">15 minutes ago</div>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-icon ai-green"><i class="ti ti-circle-check"></i></div>
+              <div class="act-body">
+                <div class="act-text">Ticket <strong>#ADM-2024-003</strong> resolved</div>
+                <div class="act-time">1 hour ago</div>
+              </div>
+            </div>
+            <div class="act-item">
+              <div class="act-icon ai-purple"><i class="ti ti-user"></i></div>
+              <div class="act-body">
+                <div class="act-text">Ticket <strong>#MIS-2024-002</strong> assigned to you</div>
+                <div class="act-time">2 hours ago</div>
+              </div>
+            </div>
+          </div>
+          <a href="#" class="view-all">View all activity <i class="ti ti-arrow-right"></i></a>
+        </div>
+
+      </div>
+
+      <!-- TICKETS TABLE -->
+      <div class="tc">
+        <div class="tc-hd">
+          <span class="tc-title">All Concern Tickets</span>
+          <span class="tc-count">{{ total }} ticket{{ total|pluralize }}</span>
+          <div class="tc-spacer"></div>
+          <div class="sw">
+            <i class="ti ti-search"></i>
+            <input type="text" id="searchInput" placeholder="Search user, category, ID..." oninput="filterTable()">
+          </div>
           <form method="get" style="display:inline;">
-            <select name="department" class="filter-sel" onchange="this.form.submit()">
+            <select name="department" class="ds" onchange="this.form.submit()">
               <option value="">All Departments</option>
               {% for value, label in departments %}
                 <option value="{{ value }}" {% if selected_dept == value %}selected{% endif %}>{{ label }}</option>
               {% endfor %}
             </select>
           </form>
+          <div class="btn-cal"><i class="ti ti-calendar"></i></div>
+          <button class="btn-new"><i class="ti ti-plus"></i> New Ticket</button>
         </div>
-        <div style="overflow-x:auto;">
-          <table class="tbl">
+
+        <div class="tc-body">
+          <table class="tbl" id="ticketTable">
             <thead>
               <tr>
-  <th style="width:32px;">ID</th>
-  <th style="width:90px;">User</th>
-  <th style="width:60px;">Dept</th>
-  <th>Category</th>
-  <th>Sub-Category</th>
-  <th style="width:120px;">Message</th>
-  <th style="width:70px;">Attachment</th>
-  <th style="width:70px;">Date</th>
-  <th style="width:80px;">Status</th>
-  <th style="width:80px;">Assigned To</th>
-  <th style="width:90px;">Remarks</th>
-  <th style="width:100px;">Action</th>
-</tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Dept</th>
+                <th>Category</th>
+                <th>Sub-Category</th>
+                <th>Message</th>
+                <th>File</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Remarks</th>
+                <th>Actions</th>
+              </tr>
             </thead>
             <tbody>
               {% for c in concerns %}
               <tr>
-                <td class="tbl-id">#{{ c.id }}</td>
-<td>{{ c.user.get_full_name|default:c.user.username }}</td>
-<td><span class="dept-badge">{{ c.user.userprofile.department }}</span></td>
-<td>{{ c.category }}</td>
-<td>{{ c.sub_category }}</td>
-<td style="font-size:10px;color:rgba(255,255,255,0.6);max-width:120px;">
-  {% if c.description %}
-    <span title="{{ c.description }}" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px;cursor:default;">
-      {{ c.description }}
-    </span>
-  {% else %}
-    <span style="color:rgba(255,255,255,0.3);">—</span>
-  {% endif %}
-</td>
-<td style="text-align:center;">
-  {% if c.attachment %}
-    <a href="{{ c.attachment.url }}" target="_blank" title="View Attachment" style="color:#6ea4ff;font-size:18px;text-decoration:none;">
-      <i class="ti ti-paperclip"></i>
-    </a>
-  {% else %}
-    <span style="color:rgba(255,255,255,0.3);font-size:10px;">—</span>
-  {% endif %}
-</td>
-<td>{{ c.date_submitted|date:"m/d/Y" }}</td>
+                <td class="tid">#{{ c.id }}</td>
+                <td class="fw">{{ c.user.get_full_name|default:c.user.username }}</td>
                 <td>
-                  {% if c.status == 'Pending' %}
-                    <span class="status-pill pill-pending"><span class="dot"></span>Pending</span>
-                  {% elif c.status == 'In Progress' %}
-                    <span class="status-pill pill-progress"><span class="dot"></span>In Progress</span>
+                  {% with dept=c.user.userprofile.department %}
+                    {% if dept == 'Admin' %}
+                      <span class="dp dp-admin">{{ dept }}</span>
+                    {% elif dept == 'Finance' %}
+                      <span class="dp dp-finance">{{ dept }}</span>
+                    {% elif dept == 'MIS' or dept == 'Information Technology' %}
+                      <span class="dp dp-mis">{{ dept }}</span>
+                    {% elif dept == 'Human Resources' %}
+                      <span class="dp dp-hr">{{ dept }}</span>
+                    {% elif dept == 'Security' %}
+                      <span class="dp dp-security">{{ dept }}</span>
+                    {% elif dept == 'Operations' or dept == 'General / Operational Mgmt' %}
+                      <span class="dp dp-ops">{{ dept }}</span>
+                    {% else %}
+                      <span class="dp dp-default">{{ dept }}</span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td style="font-size:12px;color:var(--text-1)">{{ c.category }}</td>
+                <td class="muted">{{ c.sub_category }}</td>
+                <td>
+                  {% if c.description %}
+                    <span class="trunc" title="{{ c.description }}">{{ c.description }}</span>
                   {% else %}
-                    <span class="status-pill pill-resolved"><span class="dot"></span>Resolved</span>
+                    <span class="muted">—</span>
                   {% endif %}
                 </td>
-                <td style="font-size:10px;color:rgba(255,255,255,0.6);">{{ c.assigned_to|default:"—" }}</td>
-                <td style="font-size:10px;color:rgba(255,255,255,0.6);">{{ c.remarks|default:"—" }}</td>
+                <td style="text-align:center">
+                  {% if c.attachment %}
+                    <a href="{{ c.attachment.url }}" target="_blank" style="color:var(--accent);font-size:16px;text-decoration:none;">
+                      <i class="ti ti-paperclip"></i>
+                    </a>
+                  {% else %}
+                    <span class="muted">—</span>
+                  {% endif %}
+                </td>
+                <td class="muted">{{ c.date_submitted|date:"m/d/Y" }}</td>
                 <td>
-                  <form method="post" action="{% url 'update_concern' c.id %}" class="update-form">
-                    {% csrf_token %}
-                    <select name="status" class="act-sel">
-                      <option value="Pending" {% if c.status == 'Pending' %}selected{% endif %}>Pending</option>
-                      <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
-                      <option value="Resolved" {% if c.status == 'Resolved' %}selected{% endif %}>Resolved</option>
-                    </select>
-                    <input type="text" name="assigned_to" class="act-inp" placeholder="Assign to" value="{{ c.assigned_to }}">
-                    <input type="text" name="remarks" class="act-inp" placeholder="Remarks" value="{{ c.remarks }}">
-                    <button type="submit" class="act-btn">Save</button>
-                  </form>
+                  {% if c.status == 'Pending' %}
+                    <span class="sp sp-p"><span class="sdot"></span>Pending</span>
+                  {% elif c.status == 'In Progress' %}
+                    <span class="sp sp-i"><span class="sdot"></span>In Progress</span>
+                  {% else %}
+                    <span class="sp sp-r"><span class="sdot"></span>Resolved</span>
+                  {% endif %}
+                </td>
+                <td style="font-size:11px;color:var(--text-2)">{{ c.assigned_to|default:"—" }}</td>
+                <td class="muted">{{ c.remarks|default:"—" }}</td>
+                <td>
+                  <button
+                    class="eb"
+                    onclick="openModal(
+                      {{ c.id }},
+                      '{{ c.status }}',
+                      '{{ c.assigned_to|default:'' }}',
+                      '{{ c.remarks|default:'' }}',
+                      '{% url 'update_concern' c.id %}',
+                      '#{{ c.id }} — {{ c.category }}'
+                    )"
+                    title="Edit ticket #{{ c.id }}"
+                  >
+                    <i class="ti ti-dots-vertical"></i>
+                  </button>
                 </td>
               </tr>
               {% empty %}
               <tr>
-                <td colspan="10" style="text-align:center;color:rgba(255,255,255,0.35);padding:32px;font-size:12px;">
-                  No concerns found.
+                <td colspan="12">
+                  <div class="empty-state">
+                    <i class="ti ti-inbox"></i>
+                    <p>No concerns found.</p>
+                  </div>
                 </td>
               </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
+
+        <div class="tc-foot">
+          <span class="pg-info">Showing 1 to {{ total }} of {{ total }} ticket{{ total|pluralize }}</span>
+          <div class="pg-controls">
+            <div class="pg-btn"><i class="ti ti-chevron-left"></i></div>
+            <div class="pg-num">1</div>
+            <div class="pg-btn"><i class="ti ti-chevron-right"></i></div>
+          </div>
+          <div class="pg-size">
+            <select>
+              <option>10 / page</option>
+              <option>25 / page</option>
+              <option>50 / page</option>
+            </select>
+          </div>
+        </div>
       </div>
+
     </div>
   </div>
-
 </div>
 {% endwith %}
 
+<!-- ── MODAL ── -->
+<div class="modal-overlay" id="editModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="md-head">
+      <div>
+        <div class="md-title">Update Ticket</div>
+        <div class="md-id" id="modalId">#—</div>
+      </div>
+      <button class="md-close" onclick="closeModal()">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <form method="post" id="modalForm">
+      {% csrf_token %}
+      <div class="field-row">
+        <div class="field">
+          <label for="modalStatus">Status</label>
+          <select name="status" id="modalStatus">
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="modalAssigned">Assigned to</label>
+          <input type="text" name="assigned_to" id="modalAssigned" placeholder="Staff name">
+        </div>
+      </div>
+      <div class="field-full">
+        <label for="modalRemarks">Remarks</label>
+        <input type="text" name="remarks" id="modalRemarks" placeholder="Add a remark...">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-save">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
-function expandSidebar() {
-  document.getElementById('sb-col').style.display = 'none';
-  var e = document.getElementById('sb-exp');
-  e.style.display = 'flex';
-  e.style.flexDirection = 'column';
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
 }
-function collapseSidebar() {
-  document.getElementById('sb-exp').style.display = 'none';
-  document.getElementById('sb-col').style.display = 'flex';
+
+function openModal(id, status, assigned, remarks, actionUrl, subtitle) {
+  document.getElementById('modalId').textContent = subtitle;
+  document.getElementById('modalStatus').value = status;
+  document.getElementById('modalAssigned').value = assigned;
+  document.getElementById('modalRemarks').value = remarks;
+  document.getElementById('modalForm').action = actionUrl;
+  document.getElementById('editModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
+function closeModal() {
+  document.getElementById('editModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeModalOutside(e) {
+  if (e.target === document.getElementById('editModal')) closeModal();
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+function filterTable() {
+  var q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('#ticketTable tbody tr').forEach(function(row) {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+
+  // Line chart
+  var lineCtx = document.getElementById('lineChart');
+  if (lineCtx) {
+    new Chart(lineCtx, {
+      type: 'line',
+      data: {
+        labels: ['May 8','May 9','May 10','May 11','May 12','May 13','May 14'],
+        datasets: [{
+          data: [2, 4, 3, 6, 5, 7, 5],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59,130,246,0.08)',
+          borderWidth: 2,
+          pointBackgroundColor: '#3b82f6',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false }, tooltip: {
+          backgroundColor: '#1e293b', titleColor: '#f1f5f9',
+          bodyColor: '#94a3b8', borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1, padding: 10,
+          callbacks: { label: ctx => ' ' + ctx.parsed.y + ' tickets' }
+        }},
+        scales: {
+          x: {
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: { color: '#64748b', font: { size: 11 } }
+          },
+          y: {
+            grid: { color: 'rgba(255,255,255,0.04)' },
+            ticks: { color: '#64748b', font: { size: 11 }, stepSize: 2 },
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  }
+
+  // Donut chart
+  var donutCtx = document.getElementById('donutChart');
+  if (donutCtx) {
+    var deptData = {{ dept_counts_json|default:'{}' }};
+    var labels = Object.keys(deptData);
+    var data   = Object.values(deptData);
+    var colors = ['#3b82f6','#f59e0b','#8b5cf6','#10b981','#f97316','#ef4444','#06b6d4'];
+
+    new Chart(donutCtx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data.length ? data : [1],
+          backgroundColor: data.length ? colors.slice(0, labels.length) : ['rgba(255,255,255,0.05)'],
+          borderWidth: 0,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '72%',
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#1e293b', titleColor: '#f1f5f9',
+            bodyColor: '#94a3b8', borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1, padding: 10
+          }
+        }
+      }
+    });
+
+    var legend = document.getElementById('donutLegend');
+    var total = data.reduce((a,b)=>a+b,0);
+    labels.forEach(function(lbl, i) {
+      var pct = total ? Math.round(data[i]/total*100) : 0;
+      var item = document.createElement('div');
+      item.className = 'dl-item';
+      item.innerHTML = '<div class="dl-dot-name"><div class="dl-dot" style="background:'+colors[i]+'"></div><span class="dl-name">'+lbl+'</span></div><span class="dl-pct">'+pct+'% ('+data[i]+')</span>';
+      legend.appendChild(item);
+    });
+     }
+    });
 </script>
 
 {% endblock %}

@@ -78,10 +78,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'opascor_db',
-        'USER': 'opascor_user',
+        'USER': 'root',
         'PASSWORD': '#@ACTstudent4',
         'HOST': 'localhost',
-        'PORT': '3306',
+        'PORT': '3307',
+        
     }
 }
 
