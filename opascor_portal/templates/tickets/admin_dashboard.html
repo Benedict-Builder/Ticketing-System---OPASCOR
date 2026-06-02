@@ -4,647 +4,528 @@
 {% block content %}
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
 
 :root {
-  --bg-base:    #0b0f1a;
-  --bg-surface: #111827;
-  --bg-card:    #151d2e;
-  --bg-hover:   #1a2540;
-  --bg-input:   #1e2a3d;
-  --border:     rgba(255,255,255,0.07);
-  --border-2:   rgba(255,255,255,0.12);
-  --accent:     #3b82f6;
-  --accent-glow:rgba(59,130,246,0.25);
-  --amber:      #f59e0b;
-  --orange:     #f97316;
-  --green:      #10b981;
-  --purple:     #8b5cf6;
-  --text-1:     #f1f5f9;
-  --text-2:     #94a3b8;
-  --text-3:     #64748b;
-  --font:       'Plus Jakarta Sans', sans-serif;
-  --mono:       'JetBrains Mono', monospace;
-  --sb-w:       220px;
-  --radius:     12px;
+  --navy: #04080f;
+  --bg-base: #02040a;
+  --bg-panel: #06101e;
+  --bg-card: #080d18;
+  --bg-hover: rgba(28,72,245,0.07);
+  --blue: #1c48f5;
+  --blue-lt: #4a7cff;
+  --blue-gl: rgba(74,124,255,0.12);
+  --red: #c8001c;
+  --gold: #ffd34a;
+  --green: #4ade80;
+  --purple: #818cf8;
+  --border: rgba(255,255,255,0.07);
+  --border-blue: rgba(74,124,255,0.25);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.35);
+  --text-dim: rgba(255,255,255,0.18);
+  --muted: rgba(255,255,255,0.22);
+  --cream: #e8eaf6;
+  --cream2: #8899bb;
+  --mono: 'DM Mono', monospace;
+  --r: 10px;
 }
 
-html, body { height: 100%; overflow: hidden; background: var(--bg-base); }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-.shell {
-  display: flex; height: 100vh;
-  font-family: var(--font);
+body {
+  font-family: 'DM Sans', sans-serif;
   background: var(--bg-base);
-  overflow: hidden;
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
 }
+
+html, body { height: 100%; overflow: hidden; }
+.dash { display: flex; height: 100vh; min-height: 700px; font-size: 13px; overflow: hidden; }
 
 /* ── SIDEBAR ── */
 .sidebar {
-  width: var(--sb-w);
-  background: var(--bg-surface);
+  width: 200px; min-width: 200px;
+  background: #030711;
   border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-  flex-shrink: 0; overflow: hidden;
-  transition: width 0.25s ease;
-  position: relative; z-index: 50;
+  color: var(--text-secondary);
+  display: flex; flex-direction: column; padding: 0;
+  transition: width .25s ease; overflow: hidden;
 }
-.sidebar.collapsed { width: 60px; }
-.sidebar.collapsed .sb-brand,
-.sidebar.collapsed .sb-user-info,
+.sidebar.collapsed { width: 52px; min-width: 52px; }
+.sidebar.collapsed .logo-name,
+.sidebar.collapsed .logo-sub,
+.sidebar.collapsed .sb-uname,
+.sidebar.collapsed .sb-urole,
+.sidebar.collapsed .sb-online,
 .sidebar.collapsed .nav-lbl,
 .sidebar.collapsed .nav-badge,
-.sidebar.collapsed .nav-sec,
-.sidebar.collapsed .sb-foot-label { display: none; }
+.sidebar.collapsed .nav-section,
+.sidebar.collapsed .sb-foot-lbl { display: none; }
 
-.sb-head {
-  padding: 16px 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 10px;
-  cursor: pointer; user-select: none; flex-shrink: 0;
-}
-.sb-logo {
-  width: 36px; height: 36px; border-radius: 9px;
-  background: var(--accent); display: flex;
-  align-items: center; justify-content: center;
-  flex-shrink: 0; overflow: hidden;
-}
-.sb-logo img { width: 36px; height: 36px; object-fit: contain; }
-.sb-brand-name { font-size: 13px; font-weight: 800; color: var(--text-1); letter-spacing: 1px; }
-.sb-brand-sub  { font-size: 9px; color: var(--text-3); margin-top: 1px; }
+.sidebar .logo { padding: 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; flex-shrink: 0; }
+.sb-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--blue-gl); border: 1px solid var(--border-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+.sb-icon img { width: 32px; height: 32px; object-fit: contain; border-radius: 7px; }
+.logo-name { color: #fff; font-size: 13px; font-weight: 800; font-family: 'Syne', sans-serif; letter-spacing: 0.5px; white-space: nowrap; }
+.logo-sub { font-size: 8px; color: var(--text-dim); margin-top: 1px; white-space: nowrap; }
 
-.sb-user {
-  display: flex; align-items: center; gap: 10px;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.sb-av {
-  width: 32px; height: 32px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 700; color: #fff;
-  flex-shrink: 0; text-transform: uppercase;
-}
-.sb-uname { font-size: 12px; color: var(--text-1); font-weight: 600; white-space: nowrap; }
-.sb-urole  { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+.sb-user { padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+.sb-av { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; text-transform: uppercase; border: 2px solid rgba(99,102,241,0.4); }
+.sb-uname { font-size: 11px; color: var(--text-primary); font-weight: 700; white-space: nowrap; line-height: 1.2; font-family: 'Syne', sans-serif; }
+.sb-urole { font-size: 9px; color: var(--text-secondary); }
+.sb-online { display: flex; align-items: center; gap: 4px; font-size: 8px; color: var(--green); margin-top: 2px; }
+.sb-online::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
 
-.sb-nav { flex: 1; overflow-y: auto; padding: 10px 8px; overflow-x: hidden; }
+.sb-nav { flex: 1; overflow-y: auto; padding: 8px 0; overflow-x: hidden; }
 .sb-nav::-webkit-scrollbar { width: 0; }
-
-.nav-sec {
-  font-size: 9px; color: var(--text-3);
-  letter-spacing: 1.2px; padding: 12px 8px 5px;
-  text-transform: uppercase; white-space: nowrap; font-weight: 600;
+.nav-section {
+  padding: 10px 8px 4px;
+  font-size: 9px; font-family: 'Syne', sans-serif;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.18); white-space: nowrap;
 }
-.nav-a {
-  display: flex; align-items: center; gap: 9px;
-  padding: 8px 10px; color: var(--text-3);
-  font-size: 12px; font-weight: 500;
-  cursor: pointer; text-decoration: none;
-  border-radius: 8px; transition: all 0.15s;
-  position: relative; margin-bottom: 1px;
-  white-space: nowrap; overflow: hidden;
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px; border-radius: 6px; cursor: pointer;
+  font-size: 12px; margin: 1px 6px;
+  transition: background 0.15s, color 0.15s;
+  color: var(--text-secondary);
+  text-decoration: none; position: relative; white-space: nowrap; overflow: hidden;
 }
-.nav-a:hover { background: var(--bg-hover); color: var(--text-1); }
-.nav-a.active {
-  background: rgba(59,130,246,0.15);
-  color: #93c5fd;
-}
-.nav-a.active::before {
-  content: '';
-  position: absolute; left: 0; top: 20%; bottom: 20%;
-  width: 3px; border-radius: 0 3px 3px 0;
-  background: var(--accent);
-}
-.nav-a i { font-size: 16px; flex-shrink: 0; }
+.nav-item:hover { background: rgba(74,124,255,0.08); color: rgba(255,255,255,0.7); }
+.nav-item.active { background: rgba(28,72,245,0.18); color: var(--blue-lt); border: 1px solid rgba(74,124,255,0.2); }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 18%; bottom: 18%; width: 3px; border-radius: 0 3px 3px 0; background: var(--blue); }
+.nav-item i { font-size: 15px; flex-shrink: 0; }
 .nav-lbl { flex: 1; overflow: hidden; text-overflow: ellipsis; }
-.nav-badge {
-  background: #ef4444; color: #fff;
-  font-size: 9px; font-weight: 700;
-  min-width: 17px; height: 17px; border-radius: 9px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 4px; flex-shrink: 0;
-}
-.nav-div { height: 1px; background: var(--border); margin: 6px 4px; }
+.nav-badge { background: var(--red); color: #fff; font-size: 8px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 5px; flex-shrink: 0; }
+.nav-div { height: 1px; background: var(--border); margin: 5px 8px; }
 
-.sb-foot { padding: 8px 8px 16px; border-top: 1px solid var(--border); flex-shrink: 0; }
-.sb-collapse-btn {
-  display: flex; align-items: center; gap: 9px;
-  padding: 8px 10px; color: var(--text-3);
-  font-size: 12px; font-weight: 500;
-  cursor: pointer; border-radius: 8px;
-  transition: all 0.15s; margin-bottom: 2px;
-  user-select: none;
-}
-.sb-collapse-btn:hover { background: var(--bg-hover); color: var(--text-1); }
-.sb-collapse-btn i { font-size: 16px; flex-shrink: 0; transition: transform 0.25s; }
-.sidebar.collapsed .sb-collapse-btn i { transform: rotate(180deg); }
+.sb-foot { padding: 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.sb-collapse { display: flex; align-items: center; gap: 8px; padding: 7px 10px; color: var(--text-secondary); font-size: 11px; cursor: pointer; border-radius: 6px; transition: all .15s; user-select: none; }
+.sb-collapse:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+.sb-collapse i { font-size: 15px; flex-shrink: 0; transition: transform .25s; }
+.sidebar.collapsed .sb-collapse i { transform: rotate(180deg); }
 
 /* ── MAIN ── */
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-base); min-width: 0; }
 
 /* ── TOPBAR ── */
 .topbar {
-  background: var(--bg-surface);
-  height: 58px;
-  display: flex; align-items: center;
-  padding: 0 24px;
+  background: #030711;
   border-bottom: 1px solid var(--border);
-  flex-shrink: 0; gap: 10px;
+  padding: 0 20px; height: 52px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; flex-shrink: 0;
 }
-.tb-menu {
-  width: 34px; height: 34px; border-radius: 8px;
-  border: 1px solid var(--border); background: var(--bg-card);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text-2); font-size: 17px;
-  transition: all 0.15s; flex-shrink: 0;
-}
-.tb-menu:hover { background: var(--bg-hover); color: var(--text-1); }
-.tb-breadcrumb { display: flex; align-items: center; gap: 6px; }
-.tb-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
-.tb-sep { color: var(--text-3); font-size: 13px; }
-.tb-crumb { display: flex; align-items: center; gap: 4px; font-size: 12px; color: var(--text-3); }
-.tb-crumb i { font-size: 14px; }
-.tb-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.topbar-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.tb-menu { width: 32px; height: 32px; border-radius: 7px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 16px; transition: all .15s; }
+.tb-menu:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.topbar-breadcrumb { display: flex; align-items: center; gap: 8px; }
+.topbar-breadcrumb .page-title { font-size: 15px; font-weight: 700; color: #fff; font-family: 'Syne', sans-serif; }
+.topbar-breadcrumb .sep { color: rgba(255,255,255,0.25); font-size: 14px; }
+.topbar-breadcrumb .sub-crumb { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.45); }
 
-.tb-icon {
-  width: 36px; height: 36px; border-radius: 9px;
-  border: 1px solid var(--border); background: var(--bg-card);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text-2); font-size: 17px;
-  position: relative; text-decoration: none;
-  transition: all 0.15s;
-}
-.tb-icon:hover { background: var(--bg-hover); color: var(--text-1); }
-.tb-icon .nd {
-  position: absolute; top: 7px; right: 7px;
-  width: 7px; height: 7px; border-radius: 50%;
-  background: #ef4444; border: 1.5px solid var(--bg-surface);
-}
-.notif-badge {
-  position: absolute; top: -4px; right: -4px;
-  background: #ef4444; color: #fff;
-  font-size: 8px; font-weight: 700;
-  min-width: 16px; height: 16px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  padding: 0 3px; border: 1.5px solid var(--bg-surface);
-}
-.admin-tag {
-  background: var(--bg-card); color: var(--text-1);
-  font-size: 10px; font-weight: 700;
-  padding: 5px 12px; border-radius: 7px;
-  border: 1px solid var(--border); letter-spacing: 0.5px;
-}
-.user-chip {
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.search-box {
   display: flex; align-items: center; gap: 8px;
-  padding: 5px 10px 5px 5px;
-  border-radius: 9px; border: 1px solid var(--border);
-  background: var(--bg-card); cursor: pointer;
-  transition: background 0.15s;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 8px; padding: 7px 12px;
+  font-size: 12px; color: var(--text-dim); width: 220px;
+  transition: border-color 0.2s;
 }
-.user-chip:hover { background: var(--bg-hover); }
-.chip-av {
-  width: 26px; height: 26px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--accent), var(--purple));
+.search-box input { border: none; background: transparent; font-size: 11px; color: var(--text-primary); outline: none; flex: 1; font-family: 'DM Sans', sans-serif; }
+.search-box input::placeholder { color: var(--text-dim); }
+.search-box:focus-within { border-color: var(--border-blue); }
+.search-arrow {
+  width: 28px; height: 28px; border-radius: 6px;
+  background: var(--blue); display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; transition: background 0.15s;
+}
+.search-arrow:hover { background: var(--blue-lt); }
+.tb-notif { width: 32px; height: 32px; border-radius: 7px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 17px; position: relative; text-decoration: none; transition: all .15s; }
+.tb-notif:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.notif-badge { position: absolute; top: -5px; right: -5px; background: var(--red); color: #fff; font-size: 8px; font-weight: 700; min-width: 17px; height: 17px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #030711; }
+.tb-tag { background: rgba(28,72,245,0.15); color: var(--blue-lt); font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--border-blue); letter-spacing: .8px; font-family: 'Syne', sans-serif; }
+.topbar-user {
+  display: flex; align-items: center; gap: 8px;
+  padding: 4px 10px 4px 5px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 8px; cursor: pointer;
+  transition: border-color 0.15s;
+}
+.topbar-user:hover { border-color: var(--border-blue); }
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg,#6366f1,#3b82f6);
   display: flex; align-items: center; justify-content: center;
-  font-size: 9px; color: #fff; font-weight: 700; text-transform: uppercase;
+  font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase;
 }
-.chip-name { font-size: 11px; color: var(--text-2); font-weight: 500; }
-.chip-role { font-size: 9px; color: var(--text-3); }
-.chip-caret { color: var(--text-3); font-size: 13px; }
+.tb-user-name { font-size: 10px; color: var(--text-primary); font-weight: 700; font-family: 'Syne', sans-serif; }
+.tb-user-role { font-size: 8px; color: var(--text-secondary); }
 
 /* ── CONTENT ── */
-.content {
-  padding: 20px; flex: 1;
-  overflow-y: auto; display: flex;
-  flex-direction: column; gap: 18px;
-}
+.content { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
 .content::-webkit-scrollbar { width: 4px; }
-.content::-webkit-scrollbar-thumb { background: var(--bg-hover); border-radius: 2px; }
+.content::-webkit-scrollbar-thumb { background: rgba(74,124,255,0.35); border-radius: 2px; }
 
 /* ── ALERTS ── */
-.alert {
-  background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3);
-  color: #6ee7b7; padding: 10px 16px;
-  border-radius: var(--radius); font-size: 12px;
+.alert { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: var(--green); padding: 10px 16px; border-radius: 10px; font-size: 12px; }
+
+/* ── FILTER BAR ── */
+.filter-bar {
+  background: #030711;
+  border: 1px solid var(--border);
+  border-radius: var(--r); padding: 8px 14px;
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
 }
+.filter-chip {
+  display: flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border: 1px solid var(--border);
+  border-radius: 5px; font-size: 11px; cursor: pointer;
+  color: var(--text-secondary);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+.filter-chip:hover { border-color: var(--border-blue); color: var(--blue-lt); }
+.filter-chip.active { border-color: var(--blue-lt); color: var(--blue-lt); background: rgba(74,124,255,0.1); }
 
 /* ── STAT CARDS ── */
-.sg { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; }
+.sg { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.sc { background: #030711; border: 1px solid var(--border); border-radius: var(--r); padding: 16px 16px 0; display: flex; flex-direction: column; min-height: 120px; position: relative; overflow: hidden; }
+.sc-top { display: flex; align-items: flex-start; gap: 12px; }
+.sc-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.si-blue   { background: rgba(74,124,255,0.18); color: var(--blue-lt); border: 1px solid rgba(74,124,255,0.25); }
+.si-red    { background: rgba(200,0,28,0.18);   color: #e8304a; border: 1px solid rgba(200,0,28,0.25); }
+.si-purple { background: rgba(129,140,248,0.18);color: var(--purple); border: 1px solid rgba(129,140,248,0.25); }
+.si-green  { background: rgba(74,222,128,0.18); color: var(--green); border: 1px solid rgba(74,222,128,0.25); }
+.sc-body { flex: 1; }
+.sc-lbl { font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+.sc-val { font-size: 32px; font-weight: 800; color: var(--text-primary); line-height: 1; font-family: 'Syne', sans-serif; }
+.sc-hint { font-size: 9px; color: var(--text-secondary); margin-top: 3px; }
+.sc-wave { margin-top: auto; height: 44px; width: calc(100% + 32px); margin-left: -16px; display: block; }
 
-.sc {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px 18px 0;
-  display: flex; flex-direction: column;
-  position: relative; overflow: hidden;
-  min-height: 130px;
-}
-.sc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-.sc-label {
-  font-size: 10px; font-weight: 600;
-  color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px;
-  margin-bottom: 6px;
-}
-.sc-val { font-size: 36px; font-weight: 800; color: var(--text-1); line-height: 1; }
-.sc-hint { font-size: 10px; color: var(--text-3); margin-top: 4px; }
-.sc-icon {
-  width: 44px; height: 44px; border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 22px; flex-shrink: 0;
-}
-.si-b { background: rgba(59,130,246,0.15); color: var(--accent); }
-.si-a { background: rgba(245,158,11,0.15); color: var(--amber); }
-.si-o { background: rgba(249,115,22,0.15); color: var(--orange); }
-.si-g { background: rgba(16,185,129,0.15); color: var(--green); }
-
-.sc-wave {
-  margin-top: auto; height: 48px; width: calc(100% + 36px);
-  margin-left: -18px; display: block;
-}
-
-/* ── MIDDLE GRID ── */
-.mid-grid { display: grid; grid-template-columns: 1fr 300px 260px; gap: 14px; }
-
-/* ── CHART CARD ── */
-.chart-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-}
-.chart-hd {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
-}
-.chart-title { font-size: 13px; font-weight: 700; color: var(--text-1); }
-.chart-filter {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--bg-input); border: 1px solid var(--border);
-  border-radius: 8px; padding: 5px 10px;
-  font-size: 11px; color: var(--text-2); cursor: pointer;
-}
-.chart-filter i { font-size: 13px; }
-
-/* ── DONUT CARD ── */
-.donut-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  display: flex; flex-direction: column;
-}
-.donut-wrap { position: relative; width: 140px; height: 140px; margin: 0 auto 12px; }
-.donut-center {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-}
-.donut-val { font-size: 26px; font-weight: 800; color: var(--text-1); }
-.donut-lbl { font-size: 10px; color: var(--text-3); }
-.donut-legend { display: flex; flex-direction: column; gap: 6px; }
-.dl-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.dl-dot-name { display: flex; align-items: center; gap: 7px; }
-.dl-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.dl-name { font-size: 11px; color: var(--text-2); }
-.dl-pct { font-size: 11px; color: var(--text-3); font-family: var(--mono); }
-
-/* ── ACTIVITY CARD ── */
-.activity-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 18px;
-  display: flex; flex-direction: column;
-}
-.act-list { flex: 1; display: flex; flex-direction: column; gap: 12px; margin-top: 4px; overflow: hidden; }
-.act-item { display: flex; align-items: flex-start; gap: 10px; }
-.act-icon {
-  width: 30px; height: 30px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 14px; flex-shrink: 0; margin-top: 1px;
-}
-.act-icon.ai-amber { background: rgba(245,158,11,0.15); color: var(--amber); }
-.act-icon.ai-blue  { background: rgba(59,130,246,0.15);  color: var(--accent); }
-.act-icon.ai-green { background: rgba(16,185,129,0.15);  color: var(--green); }
-.act-icon.ai-purple{ background: rgba(139,92,246,0.15);  color: var(--purple); }
-.act-body { flex: 1; min-width: 0; }
-.act-text { font-size: 11px; color: var(--text-2); line-height: 1.4; }
-.act-text strong { color: var(--text-1); font-weight: 600; }
-.act-time { font-size: 10px; color: var(--text-3); margin-top: 2px; }
-.view-all {
-  display: flex; align-items: center; justify-content: center; gap: 5px;
-  margin-top: 14px; padding: 9px;
-  border: 1px solid var(--border); border-radius: 8px;
-  font-size: 11px; color: var(--text-3); cursor: pointer;
-  transition: all 0.15s; text-decoration: none; font-weight: 500;
-}
-.view-all:hover { background: var(--bg-hover); color: var(--text-1); }
-
-/* ── TABLE CARD ── */
-.tc {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.tc-hd {
-  display: flex; align-items: center; gap: 10px;
-  padding: 14px 18px; border-bottom: 1px solid var(--border);
-  flex-wrap: wrap; gap: 8px;
-}
-.tc-title { font-size: 13px; font-weight: 700; color: var(--text-1); }
-.tc-count {
-  font-size: 11px; color: var(--text-3);
-  background: rgba(255,255,255,0.06); padding: 3px 10px;
-  border-radius: 20px; font-weight: 600;
-  border: 1px solid var(--border);
-}
-.tc-spacer { flex: 1; }
-.sw {
-  display: flex; align-items: center; gap: 7px;
-  border: 1px solid var(--border); border-radius: 8px;
-  padding: 0 12px; height: 34px;
-  background: var(--bg-input); transition: border-color 0.15s;
-}
-.sw:focus-within { border-color: var(--accent); }
-.sw i { font-size: 14px; color: var(--text-3); }
-.sw input {
-  border: none; background: transparent;
-  font-size: 12px; color: var(--text-1);
-  outline: none; width: 160px;
-  font-family: var(--font);
-}
-.sw input::placeholder { color: var(--text-3); }
-.ds {
-  height: 34px; border: 1px solid var(--border);
-  border-radius: 8px; background: var(--bg-input);
-  color: var(--text-2); font-size: 12px;
-  padding: 0 10px; outline: none;
-  font-family: var(--font); cursor: pointer;
-}
-.ds:focus { border-color: var(--accent); }
-.ds option { background: var(--bg-surface); }
-.btn-new {
-  display: flex; align-items: center; gap: 6px;
-  height: 34px; padding: 0 14px;
-  background: var(--accent); border: none;
-  color: #fff; font-size: 12px; font-weight: 600;
-  border-radius: 8px; cursor: pointer;
-  font-family: var(--font); transition: background 0.15s;
-  white-space: nowrap;
-}
-.btn-new:hover { background: #2563eb; }
-.btn-cal {
-  width: 34px; height: 34px; border-radius: 8px;
-  border: 1px solid var(--border); background: var(--bg-input);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text-2); font-size: 16px;
-  transition: all 0.15s;
-}
-.btn-cal:hover { background: var(--bg-hover); color: var(--text-1); }
-
-.tc-body { overflow-x: auto; }
-
-/* ── TABLE ── */
-.tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
-.tbl th {
-  color: var(--text-3); font-weight: 600;
-  padding: 10px 14px; text-align: left;
+/* ── TABS ── */
+.tab-bar {
+  display: flex; gap: 0;
   border-bottom: 1px solid var(--border);
-  font-size: 10px; letter-spacing: 0.6px;
-  text-transform: uppercase; background: rgba(255,255,255,0.02);
-  white-space: nowrap;
+  background: #030711;
+  padding: 0 14px;
+  border-radius: var(--r) var(--r) 0 0;
 }
-.tbl td {
-  padding: 12px 14px; color: var(--text-2);
-  border-bottom: 1px solid var(--border);
-  vertical-align: middle;
+.tab {
+  padding: 10px 16px; font-size: 12px; cursor: pointer;
+  color: var(--text-secondary); border-bottom: 2px solid transparent;
+  transition: color 0.15s; white-space: nowrap; font-family: 'Syne', sans-serif; font-weight: 600;
+  display: flex; align-items: center; gap: 6px;
 }
-.tbl tbody tr:hover td { background: var(--bg-hover); }
+.tab:hover { color: rgba(255,255,255,0.6); }
+.tab.active { color: var(--blue-lt); border-bottom-color: var(--blue-lt); }
+.tab i { font-size: 14px; }
+
+/* ── TWO COL LAYOUT ── */
+.two-col { display: grid; grid-template-columns: 1fr 260px; gap: 12px; }
+
+.main-panel {
+  display: flex; flex-direction: column; gap: 0;
+  background: #030711;
+  border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+}
+
+/* ── TIME BANNER ── */
+.time-banner { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.time-title {
+  font-size: 12px; font-weight: 600; margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+  font-family: 'Syne', sans-serif;
+}
+.time-cols { display: grid; grid-template-columns: repeat(5, 1fr); }
+.time-col { padding: 6px 10px; border-right: 1px solid var(--border); }
+.time-col:last-child { border-right: none; }
+.time-col-label { font-size: 9px; color: var(--text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: .6px; font-family: 'Syne', sans-serif; }
+.time-col-val { font-size: 13px; font-weight: 700; color: var(--text-primary); font-family: 'DM Mono', monospace; }
+
+/* ── TICKET TABLE ── */
+.tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+.tbl th { color: var(--text-secondary); font-weight: 700; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 9px; letter-spacing: .8px; text-transform: uppercase; background: rgba(255,255,255,0.02); white-space: nowrap; font-family: 'Syne', sans-serif; }
+.tbl td { padding: 10px 12px; color: var(--text-secondary); border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tbl tbody tr:hover td { background: rgba(74,124,255,0.04); }
 .tbl tbody tr:last-child td { border-bottom: none; }
+.tid { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--blue-lt); font-weight: 600; }
+.fw { font-weight: 600; color: var(--text-primary); font-size: 11px; }
+.trunc { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; font-size: 10px; }
+.muted { color: var(--text-secondary); font-size: 10px; }
 
-.tid { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 600; }
+.dp { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+.dp-admin    { background: rgba(74,124,255,0.15);  color: var(--blue-lt); }
+.dp-finance  { background: rgba(255,211,74,0.15);  color: #ffd34a; }
+.dp-mis      { background: rgba(129,140,248,0.15); color: #818cf8; }
+.dp-ops      { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+.dp-hr       { background: rgba(74,222,128,0.15);  color: var(--green); }
+.dp-security { background: rgba(200,0,28,0.15);    color: #e8304a; }
+.dp-default  { background: rgba(255,255,255,0.07); color: var(--text-secondary); }
 
-.dp {
-  display: inline-flex; align-items: center;
-  padding: 3px 8px; border-radius: 5px;
-  font-size: 10px; font-weight: 700; white-space: nowrap;
-}
-.dp-admin   { background: rgba(59,130,246,0.15);  color: #93c5fd; }
-.dp-finance { background: rgba(245,158,11,0.15);  color: #fcd34d; }
-.dp-mis     { background: rgba(139,92,246,0.15);  color: #c4b5fd; }
-.dp-ops     { background: rgba(249,115,22,0.15);  color: #fdba74; }
-.dp-hr      { background: rgba(16,185,129,0.15);  color: #6ee7b7; }
-.dp-security{ background: rgba(239,68,68,0.15);   color: #fca5a5; }
-.dp-default { background: rgba(255,255,255,0.07); color: var(--text-2); }
-
-.sp {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 4px 10px; border-radius: 20px;
-  font-size: 10px; font-weight: 700; white-space: nowrap;
-}
-.sp-p { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.25); }
-.sp-i { background: rgba(59,130,246,0.15);  color: #93c5fd;  border: 1px solid rgba(59,130,246,0.25); }
-.sp-r { background: rgba(16,185,129,0.15);  color: #6ee7b7;  border: 1px solid rgba(16,185,129,0.25); }
+.sp { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+.sp-p { background: rgba(255,184,77,0.12); color: #ffb84d; border: 1px solid rgba(255,184,77,0.2); }
+.sp-i { background: rgba(74,124,255,0.12); color: var(--blue-lt); border: 1px solid rgba(74,124,255,0.2); }
+.sp-r { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
 .sdot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
 
-.trunc {
-  max-width: 120px; overflow: hidden;
-  text-overflow: ellipsis; white-space: nowrap;
-  display: block; color: var(--text-2); font-size: 11px;
-}
-.muted { color: var(--text-3); font-size: 11px; }
-.fw { font-weight: 600; color: var(--text-1); font-size: 12px; }
+.state-pill { font-size: 9px; padding: 2px 7px; border-radius: 10px; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px; font-weight: 700; }
+.state-done        { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+.state-pending-qa  { background: rgba(255,211,74,0.10); color: var(--gold); border: 1px solid rgba(255,211,74,0.2); }
+.state-pending-ppv { background: rgba(74,124,255,0.10); color: var(--blue-lt); border: 1px solid rgba(74,124,255,0.2); }
+.qa-yes { color: var(--green); font-size: 11px; font-weight: 600; }
+.qa-no  { color: var(--red); font-size: 11px; font-weight: 600; }
+.proj-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue-lt); display: inline-block; margin-right: 4px; }
+.id-badge { font-size: 10px; color: var(--blue-lt); font-family: 'DM Mono', monospace; font-weight: 600; }
+.ticket-id { font-size: 10px; color: var(--text-secondary); font-family: 'DM Mono', monospace; }
 
-.eb {
-  width: 28px; height: 28px; border-radius: 7px;
-  border: 1px solid var(--border); background: var(--bg-input);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text-3); font-size: 14px;
-  transition: all 0.15s;
-}
-.eb:hover { background: rgba(59,130,246,0.15); border-color: rgba(59,130,246,0.3); color: var(--accent); }
+.eb { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 13px; transition: all .15s; }
+.eb:hover { background: rgba(74,124,255,0.15); border-color: var(--border-blue); color: var(--blue-lt); }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-secondary); }
+.empty-state i { font-size: 38px; display: block; margin-bottom: 10px; opacity: .2; }
+.empty-state p { font-size: 12px; }
 
-.empty-state { text-align: center; padding: 52px 20px; color: var(--text-3); }
-.empty-state i { font-size: 44px; display: block; margin-bottom: 10px; opacity: 0.3; }
-.empty-state p { font-size: 13px; }
+/* ── TABLE CARD ── */
+.tc { background: #030711; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+.tc-hd { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.tc-title { font-size: 13px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.tc-count { font-size: 10px; color: var(--blue-lt); background: var(--blue-gl); padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border-blue); font-weight: 700; }
+.tc-spacer { flex: 1; }
+.srch { display: flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 7px; padding: 0 10px; height: 30px; background: rgba(255,255,255,0.03); transition: border-color .15s; min-width: 180px; }
+.srch:focus-within { border-color: var(--blue-lt); }
+.srch i { font-size: 12px; color: var(--text-secondary); }
+.srch input { border: none; background: transparent; font-size: 11px; color: var(--text-primary); outline: none; flex: 1; font-family: 'DM Sans', sans-serif; }
+.srch input::placeholder { color: var(--text-secondary); }
+.ds { height: 30px; border: 1px solid var(--border); border-radius: 7px; background: rgba(255,255,255,0.03); color: var(--text-secondary); font-size: 11px; padding: 0 9px; outline: none; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.ds:focus { border-color: var(--blue-lt); }
+.ds option { background: #030711; }
+.btn-cal { width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 14px; transition: all .15s; }
+.btn-cal:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.btn-new { display: flex; align-items: center; gap: 5px; height: 30px; padding: 0 13px; background: linear-gradient(135deg,#1035c8,var(--blue)); border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 11px; font-weight: 700; border-radius: 7px; cursor: pointer; font-family: 'Syne', sans-serif; white-space: nowrap; transition: opacity .15s; }
+.btn-new:hover { opacity: .85; }
 
 /* ── PAGINATION ── */
-.tc-foot {
+.tc-foot { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 6px; }
+.pg-info { font-size: 10px; color: var(--text-secondary); }
+.pg-ctrl { display: flex; align-items: center; gap: 4px; }
+.pg-btn { width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 5px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; color: var(--text-secondary); transition: background .15s, border-color .15s; }
+.pg-btn:hover { border-color: var(--border-blue); color: var(--blue-lt); }
+.pg-num { width: 26px; height: 26px; border-radius: 5px; background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.pg-size select { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 5px; padding: 3px 7px; font-size: 10px; font-family: 'DM Sans', sans-serif; outline: none; cursor: pointer; }
+
+/* ── RIGHT PANEL ── */
+.right-panel { display: flex; flex-direction: column; gap: 12px; }
+
+.status-card {
+  background: #030711; border: 1px solid var(--border);
+  border-radius: var(--r); padding: 14px;
+}
+.status-label { font-size: 11px; color: var(--text-secondary); margin-bottom: 10px; font-weight: 600; font-family: 'Syne', sans-serif; text-transform: uppercase; letter-spacing: .6px; }
+.status-bar { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.06); margin-bottom: 10px; overflow: hidden; }
+.status-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--blue-lt)); border-radius: 3px; transition: width .4s ease; }
+.status-done { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 10px; }
+.status-nodes { display: flex; justify-content: space-between; align-items: center; position: relative; padding-bottom: 5px; margin-bottom: 8px; }
+.status-track { position: absolute; bottom: 9px; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+.status-fill-track { height: 100%; background: linear-gradient(90deg,var(--blue),var(--blue-lt)); border-radius: 2px; transition: width .4s ease; }
+.status-node { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #030711; flex-shrink: 0; position: relative; z-index: 1; }
+.sn-done { background: var(--blue-lt); }
+.sn-curr { background: var(--blue-lt); box-shadow: 0 0 0 4px rgba(74,124,255,0.3); animation: pulse-node 1.5s infinite; }
+.sn-todo { background: rgba(255,255,255,0.1); }
+@keyframes pulse-node { 0%,100%{box-shadow:0 0 0 3px rgba(74,124,255,0.3)} 50%{box-shadow:0 0 0 6px rgba(74,124,255,0.12)} }
+.btn-back {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px; width: 100%;
+  background: linear-gradient(135deg,#1035c8,var(--blue));
+  border: 1px solid rgba(255,255,255,0.12);
+  color: #fff; border-radius: 8px;
+  font-size: 11px; font-weight: 700; cursor: pointer;
+  font-family: 'Syne', sans-serif; transition: opacity .15s;
+}
+.btn-back:hover { opacity: .85; }
+
+.crew-card { background: #030711; border: 1px solid var(--border); border-radius: var(--r); padding: 14px; }
+.crew-field { margin-bottom: 10px; }
+.crew-field-label { font-size: 9px; color: var(--text-secondary); margin-bottom: 5px; font-family: 'Syne', sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+.assignee-select {
   display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 18px; border-top: 1px solid var(--border);
-  flex-wrap: wrap; gap: 8px;
+  padding: 6px 10px; border: 1px solid var(--border);
+  border-radius: 6px; font-size: 11px; cursor: pointer;
+  background: rgba(255,255,255,0.02); color: var(--text-secondary);
+  transition: border-color .15s; width: 100%;
 }
-.pg-info { font-size: 11px; color: var(--text-3); }
-.pg-controls { display: flex; align-items: center; gap: 6px; }
-.pg-btn {
-  width: 30px; height: 30px; border-radius: 7px;
-  border: 1px solid var(--border); background: var(--bg-input);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text-2); font-size: 13px;
-  transition: all 0.15s;
-}
-.pg-btn:hover { background: var(--bg-hover); color: var(--text-1); }
-.pg-num {
-  width: 30px; height: 30px; border-radius: 7px;
-  background: var(--accent); color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 12px; font-weight: 700;
-}
-.pg-size {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 11px; color: var(--text-3);
-}
-.pg-size select {
-  background: var(--bg-input); border: 1px solid var(--border);
-  color: var(--text-2); border-radius: 7px;
-  padding: 4px 8px; font-size: 11px;
-  font-family: var(--font); outline: none; cursor: pointer;
-}
+.assignee-select:hover { border-color: var(--border-blue); }
+.creator-row { display: flex; align-items: center; gap: 8px; }
+.creator-av { width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff; font-weight: 700; text-transform: uppercase; flex-shrink: 0; }
+.date-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-secondary); }
 
-/* ── MODAL ── */
-.modal-overlay {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 300; align-items: center; justify-content: center;
-  backdrop-filter: blur(4px);
+/* ── BOTTOM STAT CARDS ── */
+.bottom-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.stat-card { background: #030711; border: 1px solid var(--border); border-radius: var(--r); padding: 14px; overflow: hidden; }
+.stat-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.stat-card-title { font-size: 12px; font-weight: 700; font-family: 'Syne', sans-serif; }
+.stat-card-sub { font-size: 9px; color: var(--text-secondary); margin-top: 2px; }
+.mini-chart { height: 68px; margin: 4px 0; position: relative; }
+svg.chart { width: 100%; height: 100%; }
+.donut-wrap { display: flex; align-items: center; gap: 10px; }
+.donut-legend { font-size: 10px; color: var(--text-secondary); display: flex; flex-direction: column; gap: 4px; }
+.legend-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 4px; }
+.resolution-val { font-size: 26px; font-weight: 800; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.resolution-sub { font-size: 9px; color: var(--text-secondary); }
+.quick-actions { display: flex; flex-direction: column; gap: 6px; padding-top: 4px; }
+.qa-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 10px; border: 1px solid var(--border);
+  border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 600;
+  transition: background 0.1s, border-color .15s; color: var(--text-secondary);
+  background: transparent; width: 100%; font-family: 'DM Sans', sans-serif;
 }
+.qa-btn:hover { background: rgba(255,255,255,0.03); border-color: var(--border-blue); color: var(--blue-lt); }
+.qa-btn.primary { background: linear-gradient(135deg, var(--blue) 0%, #1035c8 100%); color: #fff; border-color: rgba(255,255,255,0.12); }
+.qa-btn.primary:hover { opacity: .88; }
+.qa-btn i { font-size: 14px; flex-shrink: 0; }
+
+/* ── DRAWER ── */
+.drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(2px); }
+.drawer-overlay.open { display: block; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 820px; max-width: 96vw; background: var(--bg-base); border-left: 1px solid var(--border); z-index: 201; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .3s cubic-bezier(.4,0,.2,1); box-shadow: -24px 0 64px rgba(0,0,0,0.6); }
+.drawer.open { transform: translateX(0); }
+.dr-bar { display: flex; align-items: center; gap: 10px; padding: 0 18px; height: 50px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: #030711; }
+.dr-back { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 13px; transition: all .15s; }
+.dr-back:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.dr-breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-secondary); }
+.dr-bc-chip { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 5px; padding: 3px 9px; display: flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 600; }
+.dr-bc-chip i { font-size: 11px; color: var(--blue-lt); }
+.dr-bc-sep { color: var(--text-secondary); opacity: .4; font-size: 12px; }
+.dr-refresh { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 13px; transition: all .15s; margin-left: auto; }
+.dr-refresh:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.dr-tabs { display: flex; align-items: center; gap: 2px; padding: 0 18px; height: 40px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: #030711; }
+.dr-tab { display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 40px; font-size: 11px; font-weight: 600; color: var(--text-secondary); cursor: pointer; border-bottom: 2px solid transparent; transition: all .15s; white-space: nowrap; font-family: 'Syne', sans-serif; }
+.dr-tab:hover { color: var(--text-primary); }
+.dr-tab.active { color: var(--blue-lt); border-bottom-color: var(--blue); }
+.dr-tab i { font-size: 13px; }
+.dr-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+.dr-main { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.dr-main::-webkit-scrollbar { width: 4px; }
+.dr-main::-webkit-scrollbar-thumb { background: rgba(74,124,255,0.35); border-radius: 2px; }
+.dr-side { width: 220px; flex-shrink: 0; border-left: 1px solid var(--border); overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; background: #030711; }
+.dr-panel { display: none; flex-direction: column; gap: 12px; }
+.dr-panel.active { display: flex; }
+.det-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.det-field { background: #030711; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.det-lbl { font-size: 8px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+.det-val { font-size: 11px; color: var(--text-primary); font-weight: 500; line-height: 1.5; }
+.det-full { grid-column: span 2; }
+.time-summary { background: #030711; border: 1px solid var(--border); border-radius: 9px; padding: 12px 14px; }
+.time-sum-title { font-size: 11px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.time-sum-title i { font-size: 15px; color: var(--blue-lt); }
+.rel-table-wrap { background: #030711; border: 1px solid var(--border); border-radius: 9px; overflow: hidden; }
+.rel-table-hd { padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.rel-table-title { font-size: 11px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; display: flex; align-items: center; gap: 6px; }
+.rel-tbl { width: 100%; border-collapse: collapse; font-size: 10px; }
+.rel-tbl th { color: var(--text-secondary); font-weight: 700; padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: 8px; letter-spacing: .6px; text-transform: uppercase; background: rgba(255,255,255,0.02); font-family: 'Syne', sans-serif; white-space: nowrap; }
+.rel-tbl td { padding: 8px 10px; color: var(--text-secondary); border-bottom: 1px solid var(--border); vertical-align: middle; }
+.rel-tbl tbody tr:last-child td { border-bottom: none; }
+.rel-tbl tbody tr:hover td { background: rgba(74,124,255,0.04); }
+.rel-done     { display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:10px;font-size:8px;font-weight:700;background:rgba(74,222,128,0.12);color:var(--green);border:1px solid rgba(74,222,128,0.2); }
+.rel-pending  { display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:10px;font-size:8px;font-weight:700;background:rgba(255,184,77,0.12);color:#ffb84d;border:1px solid rgba(255,184,77,0.2); }
+.rel-progress { display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:10px;font-size:8px;font-weight:700;background:rgba(74,124,255,0.12);color:var(--blue-lt);border:1px solid rgba(74,124,255,0.2); }
+.hist-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.hist-item:last-child { border-bottom: none; }
+.hist-line { display: flex; flex-direction: column; align-items: center; width: 14px; flex-shrink: 0; }
+.hist-dot { width: 9px; height: 9px; border-radius: 50%; border: 2px solid currentColor; background: var(--bg-base); flex-shrink: 0; }
+.hist-connector { flex: 1; width: 1px; background: var(--border); min-height: 14px; margin-top: 3px; }
+.hist-body { flex: 1; }
+.hist-action { font-size: 11px; color: var(--text-primary); font-weight: 500; line-height: 1.4; }
+.hist-meta { font-size: 9px; color: var(--text-secondary); margin-top: 2px; }
+.side-section { margin-bottom: 16px; }
+.side-label { font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 9px; font-family: 'Syne', sans-serif; display: flex; align-items: center; gap: 5px; }
+.side-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.crew-select { width: 100%; height: 30px; border: 1px solid var(--border); border-radius: 6px; background: rgba(255,255,255,0.02); color: var(--text-secondary); font-size: 10px; padding: 0 8px; outline: none; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-bottom: 9px; }
+.crew-select option { background: #030711; }
+.crew-field-dr { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 9px 10px; margin-bottom: 7px; }
+.crew-field-lbl { font-size: 8px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+.crew-field-val { font-size: 10px; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.crew-av { width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; text-transform: uppercase; flex-shrink: 0; }
+.crew-date-val { font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; }
+.crew-date-val i { font-size: 12px; color: var(--blue-lt); }
+
+/* ── MODALS ── */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
 .modal-overlay.open { display: flex; }
-.modal {
-  background: var(--bg-card);
-  border-radius: 16px; border: 1px solid var(--border-2);
-  padding: 24px; width: 430px; max-width: 95vw;
-  animation: modal-in 0.2s ease;
-  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
-}
-@keyframes modal-in {
-  from { opacity: 0; transform: translateY(20px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-.md-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 22px; }
-.md-title { font-size: 16px; font-weight: 700; color: var(--text-1); }
-.md-id    { font-size: 11px; color: var(--text-3); margin-top: 3px; font-family: var(--mono); }
-.md-close {
-  width: 30px; height: 30px; border-radius: 8px;
-  border: 1px solid var(--border); background: var(--bg-input);
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text-3); font-size: 16px;
-  transition: all 0.15s; flex-shrink: 0;
-}
-.md-close:hover { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #ef4444; }
+.modal { background: #030711; border-radius: 12px; border: 1px solid rgba(74,124,255,0.2); padding: 22px; width: 420px; max-width: 95vw; animation: modal-in .2s ease; box-shadow: 0 24px 64px rgba(0,0,0,0.6); }
+@keyframes modal-in { from{opacity:0;transform:translateY(18px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+.md-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+.md-title { font-size: 14px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.md-id { font-size: 10px; color: var(--text-secondary); margin-top: 3px; font-family: 'DM Mono', monospace; }
+.md-close { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 14px; transition: all .15s; flex-shrink: 0; }
+.md-close:hover { background: rgba(200,0,28,0.15); border-color: rgba(200,0,28,0.3); color: #e8304a; }
+.field-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.field      { display: flex; flex-direction: column; gap: 4px; }
+.field-full { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.field label,.field-full label { font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; font-family: 'Syne', sans-serif; }
+.field select,.field input,.field-full input,.field-full textarea { border: 1px solid var(--border); border-radius: 7px; background: rgba(255,255,255,0.03); color: var(--text-primary); font-size: 12px; padding: 0 10px; outline: none; width: 100%; font-family: 'DM Sans', sans-serif; transition: all .15s; }
+.field select,.field input,.field-full input { height: 34px; }
+.field-full textarea { height: 68px; padding: 8px 10px; resize: none; }
+.field select option { background: #030711; }
+.field select:focus,.field input:focus,.field-full input:focus,.field-full textarea:focus { border-color: var(--blue-lt); box-shadow: 0 0 0 3px rgba(74,124,255,0.15); }
+.modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.btn-cancel { height: 36px; padding: 0 14px; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s; }
+.btn-cancel:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+.btn-save { flex: 1; height: 36px; border-radius: 7px; background: linear-gradient(135deg,#1035c8,var(--blue)); border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; transition: opacity .15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-save:hover { opacity: .85; }
+.nt-divider { height: 1px; background: var(--border); margin: 4px 0 10px; }
+.nt-section-label { font-size: 8px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-family: 'Syne', sans-serif; }
+input[type="file"].field-file { height: auto; padding: 7px 10px; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
+input[type="file"].field-file::-webkit-file-upload-button { background: rgba(255,255,255,0.06); border: 1px solid rgba(74,124,255,0.3); color: var(--text-secondary); font-size: 10px; font-family: 'DM Sans', sans-serif; padding: 3px 10px; border-radius: 5px; cursor: pointer; margin-right: 8px; }
 
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-.field     { display: flex; flex-direction: column; gap: 5px; }
-.field-full{ display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
-.field label, .field-full label {
-  font-size: 10px; font-weight: 700;
-  color: var(--text-3); text-transform: uppercase; letter-spacing: 0.6px;
-}
-.field select,
-.field input,
-.field-full input {
-  height: 38px; border: 1px solid var(--border);
-  border-radius: 9px; background: var(--bg-input);
-  color: var(--text-1); font-size: 13px;
-  padding: 0 12px; outline: none; width: 100%;
-  font-family: var(--font); transition: all 0.15s;
-}
-.field select option { background: var(--bg-surface); }
-.field select:focus,
-.field input:focus,
-.field-full input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
-.modal-actions { display: flex; gap: 8px; margin-top: 22px; }
-.btn-cancel {
-  height: 40px; padding: 0 18px; border-radius: 9px;
-  border: 1px solid var(--border); background: transparent;
-  color: var(--text-3); font-size: 13px; cursor: pointer;
-  font-family: var(--font); transition: all 0.15s;
-}
-.btn-cancel:hover { background: var(--bg-hover); color: var(--text-2); }
-.btn-save {
-  flex: 1; height: 40px; border-radius: 9px;
-  background: var(--accent); border: none;
-  color: #fff; font-size: 13px; font-weight: 700;
-  cursor: pointer; font-family: var(--font);
-  transition: background 0.15s;
-}
-.btn-save:hover { background: #2563eb; }
-
-/* ── RESPONSIVE ── */
-@media (max-width: 1100px) {
-  .mid-grid { grid-template-columns: 1fr 1fr; }
-  .activity-card { display: none; }
-}
-@media (max-width: 900px) {
-  .sg { grid-template-columns: 1fr 1fr; }
-  .mid-grid { grid-template-columns: 1fr; }
-  .sidebar { width: 60px; }
-  .sb-brand, .sb-user-info, .nav-lbl, .nav-badge, .nav-sec, .sb-foot-label { display: none; }
-}
-@media (max-width: 640px) {
-  .sg { grid-template-columns: 1fr; }
-  .tb-breadcrumb .tb-sub, .tc-count { display: none; }
-  .content { padding: 12px; }
-}
+@media (max-width:1100px) { .two-col { grid-template-columns: 1fr; } .bottom-row { grid-template-columns: 1fr 1fr; } .sg { grid-template-columns: 1fr 1fr; } }
+@media (max-width:640px)  { .sg { grid-template-columns: 1fr; } .bottom-row { grid-template-columns: 1fr; } .content { padding: 10px; } }
 </style>
 
 {% with initials=request.user.get_full_name|default:request.user.username %}
-<div class="shell">
+<div class="dash">
 
-  <!-- ── SIDEBAR ── -->
+  <!-- ══ SIDEBAR ══ -->
   <div class="sidebar" id="sidebar">
-    <div class="sb-head" onclick="toggleSidebar()" title="Toggle sidebar">
-      <div class="sb-logo">
-        <img src="{% static 'images/opascor_logo.png' %}" alt="OPASCOR">
-      </div>
-      <div class="sb-brand">
-        <div class="sb-brand-name">OPASCOR</div>
-        <div class="sb-brand-sub">Oriental Port & Allied Services</div>
+    <div class="logo" onclick="toggleSidebar()">
+      <div class="sb-icon"><img src="{% static 'images/opascor_logo.png' %}" alt="OPASCOR Logo"></div>
+      <div>
+        <div class="logo-name">OPASCOR</div>
+        <div class="logo-sub">Oriental Port &amp; Allied Services</div>
       </div>
     </div>
-
     <div class="sb-user">
       <div class="sb-av">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
-      <div class="sb-user-info">
+      <div style="min-width:0">
         <div class="sb-uname">{{ request.user.get_full_name|default:request.user.username }}</div>
         <div class="sb-urole">Administrator</div>
+        <div class="sb-online">Online</div>
       </div>
     </div>
-
     <div class="sb-nav">
-      <div class="nav-sec">Main Menu</div>
-      <a class="nav-a {% if not selected_dept %}active{% endif %}" href="?">
+      <div class="nav-section">Main Menu</div>
+      <a class="nav-item {% if not selected_dept %}active{% endif %}" href="?">
         <i class="ti ti-layout-dashboard"></i>
         <span class="nav-lbl">Dashboard</span>
       </a>
       <div class="nav-div"></div>
-      <div class="nav-sec">Departments</div>
-
+      <div class="nav-section">Departments</div>
       {% for value, label in departments %}
-        <a class="nav-a {% if selected_dept == value %}active{% endif %}" href="?department={{ value }}">
-          {% if value == 'Admin' %}
-            <i class="ti ti-shield-check"></i>
-          {% elif value == 'Finance' %}
-            <i class="ti ti-coins"></i>
-          {% elif value == 'Information Technology' or value == 'MIS' %}
-            <i class="ti ti-device-desktop"></i>
-          {% elif value == 'Operations' or value == 'General / Operational Mgmt' %}
-            <i class="ti ti-settings"></i>
-          {% elif value == 'Human Resources' %}
-            <i class="ti ti-users"></i>
-          {% elif value == 'Security' %}
-            <i class="ti ti-lock"></i>
-          {% else %}
-            <i class="ti ti-building"></i>
+        <a class="nav-item {% if selected_dept == value %}active{% endif %}" href="?department={{ value }}">
+          {% if value == 'Admin' %}<i class="ti ti-shield-check"></i>
+          {% elif value == 'Finance' %}<i class="ti ti-coins"></i>
+          {% elif value == 'MIS' or value == 'Information Technology' %}<i class="ti ti-device-desktop"></i>
+          {% elif value == 'Operational/General Management' or value == 'Operations' %}<i class="ti ti-settings"></i>
+          {% elif value == 'Human Resources' %}<i class="ti ti-users"></i>
+          {% elif value == 'Security' %}<i class="ti ti-lock"></i>
+          {% else %}<i class="ti ti-building"></i>
           {% endif %}
           <span class="nav-lbl">{{ label }}</span>
           {% with count=dept_counts|get_item:value %}
@@ -652,59 +533,66 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-base); }
           {% endwith %}
         </a>
       {% endfor %}
-
       <div class="nav-div"></div>
+      <div class="nav-section">Compliance &amp; Oversight</div>
+      <a class="nav-item" href="#"><i class="ti ti-file-text"></i><span class="nav-lbl">Reports</span></a>
+      <a class="nav-item" href="#"><i class="ti ti-calculator"></i><span class="nav-lbl">Estimate Cost</span></a>
+      <div class="nav-section">Org Settings</div>
+      <a class="nav-item" href="#"><i class="ti ti-building"></i><span class="nav-lbl">Account</span></a>
+      <a class="nav-item" href="#"><i class="ti ti-users"></i><span class="nav-lbl">Crew Members</span></a>
+      <div class="nav-section">Support</div>
+      <a class="nav-item" href="#"><i class="ti ti-settings"></i><span class="nav-lbl">Settings</span></a>
+      <a class="nav-item" href="#"><i class="ti ti-help-circle"></i><span class="nav-lbl">Help &amp; Center</span></a>
     </div>
-
     <div class="sb-foot">
-      <a class="nav-a" href="{% url 'logout' %}" style="color:var(--text-3)">
+      <a class="nav-item" href="{% url 'logout' %}" style="margin:0">
         <i class="ti ti-logout"></i>
-        <span class="nav-lbl sb-foot-label">Logout</span>
+        <span class="nav-lbl sb-foot-lbl">Logout</span>
       </a>
-      <div class="sb-collapse-btn" onclick="toggleSidebar()">
+      <div class="sb-collapse" onclick="toggleSidebar()">
         <i class="ti ti-layout-sidebar-left-collapse"></i>
-        <span class="sb-foot-label">Collapse</span>
+        <span class="sb-foot-lbl">Collapse</span>
       </div>
     </div>
   </div>
 
-  <!-- ── MAIN ── -->
+  <!-- ══ MAIN ══ -->
   <div class="main">
 
     <!-- TOPBAR -->
     <div class="topbar">
-      <div class="tb-menu" onclick="toggleSidebar()">
-        <i class="ti ti-menu-2"></i>
+      <div class="topbar-left">
+        <div class="tb-menu" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></div>
+        <div class="topbar-breadcrumb">
+          <span class="page-title">Admin Dashboard</span>
+          <span class="sep">/</span>
+          <span class="sub-crumb">
+            <i class="ti ti-home"></i>
+            {% if selected_dept %}{{ selected_dept }}{% else %}Overview{% endif %}
+          </span>
+        </div>
       </div>
-      <div class="tb-breadcrumb">
-        <span class="tb-title">Admin Dashboard</span>
-        <span class="tb-sep">/</span>
-        <span class="tb-crumb">
-          <i class="ti ti-home"></i>
-          {% if selected_dept %}{{ selected_dept }}{% else %}Overview{% endif %}
-        </span>
-      </div>
-      <div class="tb-right">
-        <a href="{% url 'admin_inbox' %}" class="tb-icon" aria-label="Messages">
-          <i class="ti ti-mail"></i>
-          {% if unread_messages %}<span class="nd"></span>{% endif %}
-        </a>
-        <div class="tb-icon" style="position:relative">
+      <div class="topbar-right">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="search-box">
+            <i class="ti ti-search" style="font-size:13px;flex-shrink:0;color:var(--text-secondary)"></i>
+            <input type="text" placeholder="Search anything...">
+          </div>
+          <div class="search-arrow"><i class="ti ti-arrow-right" style="font-size:12px;color:#fff"></i></div>
+        </div>
+        <a href="{% url 'admin_inbox' %}" class="tb-notif" style="text-decoration:none">
           <i class="ti ti-bell"></i>
           <span class="notif-badge">3</span>
-        </div>
-        <span class="admin-tag">ADMIN</span>
-        <div class="user-chip">
-          <div class="chip-av">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
-          <div>
-            <div class="chip-name">{{ request.user.get_full_name|default:request.user.username }}</div>
-            <div class="chip-role">Administrator</div>
-          </div>
-          <i class="ti ti-chevron-down chip-caret"></i>
-        </div>
-        <a href="{% url 'logout' %}" style="color:var(--text-3);font-size:18px;text-decoration:none;display:flex;align-items:center;">
-          <i class="ti ti-logout"></i>
         </a>
+        <span class="tb-tag">ADMIN</span>
+        <div class="topbar-user">
+          <div class="avatar">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
+          <div style="font-size:11px;line-height:1.2">
+            <div class="tb-user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+            <div class="tb-user-role">Administrator</div>
+          </div>
+          <i class="ti ti-chevron-down" style="font-size:11px;color:var(--text-secondary);margin-left:2px"></i>
+        </div>
       </div>
     </div>
 
@@ -719,287 +607,490 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-base); }
       <div class="sg">
         <div class="sc">
           <div class="sc-top">
-            <div class="sc-left">
-              <div class="sc-label">Total Concerns</div>
+            <div class="sc-icon si-blue"><i class="ti ti-ticket"></i></div>
+            <div class="sc-body">
+              <div class="sc-lbl">Total Concerns</div>
               <div class="sc-val">{{ total }}</div>
               <div class="sc-hint">All time tickets</div>
             </div>
-            <div class="sc-icon si-b"><i class="ti ti-ticket"></i></div>
           </div>
-          <svg class="sc-wave" viewBox="0 0 200 48" preserveAspectRatio="none" fill="none">
-            <path d="M0 32 C30 20, 50 40, 80 28 C110 16, 130 36, 160 24 C180 16, 190 28, 200 20 L200 48 L0 48 Z" fill="rgba(59,130,246,0.15)"/>
-            <path d="M0 32 C30 20, 50 40, 80 28 C110 16, 130 36, 160 24 C180 16, 190 28, 200 20" stroke="rgba(59,130,246,0.6)" stroke-width="1.5" fill="none"/>
+          <svg class="sc-wave" viewBox="0 0 200 44" preserveAspectRatio="none" fill="none">
+            <path d="M0 34 C30 20,50 40,80 26 C110 12,130 36,160 22 C180 12,192 28,200 20 L200 44 L0 44 Z" fill="rgba(74,124,255,0.2)"/>
+            <path d="M0 34 C30 20,50 40,80 26 C110 12,130 36,160 22 C180 12,192 28,200 20" stroke="rgba(74,124,255,0.8)" stroke-width="1.5" fill="none"/>
           </svg>
         </div>
         <div class="sc">
           <div class="sc-top">
-            <div class="sc-left">
-              <div class="sc-label">Pending</div>
-              <div class="sc-val" style="color:var(--amber)">{{ pending }}</div>
+            <div class="sc-icon si-red"><i class="ti ti-clock"></i></div>
+            <div class="sc-body">
+              <div class="sc-lbl">Pending</div>
+              <div class="sc-val" style="color:#e8304a">{{ pending }}</div>
               <div class="sc-hint">Awaiting action</div>
             </div>
-            <div class="sc-icon si-a"><i class="ti ti-clock"></i></div>
           </div>
-          <svg class="sc-wave" viewBox="0 0 200 48" preserveAspectRatio="none" fill="none">
-            <path d="M0 28 C25 36, 45 18, 70 30 C95 42, 120 22, 150 32 C170 38, 185 24, 200 28 L200 48 L0 48 Z" fill="rgba(245,158,11,0.15)"/>
-            <path d="M0 28 C25 36, 45 18, 70 30 C95 42, 120 22, 150 32 C170 38, 185 24, 200 28" stroke="rgba(245,158,11,0.6)" stroke-width="1.5" fill="none"/>
+          <svg class="sc-wave" viewBox="0 0 200 44" preserveAspectRatio="none" fill="none">
+            <path d="M0 28 C25 38,45 16,70 30 C95 44,120 20,150 32 C170 40,185 24,200 28 L200 44 L0 44 Z" fill="rgba(200,0,28,0.2)"/>
+            <path d="M0 28 C25 38,45 16,70 30 C95 44,120 20,150 32 C170 40,185 24,200 28" stroke="rgba(200,0,28,0.8)" stroke-width="1.5" fill="none"/>
           </svg>
         </div>
         <div class="sc">
           <div class="sc-top">
-            <div class="sc-left">
-              <div class="sc-label">In Progress</div>
-              <div class="sc-val" style="color:var(--orange)">{{ progress }}</div>
+            <div class="sc-icon si-purple"><i class="ti ti-loader"></i></div>
+            <div class="sc-body">
+              <div class="sc-lbl">In Progress</div>
+              <div class="sc-val" style="color:var(--purple)">{{ progress }}</div>
               <div class="sc-hint">Being handled</div>
             </div>
-            <div class="sc-icon si-o"><i class="ti ti-loader"></i></div>
           </div>
-          <svg class="sc-wave" viewBox="0 0 200 48" preserveAspectRatio="none" fill="none">
-            <path d="M0 36 C20 28, 40 40, 60 30 C80 20, 110 38, 140 26 C165 18, 185 32, 200 24 L200 48 L0 48 Z" fill="rgba(249,115,22,0.15)"/>
-            <path d="M0 36 C20 28, 40 40, 60 30 C80 20, 110 38, 140 26 C165 18, 185 32, 200 24" stroke="rgba(249,115,22,0.6)" stroke-width="1.5" fill="none"/>
+          <svg class="sc-wave" viewBox="0 0 200 44" preserveAspectRatio="none" fill="none">
+            <path d="M0 36 C20 28,40 40,60 30 C80 20,110 38,140 26 C165 18,185 32,200 24 L200 44 L0 44 Z" fill="rgba(129,140,248,0.2)"/>
+            <path d="M0 36 C20 28,40 40,60 30 C80 20,110 38,140 26 C165 18,185 32,200 24" stroke="rgba(129,140,248,0.8)" stroke-width="1.5" fill="none"/>
           </svg>
         </div>
         <div class="sc">
           <div class="sc-top">
-            <div class="sc-left">
-              <div class="sc-label">Resolved</div>
+            <div class="sc-icon si-green"><i class="ti ti-circle-check"></i></div>
+            <div class="sc-body">
+              <div class="sc-lbl">Resolved</div>
               <div class="sc-val" style="color:var(--green)">{{ resolved }}</div>
               <div class="sc-hint">Closed tickets</div>
             </div>
-            <div class="sc-icon si-g"><i class="ti ti-circle-check"></i></div>
           </div>
-          <svg class="sc-wave" viewBox="0 0 200 48" preserveAspectRatio="none" fill="none">
-            <path d="M0 34 C30 26, 55 42, 85 30 C115 18, 140 38, 165 26 C182 18, 194 30, 200 24 L200 48 L0 48 Z" fill="rgba(16,185,129,0.15)"/>
-            <path d="M0 34 C30 26, 55 42, 85 30 C115 18, 140 38, 165 26 C182 18, 194 30, 200 24" stroke="rgba(16,185,129,0.6)" stroke-width="1.5" fill="none"/>
+          <svg class="sc-wave" viewBox="0 0 200 44" preserveAspectRatio="none" fill="none">
+            <path d="M0 34 C30 26,55 42,85 30 C115 18,140 38,165 26 C182 18,194 30,200 24 L200 44 L0 44 Z" fill="rgba(74,222,128,0.2)"/>
+            <path d="M0 34 C30 26,55 42,85 30 C115 18,140 38,165 26 C182 18,194 30,200 24" stroke="rgba(74,222,128,0.8)" stroke-width="1.5" fill="none"/>
           </svg>
         </div>
       </div>
 
-      <!-- MIDDLE ROW -->
-      <div class="mid-grid">
-
-        <!-- LINE CHART -->
-        <div class="chart-card">
-          <div class="chart-hd">
-            <span class="chart-title">Ticket Overview</span>
-            <div class="chart-filter">Last 7 days <i class="ti ti-chevron-down"></i></div>
-          </div>
-          <canvas id="lineChart" height="130"></canvas>
-        </div>
-
-        <!-- DONUT CHART -->
-        <div class="donut-card">
-          <div class="chart-hd" style="margin-bottom:12px">
-            <span class="chart-title">Concerns by Department</span>
-          </div>
-          <div class="donut-wrap">
-            <canvas id="donutChart"></canvas>
-            <div class="donut-center">
-              <div class="donut-val">{{ total }}</div>
-              <div class="donut-lbl">Total</div>
-            </div>
-          </div>
-          <div class="donut-legend" id="donutLegend"></div>
-        </div>
-
-        <!-- RECENT ACTIVITY -->
-        <div class="activity-card">
-          <div class="chart-hd" style="margin-bottom:0">
-            <span class="chart-title">Recent Activity</span>
-          </div>
-          <div class="act-list">
-            <div class="act-item">
-              <div class="act-icon ai-amber"><i class="ti ti-clock"></i></div>
-              <div class="act-body">
-                <div class="act-text"><strong>Ticket #MIS-2024-005</strong> updated to Pending</div>
-                <div class="act-time">2 minutes ago</div>
-              </div>
-            </div>
-            <div class="act-item">
-              <div class="act-icon ai-blue"><i class="ti ti-plus"></i></div>
-              <div class="act-body">
-                <div class="act-text">New ticket <strong>#FIN-2024-004</strong> created</div>
-                <div class="act-time">15 minutes ago</div>
-              </div>
-            </div>
-            <div class="act-item">
-              <div class="act-icon ai-green"><i class="ti ti-circle-check"></i></div>
-              <div class="act-body">
-                <div class="act-text">Ticket <strong>#ADM-2024-003</strong> resolved</div>
-                <div class="act-time">1 hour ago</div>
-              </div>
-            </div>
-            <div class="act-item">
-              <div class="act-icon ai-purple"><i class="ti ti-user"></i></div>
-              <div class="act-body">
-                <div class="act-text">Ticket <strong>#MIS-2024-002</strong> assigned to you</div>
-                <div class="act-time">2 hours ago</div>
-              </div>
-            </div>
-          </div>
-          <a href="#" class="view-all">View all activity <i class="ti ti-arrow-right"></i></a>
-        </div>
-
+      <!-- FILTER BAR -->
+      <div class="filter-bar">
+        <div class="filter-chip active"><i class="ti ti-folder" style="font-size:12px"></i><span class="nav-lbl">Projects</span><i class="ti ti-chevron-down" style="font-size:10px"></i></div>
+        <div class="filter-chip"><i class="ti ti-sticker" style="font-size:12px"></i><span class="nav-lbl">Sticker_ID</span><i class="ti ti-chevron-down" style="font-size:10px"></i></div>
+        <div class="filter-chip"><i class="ti ti-hash" style="font-size:12px"></i><span class="nav-lbl">Ticket_ID</span><i class="ti ti-chevron-down" style="font-size:10px"></i></div>
+        <div class="filter-chip"><i class="ti ti-layout-distribute-horizontal" style="font-size:12px"></i><span class="nav-lbl">Flow Type</span><i class="ti ti-chevron-down" style="font-size:10px"></i></div>
+        <div style="margin-left:auto"><i class="ti ti-refresh" style="color:var(--text-secondary);font-size:15px;cursor:pointer"></i></div>
       </div>
 
-      <!-- TICKETS TABLE -->
-      <div class="tc">
-        <div class="tc-hd">
-          <span class="tc-title">All Concern Tickets</span>
-          <span class="tc-count">{{ total }} ticket{{ total|pluralize }}</span>
-          <div class="tc-spacer"></div>
-          <div class="sw">
-            <i class="ti ti-search"></i>
-            <input type="text" id="searchInput" placeholder="Search user, category, ID..." oninput="filterTable()">
+      <!-- TWO COL -->
+      <div class="two-col">
+
+        <!-- MAIN PANEL -->
+        <div class="main-panel">
+          <div class="tab-bar">
+            <div class="tab active" onclick="switchMainTab('tickets',this)"><i class="ti ti-ticket"></i> All Tickets</div>
+            <div class="tab" onclick="switchMainTab('time',this)"><i class="ti ti-clock"></i> Time</div>
+            <div class="tab" onclick="switchMainTab('history',this)"><i class="ti ti-history"></i> History</div>
+            <div class="tab" onclick="switchMainTab('related',this)"><i class="ti ti-git-branch"></i> Related Tickets</div>
           </div>
-          <form method="get" style="display:inline;">
-            <select name="department" class="ds" onchange="this.form.submit()">
-              <option value="">All Departments</option>
-              {% for value, label in departments %}
-                <option value="{{ value }}" {% if selected_dept == value %}selected{% endif %}>{{ label }}</option>
-              {% endfor %}
-            </select>
-          </form>
-          <div class="btn-cal"><i class="ti ti-calendar"></i></div>
-          <button class="btn-new"><i class="ti ti-plus"></i> New Ticket</button>
+
+          <!-- TICKETS TAB -->
+          <div id="main-panel-tickets" class="main-tab-panel" style="display:flex;flex-direction:column">
+            <div class="tc-hd" style="border-radius:0;border:none;border-bottom:1px solid var(--border)">
+              <span class="tc-title">All Concern Tickets</span>
+              <span class="tc-count">{{ total }} ticket{{ total|pluralize }}</span>
+              <div class="tc-spacer"></div>
+              <div class="srch">
+                <i class="ti ti-search"></i>
+                <input type="text" id="searchInput" placeholder="Search user, category, ID..." oninput="filterTable()">
+              </div>
+              <form method="get" style="display:inline">
+                <select name="department" class="ds" onchange="this.form.submit()">
+                  <option value="">All Departments</option>
+                  {% for value, label in departments %}
+                    <option value="{{ value }}" {% if selected_dept == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+              </form>
+              <div class="btn-cal"><i class="ti ti-calendar"></i></div>
+              <button class="btn-new" onclick="openNewTicketModal()"><i class="ti ti-plus"></i> New Ticket</button>
+            </div>
+            <div style="overflow-x:auto;flex:1">
+              <table class="tbl" id="ticketTable">
+                <thead>
+                  <tr>
+                    <th>ID</th><th>User</th><th>Dept</th><th>Category</th><th>Sub-Category</th>
+                    <th>Message</th><th>File</th><th>Date</th><th>Status</th>
+                    <th>Assigned To</th><th>Remarks</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for c in concerns %}
+                  <tr>
+                    <td class="tid">#{{ c.id }}</td>
+                    <td class="fw">{{ c.user.get_full_name|default:c.user.username }}</td>
+                    <td>
+                      {% with dept=c.user.userprofile.department %}
+                        {% if dept == 'Admin' %}<span class="dp dp-admin">{{ dept }}</span>
+                        {% elif dept == 'Finance' %}<span class="dp dp-finance">{{ dept }}</span>
+                        {% elif dept == 'MIS' or dept == 'Information Technology' %}<span class="dp dp-mis">{{ dept }}</span>
+                        {% elif dept == 'Human Resources' %}<span class="dp dp-hr">{{ dept }}</span>
+                        {% elif dept == 'Security' %}<span class="dp dp-security">{{ dept }}</span>
+                        {% elif dept == 'Operational/General Management' or dept == 'Operations' %}<span class="dp dp-ops">{{ dept }}</span>
+                        {% else %}<span class="dp dp-default">{{ dept }}</span>
+                        {% endif %}
+                      {% endwith %}
+                    </td>
+                    <td style="font-size:11px;color:var(--text-primary)">{{ c.category }}</td>
+                    <td class="muted">{{ c.sub_category }}</td>
+                    <td>
+                      {% if c.description %}<span class="trunc" title="{{ c.description }}">{{ c.description }}</span>
+                      {% else %}<span class="muted">—</span>{% endif %}
+                    </td>
+                    <td style="text-align:center">
+                      {% if c.attachment %}
+                        <a href="{{ c.attachment.url }}" target="_blank" style="color:var(--blue-lt);font-size:15px;text-decoration:none"><i class="ti ti-paperclip"></i></a>
+                      {% else %}<span class="muted">—</span>{% endif %}
+                    </td>
+                    <td class="muted">{{ c.date_submitted|date:"m/d/Y" }}</td>
+                    <td>
+                      {% if c.status == 'Pending' %}<span class="sp sp-p"><span class="sdot"></span>Pending</span>
+                      {% elif c.status == 'In Progress' %}<span class="sp sp-i"><span class="sdot"></span>In Progress</span>
+                      {% else %}<span class="sp sp-r"><span class="sdot"></span>Resolved</span>
+                      {% endif %}
+                    </td>
+                    <td style="font-size:10px;color:var(--text-secondary)">{{ c.assigned_to|default:"—" }}</td>
+                    <td class="muted">{{ c.remarks|default:"—" }}</td>
+                    <td style="display:flex;gap:4px;align-items:center">
+                      <button class="eb" onclick="openDrawer({id:{{ c.id }},status:'{{ c.status }}',assigned:'{{ c.assigned_to|default:'' }}',remarks:'{{ c.remarks|default:'' }}',user:'{{ c.user.get_full_name|default:c.user.username }}',dept:'{{ c.user.userprofile.department }}',category:'{{ c.category }}',sub_category:'{{ c.sub_category|default:'' }}',description:'{{ c.description|default:''|escapejs }}',date:'{{ c.date_submitted|date:"m/d/Y" }}',attachment:'{% if c.attachment %}{{ c.attachment.url }}{% endif %}',updateUrl:'{% url "update_concern" c.id %}'})" title="View Details">
+                        <i class="ti ti-layout-sidebar-right-expand"></i>
+                      </button>
+                      <button class="eb" onclick="openModal({{ c.id }},'{{ c.status }}','{{ c.assigned_to|default:'' }}','{{ c.remarks|default:'' }}','{% url 'update_concern' c.id %}','#{{ c.id }} — {{ c.category }}')" title="Quick Edit">
+                        <i class="ti ti-dots-vertical"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr><td colspan="12">
+                    <div class="empty-state"><i class="ti ti-inbox"></i><p>No concerns found.</p></div>
+                  </td></tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="tc-foot">
+              <span class="pg-info">Showing 1 to {{ total }} of {{ total }} ticket{{ total|pluralize }}</span>
+              <div class="pg-ctrl">
+                <div class="pg-btn"><i class="ti ti-chevron-left"></i></div>
+                <div class="pg-num">1</div>
+                <div class="pg-btn"><i class="ti ti-chevron-right"></i></div>
+              </div>
+              <div class="pg-size">
+                <select><option>10 / page</option><option>25 / page</option><option>50 / page</option></select>
+              </div>
+            </div>
+          </div>
+
+          <!-- TIME TAB -->
+          <div id="main-panel-time" class="main-tab-panel" style="display:none;padding:14px">
+            <div class="time-banner" style="border:none;padding:0">
+              <div class="time-title"><i class="ti ti-clock" style="color:var(--blue-lt);font-size:14px"></i> Total Time for Related Tickets [7h 48m]</div>
+              <div class="time-cols" style="border:1px solid var(--border);border-radius:8px;overflow:hidden">
+                <div class="time-col"><div class="time-col-label">Development</div><div class="time-col-val">1h 24m</div></div>
+                <div class="time-col"><div class="time-col-label">PR Review</div><div class="time-col-val">6h 40m</div></div>
+                <div class="time-col"><div class="time-col-label">QA Review</div><div class="time-col-val">56m</div></div>
+                <div class="time-col"><div class="time-col-label">Product Review</div><div class="time-col-val">7m</div></div>
+                <div class="time-col"><div class="time-col-label">PPV Review</div><div class="time-col-val">5m</div></div>
+              </div>
+            </div>
+            <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:9px;padding:14px;margin-top:12px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-primary);font-family:'Syne',sans-serif;margin-bottom:10px">Timeline Activity</div>
+              <canvas id="mainTimelineChart" height="80"></canvas>
+            </div>
+          </div>
+
+          <!-- HISTORY TAB -->
+          <div id="main-panel-history" class="main-tab-panel" style="display:none;padding:14px">
+            <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:9px;padding:14px">
+              <div style="font-size:11px;color:var(--text-secondary);text-align:center;padding:24px 0">Select a ticket to view its history.</div>
+            </div>
+          </div>
+
+          <!-- RELATED TICKETS TAB -->
+          <div id="main-panel-related" class="main-tab-panel" style="display:none">
+            <div class="time-banner">
+              <div class="time-title"><i class="ti ti-clock" style="color:var(--blue-lt);font-size:14px"></i> Total Time for Related Tickets [7h 48m]</div>
+              <div class="time-cols">
+                <div class="time-col"><div class="time-col-label">Development</div><div class="time-col-val">1h 24m</div></div>
+                <div class="time-col"><div class="time-col-label">PR Review</div><div class="time-col-val">6h 40m</div></div>
+                <div class="time-col"><div class="time-col-label">QA Review</div><div class="time-col-val">56m</div></div>
+                <div class="time-col"><div class="time-col-label">Product Review</div><div class="time-col-val">7m</div></div>
+                <div class="time-col"><div class="time-col-label">PPV Review</div><div class="time-col-val">5m</div></div>
+              </div>
+            </div>
+            <div style="padding:8px 14px 6px;font-size:12px;font-weight:600;font-family:'Syne',sans-serif;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)">
+              <i class="ti ti-git-branch" style="color:var(--blue-lt)"></i> Related Tickets
+            </div>
+            <div style="display:grid;grid-template-columns:80px 80px 80px 50px 1fr 30px 90px 60px;padding:7px 12px;background:rgba(255,255,255,0.02);font-size:9px;color:var(--text-secondary);border-bottom:1px solid var(--border);gap:6px;font-family:'Syne',sans-serif;letter-spacing:.04em;text-transform:uppercase">
+              <span>Project</span><span>Ext.ticket_ID</span><span>Ticket ID</span><span>PPV</span><span>Title</span><span></span><span>State</span><span>QA?</span>
+            </div>
+            {% for c in concerns|slice:":7" %}
+            <div style="display:grid;grid-template-columns:80px 80px 80px 50px 1fr 30px 90px 60px;padding:8px 12px;border-bottom:1px solid var(--border);align-items:center;gap:6px;font-size:11px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='rgba(74,124,255,0.05)'" onmouseout="this.style.background=''">
+              <span><span class="proj-dot"></span>{{ c.user.userprofile.department|slice:":5" }}</span>
+              <span class="id-badge">#{{ c.id }}</span>
+              <span class="ticket-id">TK-{{ c.id }}</span>
+              <span style="font-size:10px;color:var(--text-secondary);display:flex;align-items:center;gap:2px"><i class="ti ti-git-merge" style="font-size:11px"></i> 11%</span>
+              <span style="font-size:11px;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.category }}</span>
+              <span><i class="ti ti-copy" style="font-size:12px;color:var(--text-secondary)"></i></span>
+              <span>
+                {% if c.status == 'Resolved' %}<span class="state-pill state-done">Done</span>
+                {% elif c.status == 'In Progress' %}<span class="state-pill state-pending-ppv">In Progress</span>
+                {% else %}<span class="state-pill state-pending-qa">Pending</span>
+                {% endif %}
+              </span>
+              <span class="{% if c.assigned_to %}qa-yes{% else %}qa-no{% endif %}">{% if c.assigned_to %}Yes{% else %}No{% endif %}</span>
+            </div>
+            {% empty %}
+            <div style="padding:24px;text-align:center;color:var(--text-secondary);font-size:12px">No related tickets found.</div>
+            {% endfor %}
+            <div class="tc-foot">
+              <div class="pg-ctrl">
+                <div class="pg-btn"><i class="ti ti-chevron-left"></i></div>
+                <div class="pg-num">1</div>
+                <div class="pg-btn"><i class="ti ti-chevron-right"></i></div>
+              </div>
+              <span style="font-size:10px;color:var(--text-secondary)">Showing entries</span>
+            </div>
+          </div>
+
+        </div><!-- /main-panel -->
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+          <div class="status-card">
+            <div class="status-label">Status</div>
+            <div class="status-nodes" id="mainStatusNodes">
+              <div class="status-track"><div class="status-fill-track" style="width:100%"></div></div>
+              <div class="status-node sn-done" title="Pending"></div>
+              <div class="status-node sn-done" title="In Progress"></div>
+              <div class="status-node sn-curr" title="Resolved"></div>
+            </div>
+            <div class="status-done"><i class="ti ti-circle-check"></i> Done</div>
+            <div class="btn-back"><i class="ti ti-arrow-back"></i> Go Back to Pending PPV</div>
+          </div>
+          <div class="crew-card">
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:700;font-family:'Syne',sans-serif;margin-bottom:12px"><i class="ti ti-users" style="color:var(--blue-lt)"></i> Ticket Crew</div>
+            <div class="crew-field">
+              <div class="crew-field-label">Current Assignee</div>
+              <div class="assignee-select">Unassigned <i class="ti ti-chevron-down" style="font-size:11px"></i></div>
+            </div>
+            <div class="crew-field">
+              <div class="crew-field-label">Created By</div>
+              <div class="creator-row">
+                <div class="creator-av">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
+                <span style="font-size:11px">{{ request.user.get_full_name|default:request.user.username }}</span>
+              </div>
+            </div>
+            <div class="crew-field">
+              <div class="crew-field-label">Created At</div>
+              <div class="date-row"><i class="ti ti-calendar" style="font-size:13px"></i> — </div>
+            </div>
+          </div>
         </div>
 
-        <div class="tc-body">
-          <table class="tbl" id="ticketTable">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>User</th>
-                <th>Dept</th>
-                <th>Category</th>
-                <th>Sub-Category</th>
-                <th>Message</th>
-                <th>File</th>
-                <th>Date</th>
-                <th>Status</th>
-                <th>Assigned To</th>
-                <th>Remarks</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for c in concerns %}
-              <tr>
-                <td class="tid">#{{ c.id }}</td>
-                <td class="fw">{{ c.user.get_full_name|default:c.user.username }}</td>
-                <td>
-                  {% with dept=c.user.userprofile.department %}
-                    {% if dept == 'Admin' %}
-                      <span class="dp dp-admin">{{ dept }}</span>
-                    {% elif dept == 'Finance' %}
-                      <span class="dp dp-finance">{{ dept }}</span>
-                    {% elif dept == 'MIS' or dept == 'Information Technology' %}
-                      <span class="dp dp-mis">{{ dept }}</span>
-                    {% elif dept == 'Human Resources' %}
-                      <span class="dp dp-hr">{{ dept }}</span>
-                    {% elif dept == 'Security' %}
-                      <span class="dp dp-security">{{ dept }}</span>
-                    {% elif dept == 'Operations' or dept == 'General / Operational Mgmt' %}
-                      <span class="dp dp-ops">{{ dept }}</span>
-                    {% else %}
-                      <span class="dp dp-default">{{ dept }}</span>
-                    {% endif %}
-                  {% endwith %}
-                </td>
-                <td style="font-size:12px;color:var(--text-1)">{{ c.category }}</td>
-                <td class="muted">{{ c.sub_category }}</td>
-                <td>
-                  {% if c.description %}
-                    <span class="trunc" title="{{ c.description }}">{{ c.description }}</span>
-                  {% else %}
-                    <span class="muted">—</span>
-                  {% endif %}
-                </td>
-                <td style="text-align:center">
-                  {% if c.attachment %}
-                    <a href="{{ c.attachment.url }}" target="_blank" style="color:var(--accent);font-size:16px;text-decoration:none;">
-                      <i class="ti ti-paperclip"></i>
-                    </a>
-                  {% else %}
-                    <span class="muted">—</span>
-                  {% endif %}
-                </td>
-                <td class="muted">{{ c.date_submitted|date:"m/d/Y" }}</td>
-                <td>
-                  {% if c.status == 'Pending' %}
-                    <span class="sp sp-p"><span class="sdot"></span>Pending</span>
-                  {% elif c.status == 'In Progress' %}
-                    <span class="sp sp-i"><span class="sdot"></span>In Progress</span>
-                  {% else %}
-                    <span class="sp sp-r"><span class="sdot"></span>Resolved</span>
-                  {% endif %}
-                </td>
-                <td style="font-size:11px;color:var(--text-2)">{{ c.assigned_to|default:"—" }}</td>
-                <td class="muted">{{ c.remarks|default:"—" }}</td>
-                <td>
-                  <button
-                    class="eb"
-                    onclick="openModal(
-                      {{ c.id }},
-                      '{{ c.status }}',
-                      '{{ c.assigned_to|default:'' }}',
-                      '{{ c.remarks|default:'' }}',
-                      '{% url 'update_concern' c.id %}',
-                      '#{{ c.id }} — {{ c.category }}'
-                    )"
-                    title="Edit ticket #{{ c.id }}"
-                  >
-                    <i class="ti ti-dots-vertical"></i>
-                  </button>
-                </td>
-              </tr>
-              {% empty %}
-              <tr>
-                <td colspan="12">
-                  <div class="empty-state">
-                    <i class="ti ti-inbox"></i>
-                    <p>No concerns found.</p>
-                  </div>
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+      </div><!-- /two-col -->
+
+      <!-- BOTTOM STAT CARDS -->
+      <div class="bottom-row">
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div><div class="stat-card-title">Ticket Trend</div><div class="stat-card-sub">Last 7 days</div></div>
+            <div style="font-size:10px;color:var(--blue-lt);border:1px solid rgba(74,124,255,0.3);background:rgba(74,124,255,0.08);border-radius:4px;padding:2px 6px;">7 Days</div>
+          </div>
+          <div class="mini-chart">
+            <svg class="chart" viewBox="0 0 180 70" xmlns="http://www.w3.org/2000/svg">
+              <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1c48f5" stop-opacity="0.3"/><stop offset="100%" stop-color="#1c48f5" stop-opacity="0.02"/></linearGradient></defs>
+              <path d="M10,55 L35,45 L60,50 L85,30 L110,35 L135,20 L160,18" fill="none" stroke="#4a7cff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M10,55 L35,45 L60,50 L85,30 L110,35 L135,20 L160,18 L160,68 L10,68 Z" fill="url(#tg)"/>
+              <text x="10" y="67" font-size="8" fill="rgba(255,255,255,0.25)">31</text>
+              <text x="37" y="67" font-size="8" fill="rgba(255,255,255,0.25)">01</text>
+              <text x="64" y="67" font-size="8" fill="rgba(255,255,255,0.25)">02</text>
+              <text x="91" y="67" font-size="8" fill="rgba(255,255,255,0.25)">03</text>
+              <text x="118" y="67" font-size="8" fill="rgba(255,255,255,0.25)">05</text>
+              <text x="145" y="67" font-size="8" fill="rgba(255,255,255,0.25)">06</text>
+            </svg>
+          </div>
         </div>
 
-        <div class="tc-foot">
-          <span class="pg-info">Showing 1 to {{ total }} of {{ total }} ticket{{ total|pluralize }}</span>
-          <div class="pg-controls">
-            <div class="pg-btn"><i class="ti ti-chevron-left"></i></div>
-            <div class="pg-num">1</div>
-            <div class="pg-btn"><i class="ti ti-chevron-right"></i></div>
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div><div class="stat-card-title">Category Breakdown</div><div class="stat-card-sub">Top 5 Categories</div></div>
           </div>
-          <div class="pg-size">
-            <select>
-              <option>10 / page</option>
-              <option>25 / page</option>
-              <option>50 / page</option>
-            </select>
+          <div class="donut-wrap" style="margin-top:6px">
+            <div style="position:relative;width:58px;height:58px;flex-shrink:0">
+              <canvas id="catChart" width="58" height="58"></canvas>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;color:var(--text-secondary)">
+                <span style="font-size:15px;font-weight:800;color:#fff">{{ total }}</span>Total
+              </div>
+            </div>
+            <div class="donut-legend" id="catList"></div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div><div class="stat-card-title">Resolution Rate</div><div class="stat-card-sub">This Month</div></div>
+          </div>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:10px">
+            <div>
+              <div class="resolution-val" id="resolvePct">—</div>
+              <div class="resolution-sub">Resolved</div>
+            </div>
+            <div style="flex:1">
+              <div style="height:5px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;margin-bottom:4px">
+                <div id="resolveBar" style="height:100%;background:linear-gradient(90deg,var(--blue),var(--blue-lt));border-radius:3px;width:0%"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text-secondary)"><span>0%</span><span>100%</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-header">
+            <div><div class="stat-card-title">Status Overview</div><div class="stat-card-sub">All Tickets</div></div>
+            <div style="position:relative;width:46px;height:46px;flex-shrink:0">
+              <canvas id="ovChart" width="46" height="46"></canvas>
+              <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+                <span style="font-size:13px;font-weight:800;color:#fff;font-family:'Syne',sans-serif">{{ total }}</span>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:10px;display:flex;flex-direction:column;gap:3px;margin-top:4px">
+            <div style="display:flex;justify-content:space-between"><span><span class="legend-dot" style="background:#ffd34a"></span>Pending</span><span style="color:var(--text-secondary)">{{ pending }} <span id="pct-pending"></span></span></div>
+            <div style="display:flex;justify-content:space-between"><span><span class="legend-dot" style="background:var(--blue-lt)"></span>In Progress</span><span style="color:var(--text-secondary)">{{ progress }} <span id="pct-progress"></span></span></div>
+            <div style="display:flex;justify-content:space-between"><span><span class="legend-dot" style="background:var(--green)"></span>Resolved</span><span style="color:var(--text-secondary)">{{ resolved }} <span id="pct-resolved"></span></span></div>
+          </div>
+          <div class="quick-actions" style="border-top:1px solid var(--border);padding-top:8px;margin-top:8px">
+            <button class="qa-btn primary" onclick="openNewTicketModal()"><i class="ti ti-plus"></i> New Ticket</button>
+            <button class="qa-btn"><i class="ti ti-download"></i> Export Report</button>
+            <button class="qa-btn"><i class="ti ti-list"></i> View Logs</button>
           </div>
         </div>
       </div>
 
+    </div><!-- /content -->
+  </div><!-- /main -->
+</div><!-- /dash -->
+{% endwith %}
+
+<!-- ══ TICKET DETAIL DRAWER ══ -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="ticketDrawer">
+  <div class="dr-bar">
+    <div class="dr-back" onclick="closeDrawer()"><i class="ti ti-arrow-left"></i></div>
+    <div class="dr-breadcrumb">
+      <div class="dr-bc-chip"><i class="ti ti-layout-grid"></i> <span id="dr-proj">Project</span></div>
+      <span class="dr-bc-sep">/</span>
+      <div class="dr-bc-chip"><i class="ti ti-ticket"></i> <span id="dr-tid">#—</span></div>
+      <span class="dr-bc-sep">→</span>
+      <div class="dr-bc-chip"><i class="ti ti-building"></i> <span id="dr-dept">Dept</span></div>
+      <span class="dr-bc-sep">/</span>
+      <div class="dr-bc-chip"><i class="ti ti-tag"></i> <span id="dr-cat">Category</span></div>
+    </div>
+    <div class="dr-refresh" onclick="rotateRefresh(this)"><i class="ti ti-refresh"></i></div>
+  </div>
+  <div class="dr-tabs">
+    <div class="dr-tab active" onclick="switchTab('details',this)"><i class="ti ti-info-circle"></i> Details</div>
+    <div class="dr-tab" onclick="switchTab('time',this)"><i class="ti ti-clock"></i> Time</div>
+    <div class="dr-tab" onclick="switchTab('history',this)"><i class="ti ti-history"></i> History</div>
+    <div class="dr-tab" onclick="switchTab('related',this)"><i class="ti ti-git-branch"></i> Related Tickets</div>
+  </div>
+  <div class="dr-body">
+    <div class="dr-main">
+      <div class="dr-panel active" id="panel-details">
+        <div class="det-grid">
+          <div class="det-field"><div class="det-lbl">Ticket ID</div><div class="det-val" id="dd-id">—</div></div>
+          <div class="det-field"><div class="det-lbl">Submitted</div><div class="det-val" id="dd-date">—</div></div>
+          <div class="det-field"><div class="det-lbl">User</div><div class="det-val" id="dd-user">—</div></div>
+          <div class="det-field"><div class="det-lbl">Department</div><div class="det-val" id="dd-dept">—</div></div>
+          <div class="det-field"><div class="det-lbl">Category</div><div class="det-val" id="dd-cat">—</div></div>
+          <div class="det-field"><div class="det-lbl">Sub-Category</div><div class="det-val" id="dd-subcat">—</div></div>
+          <div class="det-field"><div class="det-lbl">Assigned To</div><div class="det-val" id="dd-assigned">—</div></div>
+          <div class="det-field"><div class="det-lbl">Attachment</div><div class="det-val" id="dd-attachment">—</div></div>
+          <div class="det-field det-full"><div class="det-lbl">Remarks</div><div class="det-val" id="dd-remarks">—</div></div>
+          <div class="det-field det-full"><div class="det-lbl">Description / Message</div><div class="det-val" id="dd-desc" style="color:var(--text-secondary);line-height:1.7">—</div></div>
+        </div>
+      </div>
+      <div class="dr-panel" id="panel-time">
+        <div class="time-summary">
+          <div class="time-sum-title"><i class="ti ti-clock"></i> Total Time for Related Tickets</div>
+          <div class="time-cols" style="border:1px solid var(--border);border-radius:7px;overflow:hidden">
+            <div class="time-col"><div class="time-col-label">Submission</div><div class="time-col-val" id="tt-submit">—</div></div>
+            <div class="time-col"><div class="time-col-label">Review</div><div class="time-col-val" id="tt-review">—</div></div>
+            <div class="time-col"><div class="time-col-label">QA Review</div><div class="time-col-val" id="tt-qa">—</div></div>
+            <div class="time-col"><div class="time-col-label">Resolution</div><div class="time-col-val" id="tt-resolve">—</div></div>
+            <div class="time-col"><div class="time-col-label">Total</div><div class="time-col-val" id="tt-total">—</div></div>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:9px;padding:12px 14px">
+          <div style="font-size:11px;font-weight:700;color:var(--text-primary);font-family:'Syne',sans-serif;margin-bottom:10px">Timeline Activity</div>
+          <canvas id="timelineChart" height="70"></canvas>
+        </div>
+      </div>
+      <div class="dr-panel" id="panel-history">
+        <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:9px;padding:12px 14px" id="historyList"></div>
+      </div>
+      <div class="dr-panel" id="panel-related">
+        <div class="rel-table-wrap">
+          <div class="rel-table-hd">
+            <span class="rel-table-title"><i class="ti ti-git-branch" style="color:var(--blue-lt)"></i> Related Tickets</span>
+            <span style="font-size:9px;color:var(--text-secondary);background:rgba(255,255,255,0.03);border:1px solid var(--border);padding:2px 8px;border-radius:10px;margin-left:6px" id="relCount">0 tickets</span>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="rel-tbl">
+              <thead><tr><th>Project</th><th>Ticket ID</th><th>PR#</th><th>Title</th><th>State</th><th>QA?</th><th>Flow</th></tr></thead>
+              <tbody id="relatedBody"></tbody>
+            </table>
+          </div>
+          <div style="padding:9px 12px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--text-secondary)">
+            <span id="relShowing">Showing 0 entries</span>
+            <div style="display:flex;align-items:center;gap:4px">
+              <div class="pg-btn"><i class="ti ti-chevron-left"></i></div>
+              <div class="pg-num">1</div>
+              <div class="pg-btn"><i class="ti ti-chevron-right"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="dr-side">
+      <div class="side-section">
+        <div class="side-label">Status</div>
+        <div class="status-nodes" id="statusNodes" style="margin-bottom:8px"></div>
+        <div class="status-done" id="statusDoneLabel" style="display:none"><i class="ti ti-circle-check"></i> Done</div>
+        <button class="btn-back" style="margin-top:6px" onclick="openModal(currentTicket.id,currentTicket.status,currentTicket.assigned,currentTicket.remarks,currentTicket.updateUrl,'#'+currentTicket.id+' — '+currentTicket.category)">
+          <i class="ti ti-edit"></i> Update Status
+        </button>
+      </div>
+      <div class="side-section">
+        <div class="side-label">Ticket Crew</div>
+        <div style="font-size:9px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.6px;font-family:'Syne',sans-serif;margin-bottom:5px">Current Assignee</div>
+        <select class="crew-select" id="crewAssignee">
+          <option>Unassigned</option>
+          <option>IT Support</option>
+          <option>Finance Team</option>
+          <option>HR Officer</option>
+          <option>Security</option>
+        </select>
+        <div class="crew-field-dr">
+          <div class="crew-field-lbl">Created By</div>
+          <div class="crew-field-val"><div class="crew-av" id="crewAvatar">U</div><span id="crewUser">Unknown</span></div>
+        </div>
+        <div class="crew-field-dr">
+          <div class="crew-field-lbl">Created At</div>
+          <div class="crew-date-val"><i class="ti ti-calendar"></i><span id="crewDate">—</span></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
-{% endwith %}
 
-<!-- ── MODAL ── -->
+<!-- EDIT TICKET MODAL -->
 <div class="modal-overlay" id="editModal" onclick="closeModalOutside(event)">
   <div class="modal">
     <div class="md-head">
-      <div>
-        <div class="md-title">Update Ticket</div>
-        <div class="md-id" id="modalId">#—</div>
-      </div>
-      <button class="md-close" onclick="closeModal()">
-        <i class="ti ti-x"></i>
-      </button>
+      <div><div class="md-title">Update Ticket</div><div class="md-id" id="modalId">#—</div></div>
+      <button class="md-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
     </div>
     <form method="post" id="modalForm">
       {% csrf_token %}
@@ -1029,11 +1120,112 @@ html, body { height: 100%; overflow: hidden; background: var(--bg-base); }
   </div>
 </div>
 
+<!-- NEW TICKET MODAL -->
+<div class="modal-overlay" id="newTicketModal" onclick="closeNewTicketOutside(event)">
+  <div class="modal" style="width:480px;max-height:90vh;overflow-y:auto">
+    <div class="md-head">
+      <div><div class="md-title">Create New Ticket</div><div class="md-id">Admin — Manual Entry</div></div>
+      <button class="md-close" onclick="closeNewTicketModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <form method="post" action="{% url 'submit_concern' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="nt-section-label">User Info</div>
+      <div class="field-full">
+        <label for="nt-user">Username</label>
+        <input type="text" name="username" id="nt-user" placeholder="Enter the username of the user..." required>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="nt-dept">Department</label>
+          <select name="department" id="nt-dept" required>
+            <option value="" disabled selected>Select department</option>
+            {% for value, label in departments %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="nt-status">Initial Status</label>
+          <select name="status" id="nt-status">
+            <option value="Pending" selected>Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+      </div>
+      <div class="nt-divider"></div>
+      <div class="nt-section-label">Concern Details</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="nt-cat">Category</label>
+          <input type="text" name="category" id="nt-cat" placeholder="e.g. Coaching Support" required>
+        </div>
+        <div class="field">
+          <label for="nt-subcat">Sub-Category</label>
+          <input type="text" name="sub_category" id="nt-subcat" placeholder="e.g. Equipment / Devices">
+        </div>
+      </div>
+      <div class="field-full">
+        <label for="nt-msg">Message / Description</label>
+        <textarea name="description" id="nt-msg" placeholder="Describe the concern in detail..."></textarea>
+      </div>
+      <div class="field-full">
+        <label for="nt-file">Attachment <span style="color:var(--text-secondary);font-weight:400;text-transform:none;font-size:9px">(optional)</span></label>
+        <input type="file" name="attachment" id="nt-file" class="field-file">
+      </div>
+      <div class="nt-divider"></div>
+      <div class="nt-section-label">Assignment</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="nt-assigned">Assign To</label>
+          <input type="text" name="assigned_to" id="nt-assigned" placeholder="Staff name (optional)">
+        </div>
+        <div class="field">
+          <label for="nt-remarks">Remarks</label>
+          <input type="text" name="remarks" id="nt-remarks" placeholder="Optional note...">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeNewTicketModal()">Cancel</button>
+        <button type="submit" class="btn-save"><i class="ti ti-ticket"></i> Create Ticket</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
+/* ── SIDEBAR ── */
 function toggleSidebar() {
   document.getElementById('sidebar').classList.toggle('collapsed');
 }
 
+/* ── MAIN TAB SWITCHER ── */
+function switchMainTab(name, el) {
+  document.querySelectorAll('.tab-bar .tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.main-tab-panel').forEach(function(p){ p.style.display = 'none'; });
+  if (el) el.classList.add('active');
+  var panel = document.getElementById('main-panel-' + name);
+  if (panel) panel.style.display = name === 'tickets' ? 'flex' : 'block';
+  if (panel) panel.style.flexDirection = name === 'tickets' ? 'column' : '';
+  if (name === 'time') buildMainTimelineChart();
+}
+
+var mainTimelineChartInst = null;
+function buildMainTimelineChart() {
+  var ctx = document.getElementById('mainTimelineChart');
+  if (!ctx) return;
+  if (mainTimelineChartInst) { mainTimelineChartInst.destroy(); mainTimelineChartInst = null; }
+  mainTimelineChartInst = new Chart(ctx.getContext('2d'), {
+    type:'bar',
+    data:{
+      labels:['Submission','Review','QA Review','Resolution','Total'],
+      datasets:[{ data:[84,400,56,7,547], backgroundColor:['rgba(74,124,255,0.7)','rgba(129,140,248,0.7)','rgba(74,222,128,0.7)','rgba(255,211,74,0.7)','rgba(255,255,255,0.08)'], borderRadius:4, borderSkipped:false }]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{font:{size:9}}}, y:{display:false} } }
+  });
+}
+
+/* ── MODALS ── */
 function openModal(id, status, assigned, remarks, actionUrl, subtitle) {
   document.getElementById('modalId').textContent = subtitle;
   document.getElementById('modalStatus').value = status;
@@ -1041,19 +1233,110 @@ function openModal(id, status, assigned, remarks, actionUrl, subtitle) {
   document.getElementById('modalRemarks').value = remarks;
   document.getElementById('modalForm').action = actionUrl;
   document.getElementById('editModal').classList.add('open');
-  document.body.style.overflow = 'hidden';
 }
-function closeModal() {
-  document.getElementById('editModal').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function closeModalOutside(e) {
-  if (e.target === document.getElementById('editModal')) closeModal();
-}
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
-});
+function closeModal() { document.getElementById('editModal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('editModal')) closeModal(); }
+function openNewTicketModal() { document.getElementById('newTicketModal').classList.add('open'); }
+function closeNewTicketModal() { document.getElementById('newTicketModal').classList.remove('open'); }
+function closeNewTicketOutside(e) { if (e.target === document.getElementById('newTicketModal')) closeNewTicketModal(); }
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') { closeModal(); closeNewTicketModal(); closeDrawer(); } });
 
+/* ── DRAWER ── */
+var currentTicket = {};
+var timelineChartInst = null;
+
+function openDrawer(t) {
+  currentTicket = t;
+  document.getElementById('dr-tid').textContent  = '#' + t.id;
+  document.getElementById('dr-dept').textContent = t.dept || '—';
+  document.getElementById('dr-cat').textContent  = t.category || '—';
+  document.getElementById('dd-id').textContent       = '#' + t.id;
+  document.getElementById('dd-date').textContent     = t.date || '—';
+  document.getElementById('dd-user').textContent     = t.user || '—';
+  document.getElementById('dd-dept').textContent     = t.dept || '—';
+  document.getElementById('dd-cat').textContent      = t.category || '—';
+  document.getElementById('dd-subcat').textContent   = t.sub_category || '—';
+  document.getElementById('dd-assigned').textContent = t.assigned || 'Unassigned';
+  document.getElementById('dd-remarks').textContent  = t.remarks || '—';
+  document.getElementById('dd-desc').textContent     = t.description || '—';
+  var attEl = document.getElementById('dd-attachment');
+  if (t.attachment) {
+    attEl.innerHTML = '<a href="'+t.attachment+'" target="_blank" style="color:var(--blue-lt);display:flex;align-items:center;gap:4px"><i class="ti ti-paperclip"></i> View file</a>';
+  } else { attEl.textContent = 'No attachment'; }
+  document.getElementById('crewAvatar').textContent = (t.user||'U').slice(0,2).toUpperCase();
+  document.getElementById('crewUser').textContent   = t.user || '—';
+  document.getElementById('crewDate').textContent   = t.date || '—';
+  var statuses = ['Pending','In Progress','Resolved'];
+  var curIdx   = statuses.indexOf(t.status);
+  var pct      = curIdx===0?0:curIdx===1?50:100;
+  var nodesEl  = document.getElementById('statusNodes');
+  nodesEl.innerHTML = '<div class="status-track"><div class="status-fill-track" style="width:'+pct+'%"></div></div>';
+  statuses.forEach(function(s,i){
+    var cls = i<curIdx?'sn-done':i===curIdx?'sn-curr':'sn-todo';
+    nodesEl.innerHTML += '<div class="status-node '+cls+'" title="'+s+'"></div>';
+  });
+  document.getElementById('statusDoneLabel').style.display = t.status==='Resolved'?'flex':'none';
+  document.getElementById('tt-submit').textContent  = '1h 24m';
+  document.getElementById('tt-review').textContent  = '6h 40m';
+  document.getElementById('tt-qa').textContent      = '56m';
+  document.getElementById('tt-resolve').textContent = '7m';
+  document.getElementById('tt-total').textContent   = '9h 7m';
+  var hist = [
+    {color:'var(--blue-lt)', action:'Ticket #'+t.id+' was created', who:t.user, time:t.date},
+    {color:'var(--gold)',    action:'Status set to <strong>'+t.status+'</strong>', who:'Admin', time:t.date},
+    {color:'var(--green)',   action:'Assigned to '+(t.assigned||'Unassigned'), who:'Administrator', time:t.date},
+  ];
+  document.getElementById('historyList').innerHTML = hist.map(function(h,i){
+    return '<div class="hist-item"><div class="hist-line"><div class="hist-dot" style="color:'+h.color+'"></div>'+(i<hist.length-1?'<div class="hist-connector"></div>':'')+'</div><div class="hist-body"><div class="hist-action">'+h.action+'</div><div class="hist-meta">'+h.who+' · '+h.time+'</div></div></div>';
+  }).join('');
+  var relStates=['Done','Pending','In Progress'];
+  var rows=[];
+  for(var i=0;i<6;i++){
+    var st=relStates[i%3];
+    var stCls=st==='Done'?'rel-done':st==='Pending'?'rel-pending':'rel-progress';
+    rows.push('<tr><td><span class="proj-dot"></span>'+(t.dept||'OPASCOR')+'</td><td style="font-family:\'DM Mono\',monospace;font-size:9px;color:var(--blue-lt)">#'+(parseInt(t.id)+i)+'</td><td style="font-family:\'DM Mono\',monospace;font-size:9px">#'+(100+i)+'</td><td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:var(--text-primary)">'+t.category+' — task '+(i+1)+'</td><td><span class="'+stCls+'"><span class="sdot"></span>'+st+'</span></td><td style="font-size:10px">'+(i%2===0?'Yes':'No')+'</td><td style="font-size:10px">'+(t.dept||'—')+'</td></tr>');
+  }
+  document.getElementById('relatedBody').innerHTML = rows.join('');
+  document.getElementById('relCount').textContent   = rows.length+' tickets';
+  document.getElementById('relShowing').textContent = 'Showing 1 to '+rows.length+' of '+rows.length+' entries';
+  switchTab('details', document.querySelector('.dr-tab'));
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('ticketDrawer').classList.add('open');
+  setTimeout(buildTimelineChart, 80);
+}
+
+function buildTimelineChart() {
+  var ctx = document.getElementById('timelineChart');
+  if (!ctx) return;
+  if (timelineChartInst) { timelineChartInst.destroy(); timelineChartInst = null; }
+  timelineChartInst = new Chart(ctx.getContext('2d'), {
+    type:'bar',
+    data:{ labels:['Submission','Review','QA Review','Resolution','Total'], datasets:[{ data:[84,400,56,7,547], backgroundColor:['rgba(74,124,255,0.7)','rgba(129,140,248,0.7)','rgba(74,222,128,0.7)','rgba(255,211,74,0.7)','rgba(255,255,255,0.08)'], borderRadius:4, borderSkipped:false }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false},tooltip:{callbacks:{label:function(c){var m=c.raw;return ' '+Math.floor(m/60)+'h '+(m%60)+'m';}}}}, scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{font:{size:9}}}, y:{display:false} } }
+  });
+}
+
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('ticketDrawer').classList.remove('open');
+}
+
+function switchTab(name, el) {
+  document.querySelectorAll('.dr-tab').forEach(function(t){ t.classList.remove('active'); });
+  document.querySelectorAll('.dr-panel').forEach(function(p){ p.classList.remove('active'); });
+  if (el) el.classList.add('active');
+  var panel = document.getElementById('panel-'+name);
+  if (panel) panel.classList.add('active');
+  if (name==='time') setTimeout(buildTimelineChart,80);
+}
+
+function rotateRefresh(el) {
+  el.querySelector('i').style.transition='transform 0.5s ease';
+  el.querySelector('i').style.transform='rotate(360deg)';
+  setTimeout(function(){ el.querySelector('i').style.transform=''; },520);
+}
+
+/* ── TABLE SEARCH ── */
 function filterTable() {
   var q = document.getElementById('searchInput').value.toLowerCase();
   document.querySelectorAll('#ticketTable tbody tr').forEach(function(row) {
@@ -1061,95 +1344,53 @@ function filterTable() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+/* ── CHARTS ── */
+Chart.defaults.color = 'rgba(255,255,255,0.35)';
+Chart.defaults.font.family = "'DM Sans', sans-serif";
 
-  // Line chart
-  var lineCtx = document.getElementById('lineChart');
-  if (lineCtx) {
-    new Chart(lineCtx, {
-      type: 'line',
-      data: {
-        labels: ['May 8','May 9','May 10','May 11','May 12','May 13','May 14'],
-        datasets: [{
-          data: [2, 4, 3, 6, 5, 7, 5],
-          borderColor: '#3b82f6',
-          backgroundColor: 'rgba(59,130,246,0.08)',
-          borderWidth: 2,
-          pointBackgroundColor: '#3b82f6',
-          pointRadius: 4,
-          pointHoverRadius: 6,
-          fill: true,
-          tension: 0.4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        plugins: { legend: { display: false }, tooltip: {
-          backgroundColor: '#1e293b', titleColor: '#f1f5f9',
-          bodyColor: '#94a3b8', borderColor: 'rgba(255,255,255,0.1)',
-          borderWidth: 1, padding: 10,
-          callbacks: { label: ctx => ' ' + ctx.parsed.y + ' tickets' }
-        }},
-        scales: {
-          x: {
-            grid: { color: 'rgba(255,255,255,0.04)' },
-            ticks: { color: '#64748b', font: { size: 11 } }
-          },
-          y: {
-            grid: { color: 'rgba(255,255,255,0.04)' },
-            ticks: { color: '#64748b', font: { size: 11 }, stepSize: 2 },
-            beginAtZero: true
-          }
-        }
-      }
-    });
-  }
+(function() {
+  var total    = {{ total|default:0 }};
+  var resolved = {{ resolved|default:0 }};
+  var pct = total ? Math.round((resolved / total) * 100) : 0;
+  document.getElementById('resolvePct').textContent = pct + '%';
+  document.getElementById('resolveBar').style.width = pct + '%';
+})();
 
-  // Donut chart
-  var donutCtx = document.getElementById('donutChart');
-  if (donutCtx) {
-    var deptData = {{ dept_counts_json|default:'{}' }};
-    var labels = Object.keys(deptData);
-    var data   = Object.values(deptData);
-    var colors = ['#3b82f6','#f59e0b','#8b5cf6','#10b981','#f97316','#ef4444','#06b6d4'];
+(function() {
+  var catColors = ['#4a7cff','#4ade80','#ffb84d','#f472b6','#fb923c'];
+  var catLabels = ['Desktop Support','System Concerns','Access Request','Training','Others'];
+  var total = {{ total|default:0 }};
+  var catData = [
+    Math.round(total * 0.44), Math.round(total * 0.22), Math.round(total * 0.11), Math.round(total * 0.11),
+    total - Math.round(total*0.44) - Math.round(total*0.22) - Math.round(total*0.11) - Math.round(total*0.11)
+  ];
+  new Chart(document.getElementById('catChart').getContext('2d'), {
+    type:'doughnut',
+    data:{ labels:catLabels, datasets:[{ data:catData, backgroundColor:catColors, borderWidth:2, borderColor:'#030711', hoverOffset:4 }] },
+    options:{ cutout:'70%', plugins:{ legend:{display:false}, tooltip:{callbacks:{label:function(c){return ' '+c.label+': '+c.raw;}}} } }
+  });
+  var listEl = document.getElementById('catList');
+  catLabels.forEach(function(lbl, i) {
+    var pct = total ? Math.round((catData[i]/total)*100) : 0;
+    listEl.innerHTML += '<div><span class="legend-dot" style="background:'+catColors[i]+'"></span>'+lbl+' <strong>'+catData[i]+'</strong></div>';
+  });
+})();
 
-    new Chart(donutCtx, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data.length ? data : [1],
-          backgroundColor: data.length ? colors.slice(0, labels.length) : ['rgba(255,255,255,0.05)'],
-          borderWidth: 0,
-          hoverOffset: 6
-        }]
-      },
-      options: {
-        responsive: true,
-        cutout: '72%',
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            backgroundColor: '#1e293b', titleColor: '#f1f5f9',
-            bodyColor: '#94a3b8', borderColor: 'rgba(255,255,255,0.1)',
-            borderWidth: 1, padding: 10
-          }
-        }
-      }
-    });
-
-    var legend = document.getElementById('donutLegend');
-    var total = data.reduce((a,b)=>a+b,0);
-    labels.forEach(function(lbl, i) {
-      var pct = total ? Math.round(data[i]/total*100) : 0;
-      var item = document.createElement('div');
-      item.className = 'dl-item';
-      item.innerHTML = '<div class="dl-dot-name"><div class="dl-dot" style="background:'+colors[i]+'"></div><span class="dl-name">'+lbl+'</span></div><span class="dl-pct">'+pct+'% ('+data[i]+')</span>';
-      legend.appendChild(item);
-    });
-     }
-    });
+(function() {
+  var pending  = {{ pending|default:0 }};
+  var progress = {{ progress|default:0 }};
+  var resolved = {{ resolved|default:0 }};
+  var total    = {{ total|default:0 }};
+  new Chart(document.getElementById('ovChart').getContext('2d'), {
+    type:'doughnut',
+    data:{ datasets:[{ data:[pending||0.001, progress||0.001, resolved||0.001], backgroundColor:['#ffd34a','#4a7cff','#4ade80'], borderWidth:2, borderColor:'#030711', hoverOffset:4 }] },
+    options:{ cutout:'70%', plugins:{ legend:{display:false}, tooltip:{enabled:false} } }
+  });
+  function pct(n){ return total?'('+Math.round((n/total)*100)+'%)':''; }
+  document.getElementById('pct-pending').textContent  = pct(pending);
+  document.getElementById('pct-progress').textContent = pct(progress);
+  document.getElementById('pct-resolved').textContent = pct(resolved);
+})();
 </script>
 
 {% endblock %}
