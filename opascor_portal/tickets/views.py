@@ -24,8 +24,6 @@ def redirect_by_role(user):
 # LOGIN
 # ─────────────────────────────────────────
 def login_view(request):
-
-# ─────────────────────────────────────────
     if request.user.is_authenticated:
         return redirect_by_role(request.user)
 
@@ -43,6 +41,7 @@ def login_view(request):
         'total_tickets': Concern.objects.count(),
         'pending_tickets': Concern.objects.filter(status='Pending').count(),
     })
+
 # ─────────────────────────────────────────
 # SEND MESSAGE (user)
 # ─────────────────────────────────────────
@@ -87,7 +86,6 @@ def admin_inbox(request):
 
 
 # ─────────────────────────────────────────
-## ─────────────────────────────────────────
 # REGISTER
 # ─────────────────────────────────────────
 def register_view(request):
@@ -167,7 +165,6 @@ def logout_view(request):
 def user_dashboard(request):
     profile = get_object_or_404(UserProfile, user=request.user)
 
-    # if admin tries to access user dashboard, redirect to admin
     if profile.is_admin:
         return redirect('admin_dashboard')
 
@@ -182,8 +179,6 @@ def user_dashboard(request):
             concern.save()
             messages.success(request, 'Concern submitted successfully!')
             return redirect('user_dashboard')
-
-    from django.db.models import Case, When, IntegerField, Count
 
     notifications = concerns.all().annotate(
         status_order=Case(
@@ -275,9 +270,23 @@ def admin_dashboard(request):
     unread_messages = Message.objects.filter(is_read=False).count()
 
     dept_counts = dict(
-        Concern.objects.values_list('user__userprofile__department')
-                       .annotate(count=Count('id'))
-    )
+    Concern.objects.exclude(status='Resolved')
+                   .values_list('user__userprofile__department')
+                   .annotate(count=Count('id'))
+)
+
+    inbox_msgs = Message.objects.order_by('-date_sent').select_related('sender')
+    inbox_messages_json = json.dumps([
+        {
+            'id': m.sender.id,
+            'name': m.sender.get_full_name() or m.sender.username,
+            'initials': (m.sender.get_full_name() or m.sender.username)[:2].upper(),
+            'preview': m.subject,
+            'unread': not m.is_read,
+            'messages': [{'from': 'user', 'text': m.body, 'time': m.date_sent.strftime('%b %d, %I:%M %p')}]
+        }
+        for m in inbox_msgs
+    ])
 
     return render(request, 'tickets/admin_dashboard.html', {
         'concerns': concerns,
@@ -290,6 +299,7 @@ def admin_dashboard(request):
         'resolved': resolved,
         'unread_messages': unread_messages,
         'dept_counts': dept_counts,
+        'inbox_messages_json': inbox_messages_json,
     })
 
 

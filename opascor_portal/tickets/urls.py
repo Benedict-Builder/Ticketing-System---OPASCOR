@@ -14,8 +14,18 @@ urlpatterns = [
     path('submit-concern/',                   views.submit_concern,         name='submit_concern'),
     path('admin-dashboard/',                  views.admin_dashboard,        name='admin_dashboard'),
     path('update-concern/<int:concern_id>/',  views.update_concern,         name='update_concern'),
-    path('send-message/',  views.send_message,  name='send_message'),
-path('inbox/',         views.admin_inbox,   name='admin_inbox'),
+    path('send-message/',                     views.send_message,           name='send_message'),
+    path('inbox/',                            views.admin_inbox,            name='admin_inbox'),
+
+    # ── Change Password ──
+    path('password_change/', auth_views.PasswordChangeView.as_view(
+        template_name='tickets/password_change.html',
+        success_url='/password_change/done/'
+    ), name='password_change'),
+
+    path('password_change/done/', auth_views.PasswordChangeDoneView.as_view(
+        template_name='tickets/password_change_done.html'
+    ), name='password_change_done'),
 
     # ── Forgot Password ──
     path('forgot-password/', auth_views.PasswordResetView.as_view(
