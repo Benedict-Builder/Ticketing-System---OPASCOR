@@ -1,0 +1,552 @@
+{% extends 'tickets/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#04080f;--blue:#1c48f5;--blue-lt:#4a7cff;--blue-gl:rgba(74,124,255,0.12);
+  --red:#c8001c;--red-dk:#7a0010;--gold:#ffd34a;--green:#4ade80;
+  --white:#ffffff;--muted:rgba(255,255,255,0.35);--dim:rgba(255,255,255,0.12);
+  --glass:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.07);--r:14px;
+}
+.reg-page{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#02040a;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;
+  padding:24px;position:relative;overflow:hidden;
+}
+.reg-page::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(74,124,255,0.045) 1px,transparent 1px),linear-gradient(90deg,rgba(74,124,255,0.045) 1px,transparent 1px);
+  background-size:44px 44px;animation:gridShift 20s linear infinite;
+}
+@keyframes gridShift{from{background-position:0 0,0 0}to{background-position:44px 44px,44px 44px}}
+.shell{
+  position:relative;z-index:2;width:820px;
+  border-radius:20px;overflow:hidden;display:flex;
+  border:1px solid rgba(255,255,255,0.1);
+  box-shadow:0 50px 120px rgba(0,0,0,0.8),0 0 60px rgba(28,72,245,0.08);
+}
+.shell::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:100;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);
+  border-radius:20px;
+}
+.s-left{
+  flex:1.1;position:relative;z-index:2;
+  background:rgba(4,8,15,0.95);backdrop-filter:blur(24px);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2.2rem 2.5rem;border-right:1px solid rgba(255,255,255,0.06);
+}
+.glow-left{position:absolute;top:50%;left:-120px;transform:translateY(-50%);width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(28,72,245,0.12) 0%,transparent 70%);pointer-events:none;}
+.form-wrap{width:100%;max-width:310px;position:relative;z-index:1;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.form-wrap>*{animation:fadeUp 0.55s ease both;}
+.form-wrap>*:nth-child(1){animation-delay:0.05s}
+.form-wrap>*:nth-child(2){animation-delay:0.12s}
+.form-wrap>*:nth-child(3){animation-delay:0.18s}
+.form-wrap>*:nth-child(4){animation-delay:0.24s}
+.form-wrap>*:nth-child(5){animation-delay:0.30s}
+.form-wrap>*:nth-child(6){animation-delay:0.36s}
+.form-wrap>*:nth-child(7){animation-delay:0.42s}
+.form-wrap>*:nth-child(8){animation-delay:0.47s}
+.form-wrap>*:nth-child(9){animation-delay:0.52s}
+.top-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;}
+.new-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,222,128,0.07);border:1px solid rgba(74,222,128,0.2);border-radius:50px;padding:5px 12px;}
+.new-badge span{font-size:9.5px;color:var(--green);letter-spacing:1px;text-transform:uppercase;font-weight:700;font-family:'Syne',sans-serif;}
+.secure-pill{display:inline-flex;align-items:center;gap:6px;}
+.secure-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulseDot 2.4s ease-in-out infinite;}
+@keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.45)}50%{box-shadow:0 0 0 6px rgba(74,222,128,0)}}
+.secure-pill span{font-size:10px;color:var(--muted);letter-spacing:0.5px;}
+.greeting{margin-bottom:1.4rem;}
+.greeting h2{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--white);margin-bottom:5px;letter-spacing:-0.3px;}
+.greeting p{font-size:12px;color:rgba(255,255,255,0.28);line-height:1.65;}
+.dept-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(28,72,245,0.12);border:1px solid rgba(74,124,255,0.2);border-radius:50px;padding:4px 12px;font-size:10px;color:var(--blue-lt);font-family:'Syne',sans-serif;font-weight:600;margin-bottom:1rem;}
+.field{margin-bottom:0.85rem;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0.85rem;}
+.field-label{display:flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;font-family:'Syne',sans-serif;color:rgba(255,255,255,0.3);letter-spacing:1.1px;text-transform:uppercase;margin-bottom:7px;}
+.input-wrap{display:flex;align-items:center;background:var(--glass);border:1px solid var(--border);border-radius:10px;padding:0 14px;transition:border-color 0.25s,background 0.25s,box-shadow 0.25s;}
+.input-wrap:focus-within{border-color:rgba(74,124,255,0.55);background:rgba(74,124,255,0.06);box-shadow:0 0 0 3px rgba(74,124,255,0.1),inset 0 1px 0 rgba(255,255,255,0.04);}
+.input-wrap i.lead{font-size:14px;color:rgba(255,255,255,0.2);margin-right:10px;flex-shrink:0;transition:color 0.2s;}
+.input-wrap:focus-within i.lead{color:rgba(74,124,255,0.7);}
+.input-wrap input{background:transparent;border:none;outline:none;color:var(--white);font-size:13px;flex:1;padding:11px 0;caret-color:var(--blue-lt);font-family:'DM Sans',sans-serif;}
+.input-wrap input::placeholder{color:rgba(255,255,255,0.14);}
+.toggle-pw{background:none;border:none;outline:none;cursor:pointer;padding:0;color:rgba(255,255,255,0.18);display:flex;align-items:center;transition:color 0.15s;}
+.toggle-pw:hover{color:rgba(255,255,255,0.55);}
+.alert-error{background:rgba(200,0,28,0.1);border:1px solid rgba(200,0,28,0.3);color:#ff6b6b;padding:8px 14px;border-radius:8px;font-size:12px;display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.pw-strength{display:flex;gap:4px;margin-top:6px;}
+.pw-bar{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,0.08);transition:background 0.3s;}
+.btn-register{width:100%;padding:13px;background:linear-gradient(135deg,#1c48f5 0%,#1035c8 100%);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:var(--white);font-size:13px;font-weight:700;font-family:'Syne',sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;letter-spacing:0.6px;transition:transform 0.12s,box-shadow 0.2s,background 0.2s;position:relative;overflow:hidden;margin-top:0.4rem;}
+.btn-register::after{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.09),transparent);transition:left 0.55s;}
+.btn-register:hover{background:linear-gradient(135deg,#2550f5 0%,#1742e0 100%);box-shadow:0 6px 28px rgba(28,72,245,0.45);}
+.btn-register:hover::after{left:160%;}
+.btn-register:active{transform:scale(0.975);}
+.divider-or{display:flex;align-items:center;gap:10px;margin:0.9rem 0;}
+.or-line{flex:1;height:1px;background:rgba(255,255,255,0.06);}
+.or-txt{font-size:10px;color:rgba(255,255,255,0.18);letter-spacing:0.4px;}
+.back-row{display:flex;align-items:center;justify-content:center;gap:5px;}
+.back-row span{font-size:11px;color:rgba(255,255,255,0.22);}
+.back-row a{font-size:11px;color:var(--blue-lt);text-decoration:none;transition:opacity 0.15s;}
+.back-row a:hover{opacity:0.75;}
+.warning-bar{display:flex;align-items:flex-start;gap:9px;margin-top:1rem;border-top:1px solid rgba(255,255,255,0.05);padding-top:0.9rem;}
+.warning-bar i{font-size:13px;color:#ffb84d;margin-top:2px;flex-shrink:0;}
+.warning-bar span{font-size:10.5px;color:rgba(255,255,255,0.2);line-height:1.65;}
+
+/* ── RIGHT PANEL ── */
+.s-right{flex:0.9;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.25rem 1.9rem;text-align:center;position:relative;overflow:hidden;}
+.s-right::before{content:'';position:absolute;inset:0;background:linear-gradient(145deg,rgba(6,16,30,0.7) 0%,rgba(2,8,16,0.7) 60%,rgba(6,0,8,0.7) 100%);}
+.s-right::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 110%,rgba(0,0,0,0.6) 0%,transparent 70%);}
+.r-glow-t{position:absolute;top:-80px;right:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(200,0,28,0.18) 0%,transparent 70%);pointer-events:none;animation:glowPulse 4s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{opacity:0.6;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
+.r-shimmer{position:absolute;top:0;left:-200%;width:80%;height:100%;background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,0.04) 50%,transparent 70%);animation:shimmer 6s ease-in-out infinite;pointer-events:none;}
+@keyframes shimmer{0%,100%{left:-200%}50%{left:120%}}
+.brand-block{position:relative;z-index:3;display:flex;flex-direction:column;align-items:center;width:100%;gap:0;}
+.logo-area{position:relative;margin-bottom:1.3rem;width:100px;height:100px;}
+.logo-ring{position:absolute;inset:-14px;border-radius:50%;border:1.5px dashed rgba(255,255,255,0.14);animation:ringRotate 18s linear infinite;}
+.logo-ring-inner{position:absolute;inset:-7px;border-radius:50%;border:1px solid rgba(255,255,255,0.09);animation:ringRotate 10s linear infinite reverse;}
+.logo-pulse-ring{position:absolute;inset:-4px;border-radius:50%;border:1.5px solid rgba(200,0,28,0.0);animation:pulseRing 2.8s ease-out infinite;}
+@keyframes pulseRing{0%{inset:-4px;border-color:rgba(200,0,28,0.6);opacity:1}100%{inset:-22px;border-color:rgba(200,0,28,0);opacity:0}}
+@keyframes ringRotate{to{transform:rotate(360deg)}}
+.logo-ring::before,.logo-ring::after{content:'';position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.45);top:50%;transform:translateY(-50%);box-shadow:0 0 6px rgba(255,255,255,0.4);}
+.logo-ring::before{left:-3px}.logo-ring::after{right:-3px}
+.logo-outer{width:100px;height:100px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(200,0,28,0.5),0 0 20px rgba(28,72,245,0.2),inset 0 1px 0 rgba(255,255,255,0.1);animation:outerGlow 3s ease-in-out infinite;}
+@keyframes outerGlow{0%,100%{box-shadow:0 0 50px rgba(200,0,28,0.5),0 0 20px rgba(28,72,245,0.2),inset 0 1px 0 rgba(255,255,255,0.1)}50%{box-shadow:0 0 70px rgba(200,0,28,0.7),0 0 35px rgba(28,72,245,0.35),inset 0 1px 0 rgba(255,255,255,0.1)}}
+.logo-inner{width:80px;height:80px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;transition:transform 0.3s;}
+.logo-inner:hover{transform:scale(1.06);}
+.logo-inner img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.logo-badge{position:absolute;bottom:2px;right:2px;width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#ffd34a,#f0a500);border:2.5px solid var(--red-dk);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(255,211,74,0.5);animation:badgeSpin 6s linear infinite;}
+@keyframes badgeSpin{0%,100%{transform:rotate(0deg)}50%{transform:rotate(20deg)}25%,75%{transform:rotate(-10deg)}}
+.logo-badge i{font-size:10px;color:#7a4400;}
+.brand-name{display:flex;align-items:center;gap:1px;margin-bottom:4px;}
+.brand-letter{font-family:'Syne',sans-serif;font-size:26px;font-weight:900;color:#1400FF;letter-spacing:3px;text-shadow:0 0 20px rgba(20,0,255,0.5),0 2px 10px rgba(0,0,0,0.4);animation:letterGlow 3s ease-in-out infinite;animation-delay:calc(var(--i) * 0.15s);display:inline-block;}
+@keyframes letterGlow{0%,100%{color:#1400FF;text-shadow:0 0 20px rgba(20,0,255,0.5)}50%{color:#3d2fff;text-shadow:0 0 30px rgba(61,47,255,0.8),0 0 60px rgba(61,47,255,0.3)}}
+.brand-full{font-size:8px;color:rgba(255,255,255,0.38);letter-spacing:1.6px;text-transform:uppercase;line-height:2;margin-bottom:1.1rem;font-family:'Syne',sans-serif;}
+.stat-row{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:1rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:12px 18px;backdrop-filter:blur(8px);}
+.stat-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.stat-val{font-family:'Syne',sans-serif;font-size:20px;font-weight:900;color:var(--white);text-shadow:0 0 20px rgba(255,255,255,0.2);}
+.stat-lbl{font-size:8px;color:rgba(255,255,255,0.28);letter-spacing:1px;text-transform:uppercase;}
+.stat-div{width:1px;height:30px;background:rgba(255,255,255,0.08);}
+.brand-tagline{font-size:10.5px;color:rgba(255,255,255,0.22);line-height:1.85;letter-spacing:0.3px;margin-bottom:1.1rem;}
+.brand-badges{display:flex;align-items:center;gap:8px;}
+.brand-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:50px;padding:5px 11px;transition:background 0.2s,border-color 0.2s;}
+.brand-badge:hover{background:rgba(74,124,255,0.1);border-color:rgba(74,124,255,0.3);}
+.brand-badge i{font-size:10px;color:rgba(255,255,255,0.4);}
+.brand-badge span{font-size:9.5px;color:rgba(255,255,255,0.3);font-family:'Syne',sans-serif;letter-spacing:0.5px;}
+
+.feature-cards{width:100%;display:flex;flex-direction:column;gap:8px;margin-bottom:1rem;}
+.feat-card{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 14px;text-align:left;transition:background 0.2s,border-color 0.2s;}
+.feat-card:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.12);}
+.feat-icon{width:36px;height:36px;border-radius:8px;border:1px solid;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.feat-icon i{font-size:14px;}
+.feat-title{font-family:'Syne',sans-serif;font-size:11px;font-weight:700;color:var(--white);margin-bottom:2px;}
+.feat-desc{font-size:9.5px;color:rgba(255,255,255,0.28);line-height:1.4;}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0px 1000px rgba(4,8,15,0.95) inset !important;
+  -webkit-text-fill-color:#ffffff !important;
+  caret-color:#4a7cff;
+  transition:background-color 5000s ease-in-out 0s;
+}
+
+@media(max-width:640px){.shell{flex-direction:column}.s-right{display:none}}
+</style>
+
+<div class="reg-page">
+  <div class="shell">
+
+    <!-- LEFT -->
+    <div class="s-left">
+      <div class="glow-left"></div>
+      <div class="form-wrap">
+        <div class="top-meta">
+          <div class="new-badge"><span>New Account</span></div>
+          <div class="secure-pill">
+            <div class="secure-dot"></div>
+            <span>Secure</span>
+          </div>
+        </div>
+        <div class="greeting">
+          <h2>Create Account ✨</h2>
+          <p>Fill in your details to register<br>and join the OPASCOR portal.</p>
+        </div>
+        
+        {% for message in messages %}
+          <div class="alert-error"><i class="fa-solid fa-circle-exclamation"></i> {{ message }}</div>
+        {% endfor %}
+        {% if form.errors %}
+          {% for field, errors in form.errors.items %}
+            {% for error in errors %}
+              <div class="alert-error"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</div>
+            {% endfor %}
+          {% endfor %}
+        {% endif %}
+        <form method="post" style="display:contents;">
+          {% csrf_token %}
+          <div class="field-row">
+            <div class="field">
+              <div class="field-label"><i class="fa-solid fa-user"></i> Full Name</div>
+              <div class="input-wrap">
+                <i class="fa-solid fa-user lead"></i>
+                <input type="text" name="full_name" placeholder="Full name" value="{{ form.full_name.value|default:'' }}" required/>
+              </div>
+            </div>
+            <div class="field">
+              <div class="field-label"><i class="fa-solid fa-at"></i> Username</div>
+              <div class="input-wrap">
+                <i class="fa-solid fa-at lead"></i>
+                <input type="text" name="username" placeholder="Username" value="{{ form.username.value|default:'' }}" required/>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><i class="fa-solid fa-envelope"></i> Email Address</div>
+            <div class="input-wrap">
+              <i class="fa-solid fa-envelope lead"></i>
+              <input type="email" name="email" placeholder="yourname@gmail.com" value="{{ form.email.value|default:'' }}" required/>
+            </div>
+          </div>
+          <div class="field">
+            <div class="field-label"><i class="fa-solid fa-lock"></i> Password</div>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock lead"></i>
+              <input type="password" name="password" id="pw1" placeholder="Create password" required oninput="checkStrength(this.value)"/>
+              <button type="button" class="toggle-pw" onclick="togglePw('pw1',this)"><i class="fa-solid fa-eye"></i></button>
+            </div>
+            <div class="pw-strength">
+              <div class="pw-bar" id="bar1"></div>
+              <div class="pw-bar" id="bar2"></div>
+              <div class="pw-bar" id="bar3"></div>
+              <div class="pw-bar" id="bar4"></div>
+            </div>
+          </div>
+        <div class="field">
+            <div class="field-label"><i class="fa-solid fa-building"></i> Department</div>
+            <div class="input-wrap">
+              <i class="fa-solid fa-building lead"></i>
+              <select name="department" required style="background:transparent;border:none;outline:none;color:rgba(255,255,255,0.7);font-size:13px;flex:1;padding:11px 0;font-family:'DM Sans',sans-serif;cursor:pointer;">
+                <option value="" disabled selected style="background:#04080f;">Select department...</option>
+                <option value="Admin" style="background:#04080f;">Admin</option>
+                <option value="Finance" style="background:#04080f;">Finance</option>
+                <option value="MIS" style="background:#04080f;">MIS</option>
+                <option value="Operational/General Management" style="background:#04080f;">Operational/General Management</option>
+                <option value="Human Resources" style="background:#04080f;">Human Resources</option>
+                <option value="Security" style="background:#04080f;">Security</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="field-label"><i class="fa-solid fa-shield-halved"></i> Confirm Password</div>
+            <div class="input-wrap">
+              <i class="fa-solid fa-shield-halved lead"></i>
+              <input type="password" name="confirm_password" id="pw2" placeholder="Confirm password" required/>
+              <button type="button" class="toggle-pw" onclick="togglePw('pw2',this)"><i class="fa-solid fa-eye"></i></button>
+            </div>
+          </div>
+          <button type="submit" class="btn-register">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Create Account</span>
+          </button>
+        </form>
+        <div class="divider-or"><div class="or-line"></div><span class="or-txt">OR</span><div class="or-line"></div></div>
+        <div class="back-row">
+          <span>Already have an account?</span>
+          <a href="{% url 'login' %}">Sign in →</a>
+        </div>
+        <div class="warning-bar">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          <span>By registering, you agree to OPASCOR's access policies. All activity is monitored.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div class="s-right">
+      <div class="r-glow-t"></div>
+      <div class="r-shimmer"></div>
+      <canvas id="techCanvas" style="position:absolute;inset:0;z-index:0;"></canvas>
+      <div class="brand-block">
+        <div class="logo-area">
+          <div class="logo-ring"></div>
+          <div class="logo-ring-inner"></div>
+          <div class="logo-pulse-ring"></div>
+          <div class="logo-outer">
+            <div class="logo-inner">
+              <img src="{% static 'images/opascor_logo.png' %}" alt="OPASCOR"/>
+            </div>
+          </div>
+          <div class="logo-badge"><i class="fa-solid fa-star"></i></div>
+        </div>
+        <div class="brand-name">
+          <span class="brand-letter" style="--i:0">O</span>
+          <span class="brand-letter" style="--i:1">P</span>
+          <span class="brand-letter" style="--i:2">A</span>
+          <span class="brand-letter" style="--i:3">S</span>
+          <span class="brand-letter" style="--i:4">C</span>
+          <span class="brand-letter" style="--i:5">O</span>
+          <span class="brand-letter" style="--i:6">R</span>
+        </div>
+        <div class="brand-full">Oriental Port and Allied Services Corporation</div>
+        <div class="feature-cards">
+  <div class="feat-card">
+    <div class="feat-icon" style="background:rgba(74,124,255,0.15);border-color:rgba(74,124,255,0.3);">
+      <i class="fa-solid fa-desktop" style="color:#4a7cff;"></i>
+    </div>
+    <div class="feat-text">
+      <div class="feat-title">Device Monitoring</div>
+      <div class="feat-desc">Monitor PCs, laptops & office devices</div>
+    </div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon" style="background:rgba(255,184,77,0.15);border-color:rgba(255,184,77,0.3);">
+      <i class="fa-solid fa-bell" style="color:#ffb84d;"></i>
+    </div>
+    <div class="feat-text">
+      <div class="feat-title">Alerts & Incidents</div>
+      <div class="feat-desc">Get alerted on hardware & network issues</div>
+    </div>
+  </div>
+  <div class="feat-card">
+    <div class="feat-icon" style="background:rgba(74,222,128,0.15);border-color:rgba(74,222,128,0.3);">
+      <i class="fa-solid fa-chart-bar" style="color:#4ade80;"></i>
+    </div>
+    <div class="feat-text">
+      <div class="feat-title">Reports & Analytics</div>
+      <div class="feat-desc">Track device health & IT performance</div>
+    </div>
+  </div>
+</div>
+        <div class="stat-row">
+          <div class="stat-item">
+            <div class="stat-val" id="s-users">0</div>
+            <div class="stat-lbl">Users</div>
+          </div>
+          <div class="stat-div"></div>
+          <div class="stat-item">
+            <div class="stat-val" id="s-tickets">0</div>
+            <div class="stat-lbl">Tickets</div>
+          </div>
+          <div class="stat-div"></div>
+          <div class="stat-item">
+            <div class="stat-val" id="s-pending">0</div>
+            <div class="stat-lbl">Pending</div>
+          </div>
+        </div>
+        <p class="brand-tagline">Every ticket closed is a problem<br>solved. Every device monitored<br>is a crisis prevented.</p>
+        <div class="brand-badges">
+          <div class="brand-badge"><i class="fa-solid fa-shield-halved"></i><span>Secure</span></div>
+          <div class="brand-badge"><i class="fa-solid fa-bolt"></i><span>Fast</span></div>
+          <div class="brand-badge"><i class="fa-solid fa-clock"></i><span>24/7</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function togglePw(id, btn) {
+  const inp = document.getElementById(id);
+  const icon = btn.querySelector('i');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    icon.classList.replace('fa-eye','fa-eye-slash');
+  } else {
+    inp.type = 'password';
+    icon.classList.replace('fa-eye-slash','fa-eye');
+  }
+}
+function checkStrength(val) {
+  const bars = ['bar1','bar2','bar3','bar4'];
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val) && /[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const colors = ['#c8001c','#ff8c00','#ffd34a','#4ade80'];
+  bars.forEach((b, i) => {
+    document.getElementById(b).style.background = i < score ? colors[score - 1] : 'rgba(255,255,255,0.08)';
+  });
+}
+function countUp(el, target, suffix, duration) {
+  if (!el) return;
+  let start = 0;
+  const step = target / (duration / 16);
+  const tick = () => {
+    start = Math.min(start + step, target);
+    el.textContent = Math.floor(start) + suffix;
+    if (start < target) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+setTimeout(() => {
+  countUp(document.getElementById('s-users'),   {{ total_users }},   '', 900);
+  countUp(document.getElementById('s-tickets'),  {{ total_tickets }},  '', 1000);
+  countUp(document.getElementById('s-pending'),  {{ pending_tickets }}, '', 1100);
+}, 600);
+
+(function(){
+  const canvas = document.getElementById('techCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+  let traces = [], pads = [], pulses = [], particles = [];
+
+  function resize(){
+    const parent = canvas.parentElement;
+    W = canvas.width  = parent.offsetWidth  || 380;
+    H = canvas.height = parent.offsetHeight || 530;
+    canvas.style.width = '100%'; canvas.style.height = '100%';
+    buildLayout();
+  }
+
+  function buildLayout(){
+    traces = []; pads = []; pulses = [];
+    const CELL = 36;
+    const cols = Math.ceil(W/CELL)+1;
+    const rows = Math.ceil(H/CELL)+1;
+    for(let r=0;r<=rows;r++){
+      let x=0;
+      while(x<W){
+        const len=(2+Math.floor(Math.random()*7))*CELL;
+        if(Math.random()>0.35) traces.push({h:true,y:r*CELL,x1:x,x2:Math.min(x+len,W+CELL)});
+        x+=len+(Math.random()>0.6?CELL:0);
+      }
+    }
+    for(let c=0;c<=cols;c++){
+      let y=0;
+      while(y<H){
+        const len=(2+Math.floor(Math.random()*5))*CELL;
+        if(Math.random()>0.4) traces.push({h:false,x:c*CELL,y1:y,y2:Math.min(y+len,H+CELL)});
+        y+=len+(Math.random()>0.6?CELL:0);
+      }
+    }
+    for(let r=0;r<=rows;r++) for(let c=0;c<=cols;c++){
+      if(Math.random()<0.14){
+        const k=Math.random();
+        pads.push({x:c*CELL,y:r*CELL,kind:k<0.45?'via':k<0.78?'pad':'chip',phase:Math.random()*Math.PI*2,spd:0.012+Math.random()*0.028});
+      }
+    }
+    for(let i=0;i<10;i++) spawnPulse();
+  }
+
+  function spawnPulse(){
+    const ht=traces.filter(t=>t.h), vt=traces.filter(t=>!t.h);
+    const horiz=Math.random()>0.5;
+    const pool=horiz?ht:vt;
+    if(!pool.length) return;
+    const ln=pool[Math.floor(Math.random()*pool.length)];
+    const red=Math.random()<0.22;
+    pulses.push(horiz
+      ?{h:true,y:ln.y,x1:ln.x1,x2:ln.x2,pos:ln.x1,spd:1.4+Math.random()*2.8,col:red?'rgba(220,40,60,0.95)':'rgba(80,160,255,0.95)'}
+      :{h:false,x:ln.x,y1:ln.y1,y2:ln.y2,pos:ln.y1,spd:1.4+Math.random()*2.8,col:red?'rgba(220,40,60,0.95)':'rgba(80,160,255,0.95)'}
+    );
+  }
+
+  function spawnParticle(){
+    particles.push({x:Math.random()*W,y:H+10,vy:-(0.4+Math.random()*0.7),txt:Math.random()>0.5?'1':'0',a:0.05+Math.random()*0.12,life:1});
+  }
+  setInterval(spawnParticle, 180);
+
+  function drawHex(cx,cy,r,angle,stroke,fill){
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);
+    ctx.beginPath();
+    for(let i=0;i<6;i++){const a=Math.PI/3*i-Math.PI/6;i===0?ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r):ctx.lineTo(Math.cos(a)*r,Math.sin(a)*r);}
+    ctx.closePath();ctx.strokeStyle=stroke;ctx.lineWidth=1;ctx.stroke();ctx.fillStyle=fill;ctx.fill();
+    ctx.restore();
+  }
+
+  function drawCorner(cx,cy,sz,angle,color){
+    ctx.save();ctx.translate(cx,cy);ctx.rotate(angle);
+    ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(0,sz);ctx.lineTo(0,0);ctx.lineTo(sz,0);ctx.stroke();
+    ctx.restore();
+  }
+
+  function draw(){
+    t+=0.014;
+    ctx.clearRect(0,0,W,H);
+    const bg=ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,'#06101e');bg.addColorStop(0.5,'#020810');bg.addColorStop(1,'#08010c');
+    ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+    const rg=ctx.createRadialGradient(W*0.5,-20,0,W*0.5,-20,W*0.9);
+    rg.addColorStop(0,'rgba(200,0,28,0.28)');rg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=rg;ctx.fillRect(0,0,W,H);
+    const bg2=ctx.createRadialGradient(W*0.5,H+40,0,W*0.5,H+40,W*0.85);
+    bg2.addColorStop(0,'rgba(14,50,180,0.22)');bg2.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=bg2;ctx.fillRect(0,0,W,H);
+    ctx.lineWidth=0.8;
+    traces.forEach(tr=>{
+      ctx.strokeStyle='rgba(28,72,200,0.16)';ctx.beginPath();
+      if(tr.h){ctx.moveTo(tr.x1,tr.y);ctx.lineTo(tr.x2,tr.y);}
+      else{ctx.moveTo(tr.x,tr.y1);ctx.lineTo(tr.x,tr.y2);}
+      ctx.stroke();
+    });
+    pads.forEach(p=>{
+      const glow=0.45+0.55*Math.sin(t*60*p.spd+p.phase);
+      if(p.kind==='via'){
+        ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);
+        ctx.fillStyle=`rgba(60,120,255,${glow*0.75})`;ctx.fill();
+        ctx.beginPath();ctx.arc(p.x,p.y,5.5,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(60,120,255,${glow*0.3})`;ctx.lineWidth=0.8;ctx.stroke();
+      } else if(p.kind==='pad'){
+        ctx.beginPath();ctx.roundRect(p.x-4,p.y-4,8,8,1.5);
+        ctx.fillStyle=`rgba(80,150,255,${glow*0.38})`;ctx.fill();
+        ctx.strokeStyle=`rgba(100,170,255,${glow*0.55})`;ctx.lineWidth=0.7;ctx.stroke();
+      } else {
+        const cw=18,ch=10;
+        ctx.beginPath();ctx.roundRect(p.x-cw/2,p.y-ch/2,cw,ch,2);
+        ctx.fillStyle=`rgba(6,16,48,${glow*0.95})`;ctx.fill();
+        ctx.strokeStyle=`rgba(60,120,255,${glow*0.75})`;ctx.lineWidth=0.8;ctx.stroke();
+        [-5,0,5].forEach(dx=>{ctx.beginPath();ctx.arc(p.x+dx,p.y-ch/2,1,0,Math.PI*2);ctx.fillStyle=`rgba(100,170,255,${glow*0.65})`;ctx.fill();});
+      }
+    });
+    const dead=[];
+    pulses.forEach((p,i)=>{
+      p.pos+=p.spd;
+      const end=p.h?p.x2:p.y2;
+      if(p.pos>end){dead.push(i);return;}
+      const px=p.h?p.pos:p.x,py=p.h?p.y:p.pos;
+      const px0=p.h?p.pos-26:p.x,py0=p.h?p.y:p.pos-26;
+      const grad=ctx.createLinearGradient(px0,py0,px,py);
+      grad.addColorStop(0,'rgba(0,0,0,0)');grad.addColorStop(1,p.col);
+      ctx.beginPath();ctx.moveTo(px0,py0);ctx.lineTo(px,py);
+      ctx.strokeStyle=grad;ctx.lineWidth=2;ctx.stroke();
+      const hg=ctx.createRadialGradient(px,py,0,px,py,9);
+      hg.addColorStop(0,p.col);hg.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=hg;ctx.beginPath();ctx.arc(px,py,9,0,Math.PI*2);ctx.fill();
+    });
+    dead.reverse().forEach(i=>pulses.splice(i,1));
+    while(pulses.length<14) spawnPulse();
+    ctx.font='9px monospace';
+    particles.forEach((p,i)=>{
+      p.y+=p.vy;p.life-=0.004;
+      if(p.y<-10||p.life<=0){particles.splice(i,1);return;}
+      ctx.fillStyle=`rgba(60,120,255,${p.a*p.life})`;ctx.fillText(p.txt,p.x,p.y);
+    });
+    drawHex(W/2,H*0.22,34,t*0.4,'rgba(200,0,28,0.35)','rgba(200,0,28,0.15)');
+    drawHex(W/2,H*0.22,48,-t*0.25,'rgba(28,72,200,0.22)','rgba(28,72,200,0.08)');
+    drawCorner(12,12,18,0,'rgba(200,0,28,0.5)');
+    drawCorner(W-12,12,18,Math.PI/2,'rgba(200,0,28,0.5)');
+    drawCorner(W-12,H-12,18,Math.PI,'rgba(28,72,200,0.45)');
+    drawCorner(12,H-12,18,Math.PI*1.5,'rgba(28,72,200,0.45)');
+    const sy=(H*0.5)+(H*0.48)*Math.sin(t*0.35);
+    const sg=ctx.createLinearGradient(0,sy-3,0,sy+3);
+    sg.addColorStop(0,'rgba(0,0,0,0)');sg.addColorStop(0.5,'rgba(28,72,200,0.07)');sg.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=sg;ctx.fillRect(0,sy-3,W,6);
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize',()=>setTimeout(resize,50));
+  setTimeout(resize,100);
+  draw();
+})();
+</script>
+{% endblock %}
+

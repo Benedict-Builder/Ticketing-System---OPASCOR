@@ -1,0 +1,1268 @@
+{% extends 'tickets/base.html' %}
+{% load static %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body, html { height: 100%; }
+
+:root {
+  --bg-deep:    #080f1e;
+  --bg-base:    #0c1528;
+  --bg-panel:   #101d35;
+  --bg-card:    #0e1a30;
+  --bg-input:   #091422;
+  --accent:     #3b82f6;
+  --accent-dim: rgba(59,130,246,0.15);
+  --accent-glow:rgba(59,130,246,0.35);
+  --border:     rgba(255,255,255,0.07);
+  --border-md:  rgba(255,255,255,0.12);
+  --text-1:     #f0f4ff;
+  --text-2:     rgba(200,215,255,0.7);
+  --text-3:     rgba(160,185,230,0.45);
+  --gold:       #f59e0b;
+  --orange:     #f97316;
+  --green:      #22c55e;
+  --red:        #ef4444;
+  --font:       'DM Sans', sans-serif;
+  --mono:       'JetBrains Mono', monospace;
+  --radius-sm:  6px;
+  --radius-md:  10px;
+  --radius-lg:  14px;
+}
+
+.shell { display:flex; height:100vh; font-family:var(--font); overflow:hidden; background:var(--bg-deep); }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 210px;
+  background: var(--bg-base);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  z-index: 100;
+  transition: width 0.25s cubic-bezier(.4,0,.2,1);
+  position: relative;
+}
+.sidebar.collapsed { width: 56px; }
+
+.sb-logo-row {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.sb-logo-row:hover { background: rgba(255,255,255,0.03); }
+.sb-logo-img { width: 34px; height: 34px; object-fit: contain; flex-shrink: 0; border-radius: 8px; }
+.sb-brand { display: flex; flex-direction: column; white-space: nowrap; overflow: hidden; }
+.sb-brand-name { font-size: 12px; font-weight: 700; color: var(--text-1); letter-spacing: 2.5px; }
+.sb-brand-sub { font-size: 7.5px; color: var(--text-3); line-height: 1.4; margin-top: 1px; }
+.sidebar.collapsed .sb-brand { display: none; }
+
+.sb-nav { flex: 1; overflow-y: auto; padding: 10px 8px; display: flex; flex-direction: column; gap: 2px; }
+.sb-nav::-webkit-scrollbar { display: none; }
+
+.sb-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 10px;
+  color: var(--text-2);
+  font-size: 12.5px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  transition: background 0.15s, color 0.15s;
+  position: relative;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.sb-item i { font-size: 18px; flex-shrink: 0; color: var(--text-3); transition: color 0.15s; }
+.sb-item:hover { background: rgba(255,255,255,0.05); color: var(--text-1); }
+.sb-item:hover i { color: var(--text-1); }
+.sb-item.active {
+  background: var(--accent-dim);
+  color: #7db8ff;
+  border: 1px solid rgba(59,130,246,0.2);
+}
+.sb-item.active i { color: #7db8ff; }
+.sb-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 25%; bottom: 25%;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 0 3px 3px 0;
+}
+.sb-item-label { white-space: nowrap; overflow: hidden; flex: 1; }
+.sidebar.collapsed .sb-item-label { display: none; }
+.sidebar.collapsed .sb-item { justify-content: center; padding: 10px; }
+.sidebar.collapsed .sb-item.active::before { display: none; }
+
+.notif-badge {
+  background: var(--red);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 9px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  flex-shrink: 0;
+}
+.sidebar.collapsed .notif-badge { display: none; }
+
+.sb-tip {
+  position: absolute;
+  left: 62px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #1a2845;
+  border: 1px solid var(--border-md);
+  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  white-space: nowrap;
+  color: var(--text-1);
+  font-size: 11px;
+  z-index: 300;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.sidebar.collapsed .sb-item:hover .sb-tip { opacity: 1; }
+
+.sb-bottom { padding: 8px 8px 12px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+.sb-avatar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  margin-bottom: 4px;
+  overflow: hidden;
+}
+.sb-avatar-circle {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #3b82f6, #6366f1);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.sb-avatar-info { overflow: hidden; }
+.sb-avatar-name { font-size: 11.5px; font-weight: 600; color: var(--text-1); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sb-avatar-dept { font-size: 9.5px; color: var(--text-3); white-space: nowrap; }
+.sidebar.collapsed .sb-avatar-info { display: none; }
+.sidebar.collapsed .sb-avatar { justify-content: center; padding: 8px; }
+
+/* ── TOPBAR ── */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.topbar {
+  background: var(--bg-base);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  gap: 14px;
+}
+.topbar-breadcrumb { display: flex; align-items: center; gap: 6px; }
+.topbar-breadcrumb-home { font-size: 11px; color: var(--text-3); }
+.topbar-breadcrumb-sep { color: var(--text-3); font-size: 11px; }
+.topbar-title { font-size: 13px; font-weight: 600; color: var(--text-1); }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.topbar-time {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-3);
+  background: rgba(255,255,255,0.04);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.topbar-welcome { font-size: 12px; color: var(--text-2); }
+.topbar-welcome strong { color: var(--text-1); font-weight: 600; }
+.topbar-dept {
+  font-size: 10px;
+  color: #7db8ff;
+  background: var(--accent-dim);
+  border: 1px solid rgba(59,130,246,0.2);
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.logout-btn {
+  font-size: 11px;
+  color: var(--text-3);
+  border: 1px solid var(--border-md);
+  padding: 5px 14px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.2s;
+  text-decoration: none;
+  font-family: var(--font);
+}
+.logout-btn:hover { border-color: var(--red); color: #ff8080; background: rgba(239,68,68,0.06); }
+
+/* ── CONTENT ── */
+.content { flex: 1; overflow-y: auto; padding: 18px; display: flex; gap: 16px; }
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 4px; }
+
+/* ── PANELS ── */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.panel-left { width: 320px; flex-shrink: 0; }
+.panel-right { flex: 1; min-width: 0; }
+.panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+}
+.panel-title-bar {
+  width: 3px; height: 14px;
+  background: var(--accent);
+  border-radius: 2px;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* ── VIEWS ── */
+.view { display: none; width: 100%; opacity: 0; transform: translateY(6px); }
+.view.active { display: flex; gap: 16px; flex: 1; animation: fadeUp 0.2s ease forwards; }
+@keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+/* ── FORM ── */
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 10px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600; }
+.form-sel, .form-inp {
+  background: var(--bg-input);
+  border: 1px solid var(--border-md);
+  color: var(--text-1);
+  font-size: 12.5px;
+  font-family: var(--font);
+  padding: 9px 12px;
+  border-radius: var(--radius-sm);
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='rgba(160,185,230,0.5)' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 30px;
+}
+.form-sel option { background: #0d1535; color: #fff; }
+.form-sel:focus, .form-inp:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.form-textarea {
+  background: var(--bg-input);
+  border: 1px solid var(--border-md);
+  color: var(--text-1);
+  font-size: 12.5px;
+  font-family: var(--font);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  line-height: 1.6;
+}
+.form-textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.form-textarea::placeholder { color: var(--text-3); }
+.char-count { font-size: 9px; color: var(--text-3); text-align: right; font-family: var(--mono); }
+.char-count.near { color: var(--orange); }
+.char-count.full { color: var(--red); }
+
+/* ── ATTACH ── */
+.attach-zone {
+  border: 1.5px dashed var(--border-md);
+  border-radius: var(--radius-sm);
+  padding: 14px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.attach-zone:hover { border-color: var(--accent); background: var(--accent-dim); }
+.attach-zone input[type="file"] { display: none; }
+.attach-icon-wrap { width: 32px; height: 32px; background: var(--accent-dim); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.attach-icon-wrap i { font-size: 17px; color: var(--accent); }
+.attach-text { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.attach-text span { color: #7db8ff; font-weight: 500; }
+.attach-btn-label { background: rgba(255,255,255,0.06); border: 1px solid var(--border-md); color: var(--text-2); font-size: 10px; padding: 5px 11px; border-radius: var(--radius-sm); margin-left: auto; white-space: nowrap; flex-shrink: 0; font-family: var(--font); }
+.file-preview { display: none; align-items: center; gap: 8px; background: var(--accent-dim); border: 1px solid rgba(59,130,246,0.25); border-radius: var(--radius-sm); padding: 8px 12px; font-size: 11px; color: var(--text-2); }
+.file-preview i { color: var(--accent); font-size: 16px; flex-shrink: 0; }
+.file-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-remove { background: none; border: none; color: var(--text-3); cursor: pointer; font-size: 18px; line-height: 1; flex-shrink: 0; }
+.file-remove:hover { color: var(--red); }
+
+/* ── SUBMIT ── */
+.submit-btn {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  padding: 11px 0;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  width: 100%;
+  letter-spacing: 0.04em;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font);
+}
+.submit-btn:hover { background: #2563eb; box-shadow: 0 4px 20px rgba(59,130,246,0.4); }
+.submit-btn:active { transform: scale(0.99); }
+.submit-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── ALERTS ── */
+.alert-success { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3); color: #4ade80; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; display: flex; align-items: center; gap: 8px; }
+.alert-error { background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); color: #f87171; padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; display: flex; align-items: center; gap: 8px; }
+
+/* ── TABLE ── */
+.tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.tbl th { color: var(--text-3); font-weight: 600; padding: 7px 10px; text-align: left; border-bottom: 1px solid var(--border); font-size: 9px; letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap; }
+.tbl td { padding: 10px 10px; color: var(--text-2); border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: none; }
+.tbl tr:hover td { background: rgba(255,255,255,0.02); }
+.tbl-id { font-family: var(--mono); color: var(--accent); font-size: 10.5px; font-weight: 600; }
+.status-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 9px; font-weight: 700; white-space: nowrap; letter-spacing: 0.3px; }
+.pill-pending { background: rgba(245,158,11,0.12); color: var(--gold); border: 1px solid rgba(245,158,11,0.2); }
+.pill-progress { background: rgba(249,115,22,0.12); color: var(--orange); border: 1px solid rgba(249,115,22,0.2); }
+.pill-resolved { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+.dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+.empty-row { text-align: center; color: var(--text-3); padding: 40px; font-size: 12px; }
+
+/* ── HISTORY CARDS ── */
+.history-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.history-card:hover { border-color: var(--border-md); }
+.history-card::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.history-card.status-pending::before { background: var(--gold); }
+.history-card.status-progress::before { background: var(--orange); }
+.history-card.status-resolved::before { background: var(--green); }
+.history-card-top { display: flex; align-items: center; gap: 8px; }
+.history-card-id { font-family: var(--mono); color: var(--accent); font-size: 10.5px; font-weight: 600; }
+.history-card-date { font-size: 10px; color: var(--text-3); margin-left: auto; }
+.history-card-desc { font-size: 11.5px; color: var(--text-2); line-height: 1.6; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 2px; }
+.history-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; padding-top: 6px; border-top: 1px solid var(--border); }
+.assigned-txt { font-size: 10px; color: var(--text-3); display: flex; align-items: center; gap: 4px; }
+.assigned-txt i { font-size: 12px; }
+.remarks-txt { font-size: 10px; color: var(--text-3); font-style: italic; max-width: 55%; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ── STAT CARDS ── */
+.stat-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.stat-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; position: relative; overflow: hidden; }
+.stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+.stat-card.gold-card::after { background: var(--gold); }
+.stat-card.orange-card::after { background: var(--orange); }
+.stat-card.green-card::after { background: var(--green); }
+.stat-label { font-size: 9px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; font-weight: 600; }
+.stat-val { font-size: 28px; font-weight: 700; font-family: var(--mono); line-height: 1; }
+.stat-val.gold { color: var(--gold); }
+.stat-val.orange { color: var(--orange); }
+.stat-val.green { color: var(--green); }
+
+/* ── NOTIFICATIONS ── */
+.notif-item { display: flex; align-items: flex-start; gap: 12px; padding: 13px 15px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); transition: border-color 0.15s; }
+.notif-item:hover { border-color: var(--border-md); }
+.notif-item.unread { border-left: 3px solid var(--accent); }
+.notif-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 17px; }
+.notif-icon.pending { background: rgba(245,158,11,0.12); color: var(--gold); }
+.notif-icon.progress { background: rgba(249,115,22,0.12); color: var(--orange); }
+.notif-icon.resolved { background: rgba(34,197,94,0.12); color: var(--green); }
+.notif-body { flex: 1; }
+.notif-title { font-size: 12.5px; font-weight: 600; color: var(--text-1); margin-bottom: 3px; }
+.notif-sub { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+.notif-remarks { font-size: 11px; color: var(--text-2); margin-top: 4px; font-style: italic; }
+.notif-time { font-size: 10px; color: var(--text-3); margin-top: 5px; font-family: var(--mono); }
+
+/* ── HELP ── */
+.help-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-md); cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.help-item:hover { background: rgba(59,130,246,0.06); border-color: rgba(59,130,246,0.25); }
+.help-icon { width: 36px; height: 36px; border-radius: var(--radius-sm); background: var(--accent-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.help-icon i { font-size: 18px; color: var(--accent); }
+.help-title { font-size: 12.5px; font-weight: 600; color: var(--text-1); margin-bottom: 3px; }
+.help-desc { font-size: 11px; color: var(--text-3); line-height: 1.5; }
+
+/* ── SETTINGS ── */
+.settings-section { display: flex; flex-direction: column; gap: 6px; }
+.settings-section-title { font-size: 9px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; padding-bottom: 6px; border-bottom: 1px solid var(--border); }
+.settings-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  gap: 12px;
+}
+.settings-row-left { display: flex; align-items: center; gap: 10px; }
+.settings-row-icon { width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--accent-dim); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.settings-row-icon i { font-size: 16px; color: var(--accent); }
+.settings-row-title { font-size: 12px; font-weight: 600; color: var(--text-1); }
+.settings-row-sub { font-size: 10px; color: var(--text-3); margin-top: 1px; }
+.settings-inp {
+  background: var(--bg-input);
+  border: 1px solid var(--border-md);
+  color: var(--text-1);
+  font-size: 12px;
+  font-family: var(--font);
+  padding: 7px 11px;
+  border-radius: var(--radius-sm);
+  width: 200px;
+  transition: border-color 0.15s;
+  outline: none;
+}
+.settings-inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); }
+.toggle-wrap { display: flex; align-items: center; gap: 8px; }
+.toggle {
+  width: 38px; height: 20px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 10px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle.on { background: var(--accent); }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  top: 3px; left: 3px;
+  transition: left 0.2s;
+}
+.toggle.on::after { left: 21px; }
+.toggle-label { font-size: 10px; color: var(--text-3); }
+.settings-save-btn {
+  background: var(--accent);
+  border: none;
+  color: #fff;
+  padding: 9px 24px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.settings-save-btn:hover { background: #2563eb; }
+.settings-badge { font-size: 9px; padding: 2px 8px; border-radius: 10px; font-weight: 700; }
+.badge-dept { background: var(--accent-dim); color: #7db8ff; border: 1px solid rgba(59,130,246,0.25); }
+
+/* ── EMAIL TOAST ── */
+.email-toast {
+  position: fixed; bottom: 24px; right: 24px;
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; gap: 8px;
+  z-index: 9999;
+  opacity: 0; transform: translateY(10px);
+  transition: opacity 0.3s, transform 0.3s;
+  pointer-events: none;
+}
+.email-toast.show { opacity: 1; transform: translateY(0); }
+.email-toast.success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.35); color: #4ade80; }
+.email-toast.error { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.35); color: #f87171; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 900px) { .view.active { flex-direction: column; } .panel-left { width: 100%; } }
+@media (max-width: 640px) { .sidebar { display: none; } }
+</style>
+
+{% with user_dept=request.user.userprofile.department %}
+<div class="shell">
+
+  <!-- ── SIDEBAR ── -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-logo-row" onclick="toggleSidebar()" title="Toggle sidebar">
+      <img src="{% static 'images/opascor_logo.png' %}" class="sb-logo-img" alt="OPASCOR">
+      <div class="sb-brand">
+        <span class="sb-brand-name">OPASCOR</span>
+        <span class="sb-brand-sub">Oriental Port and Allied<br>Services Corporation</span>
+      </div>
+    </div>
+
+    <div class="sb-nav">
+      <button class="sb-item active" onclick="switchView('report', this)">
+        <i class="ti ti-clipboard-list"></i>
+        <span class="sb-item-label">Report a Problem</span>
+        <span class="sb-tip">Report a Problem</span>
+      </button>
+      <button class="sb-item" onclick="switchView('history', this)">
+        <i class="ti ti-clock-hour-4"></i>
+        <span class="sb-item-label">Concern History</span>
+        <span class="sb-tip">Concern History</span>
+      </button>
+      <button class="sb-item" onclick="switchView('notifications', this)">
+        <i class="ti ti-bell"></i>
+        <span class="sb-item-label">Notifications</span>
+        {% if pending_count or inprogress_count %}
+          <span class="notif-badge">{{ pending_count|add:inprogress_count }}</span>
+        {% endif %}
+        <span class="sb-tip">Notifications</span>
+      </button>
+      <button class="sb-item" onclick="switchView('help', this)">
+        <i class="ti ti-help-circle"></i>
+        <span class="sb-item-label">Help &amp; Support</span>
+        <span class="sb-tip">Help &amp; Support</span>
+      </button>
+      <button class="sb-item" onclick="switchView('settings', this)">
+        <i class="ti ti-settings"></i>
+        <span class="sb-item-label">Settings</span>
+        <span class="sb-tip">Settings</span>
+      </button>
+    </div>
+
+    <div class="sb-bottom">
+      <div class="sb-avatar">
+        <div class="sb-avatar-circle">{{ request.user.get_full_name|default:request.user.username|slice:":2"|upper }}</div>
+        <div class="sb-avatar-info">
+          <div class="sb-avatar-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+          <div class="sb-avatar-dept">{{ user_dept }}</div>
+        </div>
+      </div>
+      <a class="sb-item" href="{% url 'logout' %}">
+        <i class="ti ti-logout"></i>
+        <span class="sb-item-label">Logout</span>
+        <span class="sb-tip">Logout</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ── MAIN ── -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-breadcrumb">
+        <span class="topbar-breadcrumb-home">OPASCOR Portal</span>
+        <span class="topbar-breadcrumb-sep"><i class="ti ti-chevron-right" style="font-size:11px;"></i></span>
+        <span class="topbar-title" id="topbar-page">Report a Problem</span>
+      </div>
+      <div class="topbar-right">
+        <span class="topbar-time" id="topbar-clock">--:--</span>
+        <span class="topbar-welcome">Welcome, <strong>{{ request.user.get_full_name|default:request.user.username }}</strong></span>
+        <span class="topbar-dept">{{ user_dept }}</span>
+        <a href="{% url 'logout' %}" class="logout-btn">
+          <i class="ti ti-logout" style="font-size:13px;vertical-align:-2px;margin-right:4px;"></i>Logout
+        </a>
+      </div>
+    </div>
+
+    <div class="content" id="main-content">
+
+      {% for message in messages %}
+        {% if 'error' in message.tags %}
+          <div class="alert-error" style="position:absolute;top:66px;left:226px;right:18px;z-index:50;">
+            <i class="ti ti-alert-circle" style="font-size:15px;flex-shrink:0;"></i>{{ message }}
+          </div>
+        {% else %}
+          <div class="alert-success" style="position:absolute;top:66px;left:226px;right:18px;z-index:50;">
+            <i class="ti ti-circle-check" style="font-size:15px;flex-shrink:0;"></i>{{ message }}
+          </div>
+        {% endif %}
+      {% endfor %}
+
+      <!-- ══ VIEW: REPORT A PROBLEM ══ -->
+      <div class="view active" id="view-report">
+        <div class="panel panel-left">
+          <div class="panel-title">
+            <span class="panel-title-bar"></span>
+            Report a Problem
+          </div>
+          <form method="post" action="{% url 'submit_concern' %}" enctype="multipart/form-data" id="concern-form">
+            {% csrf_token %}
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select name="category" id="cat-sel" class="form-sel" required>
+                <option value="">— Select a category —</option>
+                {% for cat, subcats in categories.items %}
+                  <option value="{{ cat }}">{{ cat }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+              <label class="form-label">Sub-Category</label>
+              <select name="sub_category" id="subcat-sel" class="form-sel" required>
+                <option value="">— Select sub-category —</option>
+                {% for cat, subcats in categories.items %}
+                  {% for sub in subcats %}
+                    <option value="{{ sub }}" data-parent="{{ cat }}">{{ sub }}</option>
+                  {% endfor %}
+                {% endfor %}
+              </select>
+            </div>
+            <div class="form-group" style="margin-top:10px;">
+              <label class="form-label">Description</label>
+              <textarea name="description" id="desc-area" class="form-textarea" placeholder="Describe your concern in detail..." maxlength="1000" required></textarea>
+              <div class="char-count"><span id="char-num">0</span> / 1000</div>
+            </div>
+            <div class="form-group" style="margin-top:4px;">
+              <label class="attach-zone" id="attach-zone" for="file-input">
+                <input type="file" name="attachment" id="file-input" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx">
+                <div class="attach-icon-wrap"><i class="ti ti-paperclip"></i></div>
+                <div class="attach-text"><span>Attach File</span><br>Screenshot or Document</div>
+                <span class="attach-btn-label">Browse</span>
+              </label>
+              <div class="file-preview" id="file-preview">
+                <i class="ti ti-file-description"></i>
+                <span class="file-name" id="file-name">—</span>
+                <button type="button" class="file-remove" id="file-remove">&times;</button>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn" style="margin-top:8px;">
+              <i class="ti ti-send" style="font-size:15px;"></i>
+              Submit Report
+            </button>
+          </form>
+        </div>
+
+        <div class="panel panel-right">
+          <div class="panel-title">
+            <span class="panel-title-bar"></span>
+            Recent Reports
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="tbl">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Category</th>
+                  <th>Sub-Category</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for c in my_concerns|slice:":8" %}
+                <tr>
+                  <td class="tbl-id">#{{ c.id }}</td>
+                  <td style="color:var(--text-1);font-weight:500;">{{ c.category }}</td>
+                  <td style="color:var(--text-3);">{{ c.sub_category }}</td>
+                  <td style="color:var(--text-3);font-family:var(--mono);font-size:10px;">{{ c.date_submitted|date:"m/d/Y" }}</td>
+                  <td>
+                    {% if c.status == 'Pending' %}
+                      <span class="status-pill pill-pending"><span class="dot"></span>Pending</span>
+                    {% elif c.status == 'In Progress' %}
+                      <span class="status-pill pill-progress"><span class="dot"></span>In Progress</span>
+                    {% else %}
+                      <span class="status-pill pill-resolved"><span class="dot"></span>Resolved</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="empty-row">
+                  <i class="ti ti-inbox" style="font-size:24px;display:block;margin-bottom:8px;opacity:0.4;"></i>
+                  No concerns submitted yet.
+                </td></tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: CONCERN HISTORY ══ -->
+      <div class="view" id="view-history">
+        <div class="panel" style="flex:1;">
+          <div class="panel-title">
+            <span class="panel-title-bar"></span>
+            Concern History
+          </div>
+          <div class="stat-row">
+            <div class="stat-card gold-card">
+              <div class="stat-label">Pending</div>
+              <div class="stat-val gold">{{ pending_count }}</div>
+            </div>
+            <div class="stat-card orange-card">
+              <div class="stat-label">In Progress</div>
+              <div class="stat-val orange">{{ inprogress_count }}</div>
+            </div>
+            <div class="stat-card green-card">
+              <div class="stat-label">Resolved</div>
+              <div class="stat-val green">{{ resolved_count }}</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;overflow-y:auto;">
+            {% for c in my_concerns %}
+            <div class="history-card {% if c.status == 'Pending' %}status-pending{% elif c.status == 'In Progress' %}status-progress{% else %}status-resolved{% endif %}">
+              <div class="history-card-top">
+                <span class="history-card-id">#{{ c.id }}</span>
+                {% if c.status == 'Pending' %}
+                  <span class="status-pill pill-pending"><span class="dot"></span>Pending</span>
+                {% elif c.status == 'In Progress' %}
+                  <span class="status-pill pill-progress"><span class="dot"></span>In Progress</span>
+                {% else %}
+                  <span class="status-pill pill-resolved"><span class="dot"></span>Resolved</span>
+                {% endif %}
+                <span class="history-card-date">{{ c.date_submitted|date:"M d, Y" }}</span>
+              </div>
+              <div style="font-size:13px;font-weight:600;color:var(--text-1);">{{ c.category }}</div>
+              <div style="font-size:11px;color:var(--text-3);">{{ c.sub_category }}</div>
+              {% if c.description %}
+                <div class="history-card-desc">{{ c.description }}</div>
+              {% endif %}
+              <div class="history-card-footer">
+                <span class="assigned-txt">
+                  <i class="ti ti-user"></i>
+                  {% if c.assigned_to %}{{ c.assigned_to }}{% else %}Not yet assigned{% endif %}
+                </span>
+                <span class="remarks-txt">{{ c.remarks|default:"No remarks yet" }}</span>
+              </div>
+            </div>
+            {% empty %}
+            <div style="text-align:center;color:var(--text-3);padding:48px;font-size:12px;">
+              <i class="ti ti-history" style="font-size:28px;display:block;margin-bottom:10px;opacity:0.4;"></i>
+              No concerns submitted yet.
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: NOTIFICATIONS ══ -->
+      <div class="view" id="view-notifications">
+        <div class="panel" style="flex:1;">
+          <div class="panel-title">
+            <span class="panel-title-bar"></span>
+            Notifications
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;">
+            {% for c in notifications %}
+            <div class="notif-item {% if c.status != 'Resolved' %}unread{% endif %}">
+              <div class="notif-icon {% if c.status == 'Pending' %}pending{% elif c.status == 'In Progress' %}progress{% else %}resolved{% endif %}">
+                {% if c.status == 'Pending' %}<i class="ti ti-clock"></i>
+                {% elif c.status == 'In Progress' %}<i class="ti ti-loader"></i>
+                {% else %}<i class="ti ti-circle-check"></i>{% endif %}
+              </div>
+              <div class="notif-body">
+                <div class="notif-title">
+                  Concern #{{ c.id }} —
+                  {% if c.status == 'Pending' %}Awaiting review
+                  {% elif c.status == 'In Progress' %}Being handled
+                  {% else %}Resolved{% endif %}
+                </div>
+                <div class="notif-sub">
+                  {{ c.category }} › {{ c.sub_category }}
+                  {% if c.assigned_to %} · <strong style="color:var(--text-2);">{{ c.assigned_to }}</strong>{% endif %}
+                </div>
+                {% if c.remarks %}
+                  <div class="notif-remarks">Remarks: {{ c.remarks }}</div>
+                {% endif %}
+                <div class="notif-time">{{ c.date_submitted|date:"M d, Y" }}</div>
+              </div>
+            </div>
+            {% empty %}
+            <div style="text-align:center;color:var(--text-3);padding:48px;font-size:12px;">
+              <i class="ti ti-bell-off" style="font-size:28px;display:block;margin-bottom:10px;opacity:0.4;"></i>
+              No notifications yet.
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: HELP & SUPPORT ══ -->
+      <div class="view" id="view-help">
+        <div class="panel" style="flex:1;">
+          <div class="panel-title">
+            <span class="panel-title-bar"></span>
+            Help &amp; Support
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+
+            <a href="tel:+63XXXXXXXXXX" class="help-item" style="text-decoration:none;">
+              <div class="help-icon"><i class="ti ti-phone-call"></i></div>
+              <div>
+                <div class="help-title">Contact IT Support</div>
+                <div class="help-desc">
+                  For urgent technical issues, call our IT helpdesk directly.<br>
+                  <strong style="color:#7db8ff;font-size:12px;">+63 XXX XXX XXXX</strong><br>
+                  <span style="font-size:10px;">Available Monday to Friday, 8AM – 5PM.</span>
+                </div>
+              </div>
+            </a>
+
+            <!-- SEND MESSAGE TO ADMIN — now uses EmailJS -->
+            <div class="help-item" id="msg-help-item" onclick="if(event.target.closest('form')||event.target.closest('input')||event.target.closest('textarea')||event.target.closest('button[type=button]'))return; toggleHelp('msg-form')">
+              <div class="help-icon"><i class="ti ti-mail"></i></div>
+              <div style="width:100%;">
+                <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  Send a Message to Admin
+                  <i class="ti ti-chevron-down help-chevron" id="chev-msg-form" style="font-size:14px;color:var(--text-3);transition:transform 0.2s;"></i>
+                </div>
+                <div class="help-desc">Send a direct message to the admin team — they'll receive it by email.</div>
+               <div class="help-expand" id="msg-form" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+                  <form method="post" action="{% url 'send_message' %}">
+                    {% csrf_token %}
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                      <input type="text" name="subject" id="msg-subject" placeholder="Subject" required autocomplete="off"
+                        style="background:var(--bg-input);border:1px solid var(--border-md);color:var(--text-1);font-size:12px;padding:9px 12px;border-radius:var(--radius-sm);width:100%;outline:none;font-family:var(--font);">
+                      <textarea name="body" id="msg-body" placeholder="Type your message here..." required rows="4"
+                        style="background:var(--bg-input);border:1px solid var(--border-md);color:var(--text-1);font-size:12px;padding:9px 12px;border-radius:var(--radius-sm);width:100%;outline:none;font-family:var(--font);resize:vertical;"></textarea>
+                      <button type="submit"
+                        style="background:var(--accent);border:none;color:#fff;padding:9px;border-radius:var(--radius-sm);font-size:12px;font-weight:700;cursor:pointer;width:100%;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:6px;">
+                        <i class="ti ti-send"></i> Send Message
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+            <div class="help-item" onclick="toggleHelp('guide-submit')">
+              <div class="help-icon"><i class="ti ti-file-text"></i></div>
+              <div style="width:100%;">
+                <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  How to Submit a Concern
+                  <i class="ti ti-chevron-down help-chevron" id="chev-guide-submit" style="font-size:14px;color:var(--text-3);transition:transform 0.2s;"></i>
+                </div>
+                <div class="help-desc">Step-by-step guide on how to report a problem.</div>
+                <div class="help-expand" id="guide-submit" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+                  <ol style="padding-left:16px;display:flex;flex-direction:column;gap:7px;font-size:11px;color:var(--text-2);line-height:1.7;">
+                    <li>On the left sidebar, click <strong style="color:var(--text-1);">Report a Problem.</strong></li>
+                    <li>Select a <strong style="color:var(--text-1);">Category</strong> from the dropdown.</li>
+                    <li>Select the appropriate <strong style="color:var(--text-1);">Sub-Category.</strong></li>
+                    <li><strong style="color:var(--text-1);">Describe your concern</strong> clearly (up to 1,000 characters).</li>
+                    <li>Optionally <strong style="color:var(--text-1);">attach a file</strong> (screenshot or document).</li>
+                    <li>Click <strong style="color:var(--text-1);">Submit Report.</strong></li>
+                    <li>Your concern appears in the <strong style="color:var(--text-1);">Recent Reports</strong> table.</li>
+                  </ol>
+                </div>
+              </div>
+            </div>
+
+            <div class="help-item" onclick="toggleHelp('guide-track')">
+              <div class="help-icon"><i class="ti ti-refresh"></i></div>
+              <div style="width:100%;">
+                <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  Tracking Your Concern
+                  <i class="ti ti-chevron-down help-chevron" id="chev-guide-track" style="font-size:14px;color:var(--text-3);transition:transform 0.2s;"></i>
+                </div>
+                <div class="help-desc">Learn how to monitor the status of your submitted concerns.</div>
+                <div class="help-expand" id="guide-track" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+                  <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text-2);line-height:1.7;">
+                    <p>Click the <strong style="color:var(--text-1);">Notifications</strong> tab to track your concerns.</p>
+                    <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px;">
+                      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill pill-pending"><span class="dot"></span>Pending</span><span>Concern received, awaiting assignment.</span></div>
+                      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill pill-progress"><span class="dot"></span>In Progress</span><span>Staff actively handling your concern.</span></div>
+                      <div style="display:flex;align-items:center;gap:8px;"><span class="status-pill pill-resolved"><span class="dot"></span>Resolved</span><span>Concern addressed and closed.</span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="help-item" onclick="toggleHelp('guide-about')">
+              <div class="help-icon"><i class="ti ti-info-circle"></i></div>
+              <div style="width:100%;">
+                <div class="help-title" style="display:flex;justify-content:space-between;align-items:center;">
+                  About OPASCOR Portal
+                  <i class="ti ti-chevron-down help-chevron" id="chev-guide-about" style="font-size:14px;color:var(--text-3);transition:transform 0.2s;"></i>
+                </div>
+                <div class="help-desc">Learn more about the OPASCOR Ticketing System.</div>
+                <div class="help-expand" id="guide-about" style="display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px;">
+                  <div style="display:flex;flex-direction:column;gap:8px;font-size:11px;color:var(--text-2);line-height:1.8;">
+                    <p>The <strong style="color:var(--text-1);">OPASCOR Ticketing System</strong> is an internal concern management portal for employees of <strong style="color:var(--text-1);">Oriental Port and Allied Services Corporation</strong>.</p>
+                    <p>Built to provide a <strong style="color:var(--text-1);">fast, organized, and transparent</strong> way to report and resolve workplace concerns.</p>
+                    <ul style="padding-left:16px;display:flex;flex-direction:column;gap:5px;">
+                      <li>Submit concerns across IT, HR, Maintenance, and Operations.</li>
+                      <li>Automatically routes concerns to the right department.</li>
+                      <li>Real-time status updates and notifications.</li>
+                      <li>Complete concern history for accountability.</li>
+                    </ul>
+                    <p style="margin-top:4px;color:var(--text-3);">Developed and maintained by the <strong style="color:var(--text-2);">MIS Department</strong> of OPASCOR.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ VIEW: SETTINGS ══ -->
+      <div class="view" id="view-settings">
+        <div class="panel" style="flex:1;max-width:680px;margin:0 auto;width:100%;">
+          <div class="panel-title">
+            <span class="panel-title-bar"></span>
+            Settings
+          </div>
+
+          <!-- ACCOUNT INFO -->
+          <div class="settings-section">
+            <div class="settings-section-title">Account Information</div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon"><i class="ti ti-user"></i></div>
+                <div>
+                  <div class="settings-row-title">Full Name</div>
+                  <div class="settings-row-sub">Your display name in the portal</div>
+                </div>
+              </div>
+              <span style="font-size:12px;color:var(--text-2);font-weight:600;">{{ request.user.get_full_name|default:request.user.username }}</span>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon"><i class="ti ti-at"></i></div>
+                <div>
+                  <div class="settings-row-title">Username</div>
+                  <div class="settings-row-sub">Your login username</div>
+                </div>
+              </div>
+              <span style="font-size:12px;color:var(--text-2);font-family:var(--mono);">{{ request.user.username }}</span>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon"><i class="ti ti-building"></i></div>
+                <div>
+                  <div class="settings-row-title">Department</div>
+                  <div class="settings-row-sub">Your assigned department</div>
+                </div>
+              </div>
+              <span class="settings-badge badge-dept">{{ user_dept }}</span>
+            </div>
+          </div>
+
+          <!-- NOTIFICATIONS -->
+          <div class="settings-section" style="margin-top:14px;">
+            <div class="settings-section-title">Notification Preferences</div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon" style="background:rgba(34,197,94,0.12);"><i class="ti ti-bell" style="color:var(--green);"></i></div>
+                <div>
+                  <div class="settings-row-title">Status Updates</div>
+                  <div class="settings-row-sub">Get notified when your ticket status changes</div>
+                </div>
+              </div>
+              <div class="toggle-wrap">
+                <div class="toggle on" id="toggle-status" onclick="toggleSwitch(this)"></div>
+                <span class="toggle-label" id="lbl-toggle-status">On</span>
+              </div>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon" style="background:rgba(245,158,11,0.12);"><i class="ti ti-mail" style="color:var(--gold);"></i></div>
+                <div>
+                  <div class="settings-row-title">Admin Replies</div>
+                  <div class="settings-row-sub">Get notified when admin adds remarks</div>
+                </div>
+              </div>
+              <div class="toggle-wrap">
+                <div class="toggle on" id="toggle-replies" onclick="toggleSwitch(this)"></div>
+                <span class="toggle-label" id="lbl-toggle-replies">On</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DISPLAY -->
+          <div class="settings-section" style="margin-top:14px;">
+            <div class="settings-section-title">Display</div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon" style="background:rgba(129,140,248,0.12);"><i class="ti ti-eye" style="color:#818cf8;"></i></div>
+                <div>
+                  <div class="settings-row-title">Compact View</div>
+                  <div class="settings-row-sub">Show more tickets in less space</div>
+                </div>
+              </div>
+              <div class="toggle-wrap">
+                <div class="toggle" id="toggle-compact" onclick="toggleSwitch(this)"></div>
+                <span class="toggle-label" id="lbl-toggle-compact">Off</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECURITY -->
+          <div class="settings-section" style="margin-top:14px;">
+            <div class="settings-section-title">Security</div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon" style="background:rgba(239,68,68,0.12);"><i class="ti ti-lock" style="color:var(--red);"></i></div>
+                <div>
+                  <div class="settings-row-title">Change Password</div>
+                  <div class="settings-row-sub">Update your login credentials</div>
+                </div>
+              </div>
+              <a href="{% url 'password_change' %}" style="font-size:11px;color:#7db8ff;text-decoration:none;display:flex;align-items:center;gap:4px;">
+                Change <i class="ti ti-arrow-right" style="font-size:12px;"></i>
+              </a>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon" style="background:rgba(239,68,68,0.12);"><i class="ti ti-logout" style="color:var(--red);"></i></div>
+                <div>
+                  <div class="settings-row-title">Logout</div>
+                  <div class="settings-row-sub">Sign out of your account</div>
+                </div>
+              </div>
+              <a href="{% url 'logout' %}" style="font-size:11px;color:#f87171;text-decoration:none;display:flex;align-items:center;gap:4px;">
+                Logout <i class="ti ti-arrow-right" style="font-size:12px;"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- ABOUT -->
+          <div class="settings-section" style="margin-top:14px;">
+            <div class="settings-section-title">About</div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon"><i class="ti ti-info-circle"></i></div>
+                <div>
+                  <div class="settings-row-title">OPASCOR Portal</div>
+                  <div class="settings-row-sub">Internal Concern Management System</div>
+                </div>
+              </div>
+              <span style="font-size:10px;color:var(--text-3);font-family:var(--mono);">v1.0.0</span>
+            </div>
+            <div class="settings-row">
+              <div class="settings-row-left">
+                <div class="settings-row-icon" style="background:rgba(129,140,248,0.12);"><i class="ti ti-code" style="color:#818cf8;"></i></div>
+                <div>
+                  <div class="settings-row-title">Maintained By</div>
+                  <div class="settings-row-sub">MIS Department — OPASCOR</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endwith %}
+
+<!-- EMAIL TOAST -->
+<div class="email-toast" id="emailToast"></div>
+
+<script>
+/* ── EmailJS Init ── */
+(function(){
+  emailjs.init("YOUR_PUBLIC_KEY"); // ← Replace with your EmailJS public key
+})();
+
+/* ── Clock ── */
+function updateClock() {
+  var now = new Date();
+  var h = now.getHours().toString().padStart(2,'0');
+  var m = now.getMinutes().toString().padStart(2,'0');
+  document.getElementById('topbar-clock').textContent = h + ':' + m;
+}
+updateClock();
+setInterval(updateClock, 10000);
+
+/* ── View switcher ── */
+var pageNames = { report: 'Report a Problem', history: 'Concern History', notifications: 'Notifications', help: 'Help & Support', settings: 'Settings' };
+function switchView(name, btn) {
+  document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+  document.querySelectorAll('.sb-item').forEach(function(b) { b.classList.remove('active'); });
+  document.getElementById('view-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbar-page').textContent = pageNames[name] || name;
+}
+
+/* ── Sidebar toggle ── */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
+/* ── Sub-category filter ── */
+var catSel = document.getElementById('cat-sel');
+var subcatSel = document.getElementById('subcat-sel');
+var allOpts = Array.from(subcatSel.querySelectorAll('option[data-parent]'));
+function filterSubcats() {
+  var chosen = catSel.value;
+  allOpts.forEach(function(opt) {
+    opt.style.display = (!chosen || opt.dataset.parent === chosen) ? '' : 'none';
+    if (opt.dataset.parent !== chosen && opt.selected) opt.selected = false;
+  });
+  if (chosen) {
+    var first = allOpts.find(function(o) { return o.dataset.parent === chosen; });
+    if (first) first.selected = true;
+  } else { subcatSel.value = ''; }
+}
+catSel.addEventListener('change', filterSubcats);
+filterSubcats();
+
+/* ── Char counter ── */
+var descArea = document.getElementById('desc-area');
+var charNum = document.getElementById('char-num');
+var charCount = descArea.closest('.form-group').querySelector('.char-count');
+function updateChar() {
+  var len = descArea.value.length;
+  charNum.textContent = len;
+  charCount.className = 'char-count' + (len > 900 ? ' full' : len > 700 ? ' near' : '');
+}
+descArea.addEventListener('input', updateChar);
+
+/* ── File attach ── */
+var fileInput = document.getElementById('file-input');
+var attachZone = document.getElementById('attach-zone');
+var filePreview = document.getElementById('file-preview');
+var fileNameEl = document.getElementById('file-name');
+var fileRemove = document.getElementById('file-remove');
+fileInput.addEventListener('change', function() {
+  if (fileInput.files && fileInput.files[0]) {
+    fileNameEl.textContent = fileInput.files[0].name;
+    attachZone.style.display = 'none';
+    filePreview.style.display = 'flex';
+  }
+});
+fileRemove.addEventListener('click', function() {
+  fileInput.value = '';
+  fileNameEl.textContent = '—';
+  filePreview.style.display = 'none';
+  attachZone.style.display = 'flex';
+});
+attachZone.addEventListener('dragover', function(e) { e.preventDefault(); attachZone.style.borderColor = '#3b82f6'; });
+attachZone.addEventListener('dragleave', function() { attachZone.style.borderColor = ''; });
+attachZone.addEventListener('drop', function(e) {
+  e.preventDefault(); attachZone.style.borderColor = '';
+  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+    fileInput.files = e.dataTransfer.files;
+    fileNameEl.textContent = e.dataTransfer.files[0].name;
+    attachZone.style.display = 'none';
+    filePreview.style.display = 'flex';
+  }
+});
+
+/* ── Help accordion ── */
+function toggleHelp(id) {
+  var el = document.getElementById(id);
+  var chev = document.getElementById('chev-' + id);
+  var isOpen = el.style.display === 'block';
+  el.style.display = isOpen ? 'none' : 'block';
+  chev.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+}
+
+/* ── Settings toggle ── */
+function toggleSwitch(el) {
+  el.classList.toggle('on');
+  var id = el.id.replace('toggle-', '');
+  var lbl = document.getElementById('lbl-toggle-' + id);
+  if (lbl) lbl.textContent = el.classList.contains('on') ? 'On' : 'Off';
+}
+
+/* ── Email Toast ── */
+function showToast(msg, type) {
+  var t = document.getElementById('emailToast');
+  t.textContent = '';
+  t.className = 'email-toast ' + type;
+  var icon = document.createElement('i');
+  icon.className = type === 'success' ? 'ti ti-circle-check' : 'ti ti-alert-circle';
+  icon.style.fontSize = '16px';
+  t.appendChild(icon);
+  t.appendChild(document.createTextNode(' ' + msg));
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 4000);
+}
+
+/* ── Send Message to Admin via EmailJS ── */
+function sendMessageToAdmin() {
+  var subject = document.getElementById('msg-subject').value.trim();
+  var body    = document.getElementById('msg-body').value.trim();
+  var btn     = document.getElementById('msg-send-btn');
+  var btnTxt  = document.getElementById('msg-btn-text');
+
+  if (!subject || !body) {
+    showToast('Please fill in subject and message.', 'error');
+    return;
+  }
+
+  btn.disabled = true;
+  btnTxt.textContent = 'Sending...';
+
+  var templateParams = {
+    to_email:    'lloydguido458@gmail.com',
+    from_name:   '{{ request.user.get_full_name|default:request.user.username }}',
+    from_dept:   '{{ user_dept }}',
+    from_user:   '{{ request.user.username }}',
+    subject:     subject,
+    message:     body,
+    sent_at:     new Date().toLocaleString()
+  };
+
+  emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)  // ← Replace IDs
+    .then(function() {
+      showToast('Message sent to admin successfully!', 'success');
+      document.getElementById('msg-subject').value = '';
+      document.getElementById('msg-body').value = '';
+      btn.disabled = false;
+      btnTxt.textContent = 'Send Message';
+    }, function(err) {
+      showToast('Failed to send. Please try again.', 'error');
+      console.error('EmailJS error:', err);
+      btn.disabled = false;
+      btnTxt.textContent = 'Send Message';
+    });
+}
+
+/* ── Auto-switch via URL param ── */
+var urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('tab') === 'notifications') {
+  document.querySelectorAll('.sb-item')[2].click();
+} else if (urlParams.get('tab') === 'history') {
+  document.querySelectorAll('.sb-item')[1].click();
+} else if (urlParams.get('tab') === 'settings') {
+  document.querySelectorAll('.sb-item')[4].click();
+}
+</script>
+
+{% endblock %}

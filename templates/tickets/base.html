@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OPASCOR Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:        #0a0e1f;
+      --dark-blue:   #0d1535;
+      --glow-blue:   #2255dd;
+      --red-bright:  #cc1a1a;
+      --text:        #e8eaf6;
+      --text-dim:    #8899bb;
+      --gold:        #f59e0b;
+      --green:       #22c55e;
+      --orange:      #f97316;
+      --border:      rgba(34, 85, 221, 0.3);
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--text);
+    }
+
+    .bg-effect {
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 60% 50% at 80% 20%, rgba(168,18,18,0.35) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 60% at 10% 80%, rgba(26,58,143,0.4) 0%, transparent 60%),
+        linear-gradient(135deg, #05091a 0%, #0d1535 50%, #0a0e1f 100%);
+    }
+
+    .badge { display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:600; }
+    .badge-dot { width:7px;height:7px;border-radius:50%; }
+    .badge.pending  { background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.4); }
+    .badge.pending .badge-dot  { background:var(--gold);box-shadow:0 0 6px var(--gold); }
+    .badge.progress { background:rgba(249,115,22,0.15);color:var(--orange);border:1px solid rgba(249,115,22,0.4); }
+    .badge.progress .badge-dot { background:var(--orange);box-shadow:0 0 6px var(--orange); }
+    .badge.resolved { background:rgba(34,197,94,0.15);color:var(--green);border:1px solid rgba(34,197,94,0.4); }
+    .badge.resolved .badge-dot { background:var(--green);box-shadow:0 0 6px var(--green); }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #1a3a9f, #2255dd);
+      color:#fff;border:none;border-radius:8px;padding:10px 24px;
+      font-weight:600;font-size:0.95rem;cursor:pointer;letter-spacing:0.05em;
+      box-shadow:0 4px 15px rgba(34,85,221,0.4);transition:all 0.2s;
+    }
+    .btn-primary:hover { transform:translateY(-1px);box-shadow:0 6px 20px rgba(34,85,221,0.6); }
+    .btn-full { width:100%;text-align:center;padding:12px;font-size:1rem;letter-spacing:0.1em;border-radius:10px; }
+
+    .form-input {
+      width:100%;background:rgba(255,255,255,0.05);
+      border:1px solid var(--border);border-radius:8px;
+      color:var(--text);padding:10px 14px;font-size:0.9rem;
+      outline:none;transition:border-color 0.2s;
+    }
+    .form-input:focus { border-color:var(--glow-blue);box-shadow:0 0 10px rgba(34,85,221,0.2); }
+    .form-input option { background:#0d1535; }
+    label.form-label { display:block;font-size:0.8rem;color:#6ea4ff;margin-bottom:6px;font-weight:500;letter-spacing:0.05em; }
+
+    table { width:100%;border-collapse:collapse; }
+    th { background:rgba(34,85,221,0.15);color:#6ea4ff;font-size:0.78rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;padding:10px 14px;text-align:left; }
+    td { padding:10px 14px;font-size:0.85rem;border-bottom:1px solid rgba(255,255,255,0.05); }
+    tr:hover td { background:rgba(255,255,255,0.03); }
+
+    .alert { padding:10px 16px;border-radius:8px;margin-bottom:16px;font-size:0.85rem; }
+    .alert-success { background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--green); }
+    .alert-error   { background:rgba(204,26,26,0.1);border:1px solid rgba(204,26,26,0.3);color:#ff6b6b; }
+  </style>
+</head>
+<body>
+<div class="bg-effect"></div>
+{% block content %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,1424 @@
+{% extends 'tickets/base.html' %}
+{% load static %}
+{% load dict_extras %}
+{% block content %}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap');
+
+:root {
+  --navy: #04080f;
+  --bg-base: #02040a;
+  --bg-panel: #06101e;
+  --bg-card: #080d18;
+  --bg-hover: rgba(28,72,245,0.07);
+  --blue: #1c48f5;
+  --blue-lt: #4a7cff;
+  --blue-gl: rgba(74,124,255,0.12);
+  --red: #c8001c;
+  --gold: #ffd34a;
+  --green: #4ade80;
+  --purple: #818cf8;
+  --border: rgba(255,255,255,0.07);
+  --border-blue: rgba(74,124,255,0.25);
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.35);
+  --text-dim: rgba(255,255,255,0.18);
+  --muted: rgba(255,255,255,0.22);
+  --cream: #e8eaf6;
+  --cream2: #8899bb;
+  --mono: 'DM Mono', monospace;
+  --r: 10px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+}
+html, body { height: 100%; overflow: hidden; }
+.dash { display: flex; height: 100vh; min-height: 700px; font-size: 13px; overflow: hidden; min-height: 0; }
+
+/* SIDEBAR */
+.sidebar {
+  width: 200px; min-width: 200px;
+  background: #030711;
+  border-right: 1px solid var(--border);
+  color: var(--text-secondary);
+  display: flex; flex-direction: column; padding: 0;
+  transition: width .25s ease; overflow: hidden;
+}
+.sidebar.collapsed { width: 52px; min-width: 52px; }
+.sidebar.collapsed .logo-name,
+.sidebar.collapsed .logo-sub,
+.sidebar.collapsed .sb-uname,
+.sidebar.collapsed .sb-urole,
+.sidebar.collapsed .sb-online,
+.sidebar.collapsed .nav-lbl,
+.sidebar.collapsed .nav-badge,
+.sidebar.collapsed .nav-section,
+.sidebar.collapsed .sb-foot-lbl { display: none; }
+
+.sidebar .logo { padding: 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; flex-shrink: 0; }
+.sb-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--blue-gl); border: 1px solid var(--border-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+.sb-icon img { width: 32px; height: 32px; object-fit: contain; border-radius: 7px; }
+.logo-name { color: #fff; font-size: 13px; font-weight: 800; font-family: 'Syne', sans-serif; letter-spacing: 0.5px; white-space: nowrap; }
+.logo-sub { font-size: 7px; color: var(--text-dim); margin-top: 1px; white-space: nowrap; line-height: 1.4; }
+
+.sb-user { padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 9px; flex-shrink: 0; }
+.sb-av { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; text-transform: uppercase; border: 2px solid rgba(99,102,241,0.4); }
+.sb-uname { font-size: 11px; color: var(--text-primary); font-weight: 700; white-space: nowrap; line-height: 1.2; font-family: 'Syne', sans-serif; }
+.sb-urole { font-size: 9px; color: var(--text-secondary); }
+.sb-online { display: flex; align-items: center; gap: 4px; font-size: 8px; color: var(--green); margin-top: 2px; }
+.sb-online::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+.sb-nav { flex: 1; overflow-y: auto; padding: 8px 0; overflow-x: hidden; }
+.sb-nav::-webkit-scrollbar { width: 0; }
+.nav-section { padding: 10px 8px 4px; font-size: 9px; font-family: 'Syne', sans-serif; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.18); white-space: nowrap; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; margin: 1px 6px; transition: background 0.15s, color 0.15s; color: var(--text-secondary); text-decoration: none; position: relative; white-space: nowrap; overflow: hidden; }
+.nav-item:hover { background: rgba(74,124,255,0.08); color: rgba(255,255,255,0.7); }
+.nav-item.active { background: rgba(28,72,245,0.18); color: var(--blue-lt); border: 1px solid rgba(74,124,255,0.2); }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 18%; bottom: 18%; width: 3px; border-radius: 0 3px 3px 0; background: var(--blue); }
+.nav-item i { font-size: 15px; flex-shrink: 0; }
+.nav-lbl { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.nav-badge { background: var(--red); color: #fff; font-size: 8px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 5px; flex-shrink: 0; }
+.nav-div { height: 1px; background: var(--border); margin: 5px 8px; }
+
+.sb-foot { padding: 8px; border-top: 1px solid var(--border); flex-shrink: 0; }
+.sb-collapse { display: flex; align-items: center; gap: 8px; padding: 7px 10px; color: var(--text-secondary); font-size: 11px; cursor: pointer; border-radius: 6px; transition: all .15s; user-select: none; }
+.sb-collapse:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+.sb-collapse i { font-size: 15px; flex-shrink: 0; transition: transform .25s; }
+.sidebar.collapsed .sb-collapse i { transform: rotate(180deg); }
+
+/* MAIN */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-base); min-width: 0; min-height: 0; }
+
+/* TOPBAR */
+.topbar { background: #030711; border-bottom: 1px solid var(--border); padding: 0 20px; height: 52px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-shrink: 0; }
+.topbar-left { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.tb-menu { width: 32px; height: 32px; border-radius: 7px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 16px; transition: all .15s; }
+.tb-menu:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.topbar-breadcrumb { display: flex; align-items: center; gap: 8px; }
+.topbar-breadcrumb .page-title { font-size: 15px; font-weight: 700; color: #fff; font-family: 'Syne', sans-serif; }
+.topbar-breadcrumb .sep { color: rgba(255,255,255,0.25); font-size: 14px; }
+.topbar-breadcrumb .sub-crumb { display: flex; align-items: center; gap: 5px; font-size: 12px; color: rgba(255,255,255,0.45); }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.search-box { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 8px; padding: 7px 12px; font-size: 12px; color: var(--text-dim); width: 220px; transition: border-color 0.2s; }
+.search-box input { border: none; background: transparent; font-size: 11px; color: var(--text-primary); outline: none; flex: 1; font-family: 'DM Sans', sans-serif; }
+.search-box input::placeholder { color: var(--text-dim); }
+.search-box:focus-within { border-color: var(--border-blue); }
+.search-arrow { width: 28px; height: 28px; border-radius: 6px; background: var(--blue); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; transition: background 0.15s; }
+.search-arrow:hover { background: var(--blue-lt); }
+.tb-notif { width: 32px; height: 32px; border-radius: 7px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 17px; position: relative; text-decoration: none; transition: all .15s; }
+.tb-notif:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.notif-badge { position: absolute; top: -5px; right: -5px; background: var(--red); color: #fff; font-size: 8px; font-weight: 700; min-width: 17px; height: 17px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; border: 2px solid #030711; }
+.tb-tag { background: rgba(28,72,245,0.15); color: var(--blue-lt); font-size: 9px; font-weight: 800; padding: 4px 10px; border-radius: 5px; border: 1px solid var(--border-blue); letter-spacing: .8px; font-family: 'Syne', sans-serif; }
+
+/* TOPBAR USER DROPDOWN */
+.topbar-user { display: flex; align-items: center; gap: 8px; padding: 4px 10px 4px 5px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color 0.15s; position: relative; }
+.topbar-user:hover { border-color: var(--border-blue); }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; }
+.tb-user-name { font-size: 10px; color: var(--text-primary); font-weight: 700; font-family: 'Syne', sans-serif; }
+.tb-user-role { font-size: 8px; color: var(--text-secondary); }
+
+.user-dropdown { display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 210px; background: #030711; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,0.6); z-index: 100; overflow: hidden; animation: modal-in .15s ease; }
+.user-dropdown.open { display: block; }
+.ud-menu { padding: 6px; }
+.ud-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 7px; font-size: 11px; color: var(--text-secondary); cursor: pointer; transition: background .15s, color .15s; text-decoration: none; }
+.ud-item:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+.ud-item i { font-size: 14px; flex-shrink: 0; }
+.ud-div { height: 1px; background: var(--border); margin: 4px 6px; }
+.ud-item.logout { color: #e8304a; }
+.ud-item.logout:hover { background: rgba(200,0,28,0.12); color: #e8304a; }
+
+/* INBOX PANEL */
+.inbox-panel { display: none; position: absolute; top: calc(100% + 8px); right: 0; width: 300px; background: #030711; border: 1px solid var(--border); border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,0.6); z-index: 100; overflow: hidden; animation: modal-in .15s ease; }
+.inbox-panel.open { display: block; }
+.inbox-header { padding: 12px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.inbox-title { font-size: 13px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.inbox-badge { background: var(--red); color: #fff; font-size: 8px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 5px; }
+.inbox-list { max-height: 320px; overflow-y: auto; }
+.inbox-list::-webkit-scrollbar { width: 3px; }
+.inbox-list::-webkit-scrollbar-thumb { background: rgba(74,124,255,0.3); border-radius: 2px; }
+.inbox-user-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background .15s; }
+.inbox-user-item:last-child { border-bottom: none; }
+.inbox-user-item:hover { background: rgba(255,255,255,0.04); }
+.inbox-av { width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; flex-shrink: 0; }
+.inbox-user-name { font-size: 12px; font-weight: 600; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.inbox-user-preview { font-size: 10px; color: var(--text-secondary); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
+.inbox-unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue-lt); flex-shrink: 0; margin-left: auto; }
+.inbox-empty { padding: 24px; text-align: center; font-size: 11px; color: var(--text-secondary); }
+
+.inbox-thread { display: none; flex-direction: column; }
+.inbox-thread.active { display: flex; }
+.inbox-thread-header { padding: 10px 14px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+.inbox-back { width: 24px; height: 24px; border-radius: 5px; border: 1px solid var(--border); background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 12px; transition: all .15s; }
+.inbox-back:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
+.inbox-thread-name { font-size: 12px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.inbox-messages { max-height: 220px; overflow-y: auto; padding: 10px 14px; display: flex; flex-direction: column; gap: 8px; }
+.inbox-messages::-webkit-scrollbar { width: 3px; }
+.inbox-messages::-webkit-scrollbar-thumb { background: rgba(74,124,255,0.3); border-radius: 2px; }
+.msg-bubble { max-width: 85%; padding: 8px 12px; border-radius: 10px; font-size: 11px; line-height: 1.5; }
+.msg-bubble.incoming { background: rgba(255,255,255,0.06); color: var(--text-primary); border-radius: 4px 10px 10px 10px; align-self: flex-start; }
+.msg-bubble.outgoing { background: rgba(28,72,245,0.3); color: #fff; border-radius: 10px 4px 10px 10px; align-self: flex-end; border: 1px solid rgba(74,124,255,0.3); }
+.msg-time { font-size: 9px; color: var(--text-secondary); margin-top: 2px; }
+.inbox-reply-bar { padding: 8px 10px; border-top: 1px solid var(--border); display: flex; gap: 6px; align-items: center; }
+.inbox-reply-input { flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 11px; color: var(--text-primary); outline: none; font-family: 'DM Sans', sans-serif; }
+.inbox-reply-input:focus { border-color: var(--border-blue); }
+.inbox-send-btn { width: 28px; height: 28px; border-radius: 6px; background: var(--blue); border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 13px; flex-shrink: 0; transition: opacity .15s; }
+.inbox-send-btn:hover { opacity: .85; }
+
+/* CONTENT */
+.content { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-thumb { background: rgba(74,124,255,0.35); border-radius: 2px; }
+
+/* ALERTS */
+.alert { background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: var(--green); padding: 10px 16px; border-radius: 10px; font-size: 12px; }
+
+/* STAT CARDS */
+.sg { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+.sc { background: #030711; border: 1px solid var(--border); border-radius: var(--r); padding: 16px 16px 0; display: flex; flex-direction: column; min-height: 120px; position: relative; overflow: hidden; }
+.sc-top { display: flex; align-items: flex-start; gap: 12px; }
+.sc-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.si-blue   { background: rgba(74,124,255,0.18); color: var(--blue-lt); border: 1px solid rgba(74,124,255,0.25); }
+.si-red    { background: rgba(200,0,28,0.18);   color: #e8304a; border: 1px solid rgba(200,0,28,0.25); }
+.si-purple { background: rgba(129,140,248,0.18);color: var(--purple); border: 1px solid rgba(129,140,248,0.25); }
+.si-green  { background: rgba(74,222,128,0.18); color: var(--green); border: 1px solid rgba(74,222,128,0.25); }
+.sc-body { flex: 1; }
+.sc-lbl { font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+.sc-val { font-size: 32px; font-weight: 800; color: var(--text-primary); line-height: 1; font-family: 'Syne', sans-serif; }
+.sc-hint { font-size: 9px; color: var(--text-secondary); margin-top: 3px; }
+.sc-wave { margin-top: auto; height: 44px; width: calc(100% + 32px); margin-left: -16px; display: block; }
+
+/* TABLE CARD */
+.tc { background: #030711; border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; flex-shrink: 0; }
+.tc-hd { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.tc-title { font-size: 13px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.tc-count { font-size: 10px; color: var(--blue-lt); background: var(--blue-gl); padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border-blue); font-weight: 700; }
+.tc-spacer { flex: 1; }
+.srch { display: flex; align-items: center; gap: 7px; border: 1px solid var(--border); border-radius: 7px; padding: 0 10px; height: 30px; background: rgba(255,255,255,0.03); transition: border-color .15s; min-width: 180px; }
+.srch:focus-within { border-color: var(--blue-lt); }
+.srch i { font-size: 12px; color: var(--text-secondary); }
+.srch input { border: none; background: transparent; font-size: 11px; color: var(--text-primary); outline: none; flex: 1; font-family: 'DM Sans', sans-serif; }
+.srch input::placeholder { color: var(--text-secondary); }
+.ds { height: 30px; border: 1px solid var(--border); border-radius: 7px; background: rgba(255,255,255,0.03); color: var(--text-secondary); font-size: 11px; padding: 0 9px; outline: none; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.ds:focus { border-color: var(--blue-lt); }
+.ds option { background: #030711; }
+
+/* DATE RANGE */
+.btn-cal { height: 30px; padding: 0 10px; border-radius: 7px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text-secondary); font-size: 11px; transition: all .15s; white-space: nowrap; position: relative; }
+.btn-cal:hover { background: rgba(74,124,255,0.1); border-color: var(--border-blue); color: var(--blue-lt); }
+.btn-cal.active { background: rgba(74,124,255,0.18); border-color: var(--border-blue); color: var(--blue-lt); }
+.btn-cal i { font-size: 14px; }
+.date-range-panel { display: none; position: absolute; top: calc(100% + 6px); right: 0; background: #030711; border: 1px solid var(--border-blue); border-radius: 10px; box-shadow: 0 16px 40px rgba(0,0,0,0.6); z-index: 150; padding: 14px; width: 280px; animation: modal-in .15s ease; }
+.date-range-panel.open { display: block; }
+.drp-title { font-size: 10px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 10px; font-family: 'Syne', sans-serif; }
+.drp-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.drp-field { display: flex; flex-direction: column; gap: 4px; }
+.drp-label { font-size: 9px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; font-family: 'Syne', sans-serif; }
+.drp-input { height: 30px; border: 1px solid var(--border); border-radius: 6px; background: rgba(255,255,255,0.03); color: var(--text-primary); font-size: 11px; padding: 0 8px; outline: none; font-family: 'DM Mono', monospace; width: 100%; transition: border-color .15s; color-scheme: dark; }
+.drp-input:focus { border-color: var(--blue-lt); }
+.drp-actions { display: flex; gap: 6px; }
+.drp-apply { flex: 1; height: 28px; border-radius: 6px; background: var(--blue); border: none; color: #fff; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; transition: opacity .15s; }
+.drp-apply:hover { opacity: .85; }
+.drp-clear { height: 28px; padding: 0 12px; border-radius: 6px; background: transparent; border: 1px solid var(--border); color: var(--text-secondary); font-size: 11px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s; }
+.drp-clear:hover { border-color: var(--red); color: #e8304a; }
+.drp-active-badge { display: none; font-size: 9px; background: var(--blue-gl); color: var(--blue-lt); border-radius: 4px; padding: 1px 5px; border: 1px solid var(--border-blue); }
+
+.btn-new { display: flex; align-items: center; gap: 5px; height: 30px; padding: 0 13px; background: linear-gradient(135deg,#1035c8,var(--blue)); border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 11px; font-weight: 700; border-radius: 7px; cursor: pointer; font-family: 'Syne', sans-serif; white-space: nowrap; transition: opacity .15s; }
+.btn-new:hover { opacity: .85; }
+
+/* TICKET TABLE */
+.tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+.tbl th { color: var(--text-secondary); font-weight: 700; padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 9px; letter-spacing: .8px; text-transform: uppercase; background: rgba(255,255,255,0.02); white-space: nowrap; font-family: 'Syne', sans-serif; }
+.tbl td { padding: 10px 12px; color: var(--text-secondary); border-bottom: 1px solid var(--border); vertical-align: middle; }
+.tbl tbody tr:hover td { background: rgba(74,124,255,0.04); }
+.tbl tbody tr:last-child td { border-bottom: none; }
+.tid { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--blue-lt); font-weight: 600; }
+.fw { font-weight: 600; color: var(--text-primary); font-size: 11px; }
+.trunc { max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; font-size: 10px; }
+.muted { color: var(--text-secondary); font-size: 10px; }
+
+.dp { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 4px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+.dp-admin    { background: rgba(74,124,255,0.15);  color: var(--blue-lt); }
+.dp-finance  { background: rgba(255,211,74,0.15);  color: #ffd34a; }
+.dp-mis      { background: rgba(129,140,248,0.15); color: #818cf8; }
+.dp-ops      { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+.dp-hr       { background: rgba(74,222,128,0.15);  color: var(--green); }
+.dp-security { background: rgba(200,0,28,0.15);    color: #e8304a; }
+.dp-default  { background: rgba(255,255,255,0.07); color: var(--text-secondary); }
+
+.sp { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; white-space: nowrap; }
+.sp-p { background: rgba(255,184,77,0.12); color: #ffb84d; border: 1px solid rgba(255,184,77,0.2); }
+.sp-i { background: rgba(74,124,255,0.12); color: var(--blue-lt); border: 1px solid rgba(74,124,255,0.2); }
+.sp-r { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid rgba(74,222,128,0.2); }
+.sdot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+.eb { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 13px; transition: all .15s; }
+.eb:hover { background: rgba(74,124,255,0.15); border-color: var(--border-blue); color: var(--blue-lt); }
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text-secondary); }
+.empty-state i { font-size: 38px; display: block; margin-bottom: 10px; opacity: .2; }
+.empty-state p { font-size: 12px; }
+.tbl tbody tr.date-hidden { display: none; }
+
+/* PAGINATION */
+.tc-foot { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--border); flex-wrap: wrap; gap: 6px; }
+.pg-info { font-size: 10px; color: var(--text-secondary); }
+.pg-ctrl { display: flex; align-items: center; gap: 4px; }
+.pg-btn { width: 26px; height: 26px; border: 1px solid var(--border); border-radius: 5px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; color: var(--text-secondary); transition: background .15s, border-color .15s; }
+.pg-btn:hover { border-color: var(--border-blue); color: var(--blue-lt); }
+.pg-num { width: 26px; height: 26px; border-radius: 5px; background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; }
+.pg-size select { background: rgba(255,255,255,0.03); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 5px; padding: 3px 7px; font-size: 10px; font-family: 'DM Sans', sans-serif; outline: none; cursor: pointer; }
+
+/* DRAWER */
+.drawer-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; backdrop-filter: blur(2px); }
+.drawer-overlay.open { display: block; }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: 820px; max-width: 96vw; background: var(--bg-base); border-left: 1px solid var(--border); z-index: 201; display: flex; flex-direction: column; transform: translateX(100%); transition: transform .3s cubic-bezier(.4,0,.2,1); box-shadow: -24px 0 64px rgba(0,0,0,0.6); }
+.drawer.open { transform: translateX(0); }
+.dr-bar { display: flex; align-items: center; gap: 10px; padding: 0 18px; height: 50px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: #030711; }
+.dr-back { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 13px; transition: all .15s; }
+.dr-back:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.dr-breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-secondary); }
+.dr-bc-chip { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 5px; padding: 3px 9px; display: flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 600; }
+.dr-bc-chip i { font-size: 11px; color: var(--blue-lt); }
+.dr-bc-sep { color: var(--text-secondary); opacity: .4; font-size: 12px; }
+.dr-refresh { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 13px; transition: all .15s; margin-left: auto; }
+.dr-refresh:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); }
+.dr-body { flex: 1; display: flex; overflow: hidden; min-height: 0; }
+.dr-main { flex: 1; overflow-y: auto; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+.dr-main::-webkit-scrollbar { width: 4px; }
+.dr-main::-webkit-scrollbar-thumb { background: rgba(74,124,255,0.35); border-radius: 2px; }
+.dr-side { width: 220px; flex-shrink: 0; border-left: 1px solid var(--border); overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; background: #030711; }
+.det-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.det-field { background: #030711; border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.det-lbl { font-size: 8px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+.det-val { font-size: 11px; color: var(--text-primary); font-weight: 500; line-height: 1.5; }
+.det-full { grid-column: span 2; }
+.side-section { margin-bottom: 16px; }
+.side-label { font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 9px; font-family: 'Syne', sans-serif; display: flex; align-items: center; gap: 5px; }
+.side-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.crew-select { width: 100%; height: 30px; border: 1px solid var(--border); border-radius: 6px; background: rgba(255,255,255,0.02); color: var(--text-secondary); font-size: 10px; padding: 0 8px; outline: none; font-family: 'DM Sans', sans-serif; cursor: pointer; margin-bottom: 9px; }
+.crew-select option { background: #030711; }
+.crew-field-dr { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 9px 10px; margin-bottom: 7px; }
+.crew-field-lbl { font-size: 8px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; font-family: 'Syne', sans-serif; }
+.crew-field-val { font-size: 10px; color: var(--text-primary); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.crew-av { width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; color: #fff; text-transform: uppercase; flex-shrink: 0; }
+.crew-date-val { font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 5px; }
+.crew-date-val i { font-size: 12px; color: var(--blue-lt); }
+
+.status-nodes { display: flex; justify-content: space-between; align-items: center; position: relative; padding-bottom: 5px; margin-bottom: 8px; }
+.status-track { position: absolute; bottom: 9px; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.07); border-radius: 2px; overflow: hidden; }
+.status-fill-track { height: 100%; background: linear-gradient(90deg,var(--blue),var(--blue-lt)); border-radius: 2px; transition: width .4s ease; }
+.status-node { width: 10px; height: 10px; border-radius: 50%; border: 2px solid #030711; flex-shrink: 0; position: relative; z-index: 1; }
+.sn-done { background: var(--blue-lt); }
+.sn-curr { background: var(--blue-lt); box-shadow: 0 0 0 4px rgba(74,124,255,0.3); animation: pulse-node 1.5s infinite; }
+.sn-todo { background: rgba(255,255,255,0.1); }
+@keyframes pulse-node { 0%,100%{box-shadow:0 0 0 3px rgba(74,124,255,0.3)} 50%{box-shadow:0 0 0 6px rgba(74,124,255,0.12)} }
+.status-done-lbl { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: var(--green); margin-bottom: 10px; }
+.btn-update { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; width: 100%; background: linear-gradient(135deg,#1035c8,var(--blue)); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; transition: opacity .15s; }
+.btn-update:hover { opacity: .85; }
+
+/* MODALS */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 300; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+.modal-overlay.open { display: flex; }
+.modal { background: #030711; border-radius: 12px; border: 1px solid rgba(74,124,255,0.2); padding: 22px; width: 420px; max-width: 95vw; animation: modal-in .2s ease; box-shadow: 0 24px 64px rgba(0,0,0,0.6); }
+@keyframes modal-in { from{opacity:0;transform:translateY(18px) scale(0.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+.md-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 18px; }
+.md-title { font-size: 14px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.md-id { font-size: 10px; color: var(--text-secondary); margin-top: 3px; font-family: 'DM Mono', monospace; }
+.md-close { width: 26px; height: 26px; border-radius: 6px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text-secondary); font-size: 14px; transition: all .15s; flex-shrink: 0; }
+.md-close:hover { background: rgba(200,0,28,0.15); border-color: rgba(200,0,28,0.3); color: #e8304a; }
+.field-row  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.field      { display: flex; flex-direction: column; gap: 4px; }
+.field-full { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.field label,.field-full label { font-size: 9px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; font-family: 'Syne', sans-serif; }
+.field select,.field input,.field-full input,.field-full textarea { border: 1px solid var(--border); border-radius: 7px; background: rgba(255,255,255,0.03); color: var(--text-primary); font-size: 12px; padding: 0 10px; outline: none; width: 100%; font-family: 'DM Sans', sans-serif; transition: all .15s; }
+.field select,.field input,.field-full input { height: 34px; }
+.field-full textarea { height: 68px; padding: 8px 10px; resize: none; }
+.field select option { background: #030711; }
+.field select:focus,.field input:focus,.field-full input:focus,.field-full textarea:focus { border-color: var(--blue-lt); box-shadow: 0 0 0 3px rgba(74,124,255,0.15); }
+.modal-actions { display: flex; gap: 8px; margin-top: 18px; }
+.btn-cancel { height: 36px; padding: 0 14px; border-radius: 7px; border: 1px solid var(--border); background: transparent; color: var(--text-secondary); font-size: 12px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s; }
+.btn-cancel:hover { background: rgba(255,255,255,0.04); color: var(--text-primary); }
+.btn-save { flex: 1; height: 36px; border-radius: 7px; background: linear-gradient(135deg,#1035c8,var(--blue)); border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: 'Syne', sans-serif; transition: opacity .15s; display: flex; align-items: center; justify-content: center; gap: 5px; }
+.btn-save:hover { opacity: .85; }
+.nt-divider { height: 1px; background: var(--border); margin: 4px 0 10px; }
+.nt-section-label { font-size: 8px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; font-family: 'Syne', sans-serif; }
+input[type="file"].field-file { height: auto; padding: 7px 10px; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
+input[type="file"].field-file::-webkit-file-upload-button { background: rgba(255,255,255,0.06); border: 1px solid rgba(74,124,255,0.3); color: var(--text-secondary); font-size: 10px; font-family: 'DM Sans', sans-serif; padding: 3px 10px; border-radius: 5px; cursor: pointer; margin-right: 8px; }
+
+.search-highlight { background: rgba(74,124,255,0.25); color: var(--blue-lt); border-radius: 2px; padding: 0 1px; }
+.no-results-row td { text-align: center; padding: 32px; color: var(--text-secondary); font-size: 12px; }
+
+/* SETTINGS MODAL */
+.settings-modal { width: 500px; max-height: 88vh; overflow-y: auto; }
+.settings-modal::-webkit-scrollbar { width: 4px; }
+.settings-modal::-webkit-scrollbar-thumb { background: rgba(74,124,255,0.35); border-radius: 2px; }
+.settings-section-lbl { font-size: 8px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin: 14px 0 8px; font-family: 'Syne', sans-serif; display: flex; align-items: center; gap: 6px; }
+.settings-section-lbl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.settings-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 6px; gap: 10px; }
+.settings-row-left { display: flex; align-items: center; gap: 10px; }
+.settings-row-icon { width: 30px; height: 30px; border-radius: 7px; background: var(--blue-gl); border: 1px solid var(--border-blue); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.settings-row-icon i { font-size: 14px; color: var(--blue-lt); }
+.settings-row-icon.si-red-sm { background: rgba(200,0,28,0.12); border-color: rgba(200,0,28,0.25); }
+.settings-row-icon.si-red-sm i { color: #e8304a; }
+.settings-row-icon.si-green-sm { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.25); }
+.settings-row-icon.si-green-sm i { color: var(--green); }
+.settings-row-icon.si-gold-sm { background: rgba(255,211,74,0.12); border-color: rgba(255,211,74,0.25); }
+.settings-row-icon.si-gold-sm i { color: var(--gold); }
+.settings-row-icon.si-purple-sm { background: rgba(129,140,248,0.12); border-color: rgba(129,140,248,0.25); }
+.settings-row-icon.si-purple-sm i { color: var(--purple); }
+.settings-row-title { font-size: 11px; font-weight: 700; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.settings-row-sub { font-size: 9px; color: var(--text-secondary); margin-top: 1px; }
+.settings-val { font-size: 10px; color: var(--text-secondary); font-family: var(--mono); }
+.settings-link { font-size: 10px; color: var(--blue-lt); text-decoration: none; display: flex; align-items: center; gap: 4px; transition: opacity .15s; }
+.settings-link:hover { opacity: .75; }
+.s-toggle { width: 34px; height: 18px; background: rgba(255,255,255,0.1); border-radius: 9px; position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+.s-toggle.on { background: var(--blue); }
+.s-toggle::after { content: ''; position: absolute; width: 12px; height: 12px; border-radius: 50%; background: #fff; top: 3px; left: 3px; transition: left .2s; }
+.s-toggle.on::after { left: 19px; }
+.s-toggle-lbl { font-size: 9px; color: var(--text-secondary); }
+
+/* PROFILE MODAL */
+.profile-avatar-lg { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg,#6366f1,#3b82f6); display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; color: #fff; text-transform: uppercase; margin: 0 auto 12px; border: 3px solid rgba(99,102,241,0.4); }
+.profile-name { text-align: center; font-size: 16px; font-weight: 800; color: var(--text-primary); font-family: 'Syne', sans-serif; }
+.profile-role-badge { text-align: center; font-size: 10px; color: var(--blue-lt); margin-top: 3px; margin-bottom: 16px; }
+.profile-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-bottom: 16px; }
+.profile-stat { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 10px; text-align: center; }
+.profile-stat-val { font-size: 20px; font-weight: 800; color: var(--text-primary); font-family: 'Syne', sans-serif; line-height: 1; }
+.profile-stat-lbl { font-size: 8px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .6px; margin-top: 3px; font-family: 'Syne', sans-serif; }
+
+@media (max-width:1100px) { .sg { grid-template-columns: 1fr 1fr; } }
+@media (max-width:640px)  { .sg { grid-template-columns: 1fr; } .content { padding: 10px; } }
+</style>
+
+{% with initials=request.user.get_full_name|default:request.user.username %}
+<div class="dash">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar" id="sidebar">
+    <div class="logo" onclick="toggleSidebar()">
+      <div class="sb-icon"><img src="{% static 'images/opascor_logo.png' %}" alt="OPASCOR Logo"></div>
+      <div>
+        <div class="logo-name">OPASCOR</div>
+        <div class="logo-sub">ORIENTAL PORT AND ALLIED<br>SERVICES CORPORATION</div>
+      </div>
+    </div>
+    <div class="sb-user">
+      <div class="sb-av">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
+      <div style="min-width:0">
+        <div class="sb-uname">{{ request.user.get_full_name|default:request.user.username }}</div>
+        <div class="sb-urole">Administrator</div>
+        <div class="sb-online">Online</div>
+      </div>
+    </div>
+    <div class="sb-nav">
+      <div class="nav-section">Main Menu</div>
+      <a class="nav-item {% if not selected_dept %}active{% endif %}" href="?">
+        <i class="ti ti-layout-dashboard"></i>
+        <span class="nav-lbl">Dashboard</span>
+      </a>
+      <div class="nav-div"></div>
+      <div class="nav-section">Departments</div>
+      {% for value, label in departments %}
+        <a class="nav-item {% if selected_dept == value %}active{% endif %}" href="?department={{ value }}">
+          {% if value == 'Admin' %}<i class="ti ti-shield-check"></i>
+          {% elif value == 'Finance' %}<i class="ti ti-coins"></i>
+          {% elif value == 'MIS' or value == 'Information Technology' %}<i class="ti ti-device-desktop"></i>
+          {% elif value == 'Operational/General Management' or value == 'Operations' %}<i class="ti ti-settings"></i>
+          {% elif value == 'Human Resources' %}<i class="ti ti-users"></i>
+          {% elif value == 'Security' %}<i class="ti ti-lock"></i>
+          {% else %}<i class="ti ti-building"></i>
+          {% endif %}
+          <span class="nav-lbl">{{ label }}</span>
+          {% with count=dept_counts|get_item:value %}
+            {% if count %}<span class="nav-badge">{{ count }}</span>{% endif %}
+          {% endwith %}
+        </a>
+      {% endfor %}
+    </div>
+    <div class="sb-foot">
+      <div class="sb-collapse" onclick="toggleSidebar()">
+        <i class="ti ti-layout-sidebar-left-collapse"></i>
+        <span class="sb-foot-lbl">Collapse</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="tb-menu" onclick="toggleSidebar()"><i class="ti ti-menu-2"></i></div>
+        <div class="topbar-breadcrumb">
+          <span class="page-title">Admin Dashboard</span>
+          <span class="sep">/</span>
+          <span class="sub-crumb">
+            <i class="ti ti-home"></i>
+            {% if selected_dept %}{{ selected_dept }}{% else %}Overview{% endif %}
+          </span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="search-box">
+            <i class="ti ti-search" style="font-size:13px;flex-shrink:0;color:var(--text-secondary)"></i>
+            <input type="text" id="globalSearchInput" placeholder="Search ID, username, concern..." oninput="handleGlobalSearch(this.value)" onkeydown="if(event.key==='Enter')handleGlobalSearch(this.value)">
+          </div>
+          <div class="search-arrow" onclick="handleGlobalSearch(document.getElementById('globalSearchInput').value)"><i class="ti ti-arrow-right" style="font-size:12px;color:#fff"></i></div>
+        </div>
+
+        <!-- INBOX BELL -->
+        <div style="position:relative" id="inboxWrap">
+          <div class="tb-notif" onclick="toggleInbox(event)" id="inboxBtn">
+            <i class="ti ti-message"></i>
+            <span class="notif-badge" id="inboxBadge" style="display:none"></span>
+          </div>
+          <div class="inbox-panel" id="inboxPanel">
+            <div id="inboxListView">
+              <div class="inbox-header">
+                <span class="inbox-title">Messages</span>
+                <span class="inbox-badge" id="inboxBadgeCount">0</span>
+              </div>
+              <div class="inbox-list" id="inboxUserList"></div>
+            </div>
+            <div class="inbox-thread" id="inboxThreadView">
+              <div class="inbox-thread-header">
+                <div class="inbox-back" onclick="backToInboxList()"><i class="ti ti-arrow-left"></i></div>
+                <div class="inbox-av" id="threadAvatar">U</div>
+                <div class="inbox-thread-name" id="threadName">User</div>
+              </div>
+              <div class="inbox-messages" id="threadMessages"></div>
+              <div class="inbox-reply-bar">
+                <input class="inbox-reply-input" id="replyInput" placeholder="Type a reply..." onkeydown="if(event.key==='Enter')sendReply()">
+                <button class="inbox-send-btn" onclick="sendReply()"><i class="ti ti-send"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <span class="tb-tag">ADMIN</span>
+
+        <!-- TOPBAR USER -->
+        <div class="topbar-user" id="topbarUser" onclick="toggleUserDropdown(event)">
+          <div class="avatar">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
+          <div style="font-size:11px;line-height:1.2">
+            <div class="tb-user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+            <div class="tb-user-role">Administrator</div>
+          </div>
+          <i class="ti ti-chevron-down" id="udChevron" style="font-size:11px;color:var(--text-secondary);margin-left:2px;transition:transform .2s"></i>
+
+          <div class="user-dropdown" id="userDropdown">
+            <div class="ud-menu">
+              <a class="ud-item" href="#" onclick="event.preventDefault();closeAllDropdowns();openSettingsModal()">
+                <i class="ti ti-settings"></i> Settings
+              </a>
+              <a class="ud-item" href="#" onclick="event.preventDefault();closeAllDropdowns();openProfileModal()">
+                <i class="ti ti-user"></i> My Profile
+              </a>
+              <div class="ud-div"></div>
+              <a class="ud-item logout" href="{% url 'logout' %}"><i class="ti ti-logout"></i> Logout</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      {% for message in messages %}
+        <div class="alert">{{ message }}</div>
+      {% endfor %}
+
+      <!-- STAT CARDS -->
+      <div class="sg">
+        <div class="sc">
+          <div class="sc-top">
+            <div class="sc-icon si-blue"><i class="ti ti-ticket"></i></div>
+            <div class="sc-body">
+              <div class="sc-lbl">Total Concerns</div>
+              <div class="sc-val">{{ total }}</div>
+              <div class="sc-hint">All time tickets</div>
+            </div>
+          </div>
+          <svg class="sc-wave" viewBox="0 0 200 44" preserveAspectRatio="none" fill="none">
+            <path d="M0 34 C30 20,50 40,80 26 C110 12,130 36,160 22 C180 12,192 28,200 20 L200 44 L0 44 Z" fill="rgba(74,124,255,0.2)"/>
+            <path d="M0 34 C30 20,50 40,80 26 C110 12,130 36,160 22 C180 12,192 28,200 20" stroke="rgba(74,124,255,0.8)" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
+        <div class="sc">
+          <div class="sc-top">
+            <div class="sc-icon si-red"><i class="ti ti-clock"></i></div>
+            <div class="sc-body">
+              <div class="sc-lbl">Pending</div>
+              <div class="sc-val" style="color:#e8304a">{{ pending }}</div>
+              <div class="sc-hint">Awaiting action</div>
+            </div>
+          </div>
+          <svg class="sc-wave" viewBox="0 0 200 44" preserveAspectRatio="none" fill="none">
+            <path d="M0 28 C25 38,45 16,70 30 C95 44,120 20,150 32 C170 40,185 24,200 28 L200 44 L0 44 Z" fill="rgba(200,0,28,0.2)"/>
+            <path d="M0 28 C25 38,45 16,70 30 C95 44,120 20,150 32 C170 40,185 24,200 28" stroke="rgba(200,0,28,0.8)" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
+        <div class="sc">
+          <div class="sc-top">
+            <div class="sc-icon si-purple"><i class="ti ti-loader"></i></div>
+            <div class="sc-body">
+              <div class="sc-lbl">In Progress</div>
+              <div class="sc-val" style="color:var(--purple)">{{ progress }}</div>
+              <div class="sc-hint">Being handled</div>
+            </div>
+          </div>
+          <svg class="sc-wave" viewBox="0 0 200 44" preserveAspectRatio="none" fill="none">
+            <path d="M0 36 C20 28,40 40,60 30 C80 20,110 38,140 26 C165 18,185 32,200 24 L200 44 L0 44 Z" fill="rgba(129,140,248,0.2)"/>
+            <path d="M0 36 C20 28,40 40,60 30 C80 20,110 38,140 26 C165 18,185 32,200 24" stroke="rgba(129,140,248,0.8)" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
+        <div class="sc">
+          <div class="sc-top">
+            <div class="sc-icon si-green"><i class="ti ti-circle-check"></i></div>
+            <div class="sc-body">
+              <div class="sc-lbl">Resolved</div>
+              <div class="sc-val" style="color:var(--green)">{{ resolved }}</div>
+              <div class="sc-hint">Closed tickets</div>
+            </div>
+          </div>
+          <svg class="sc-wave" viewBox="0 0 200 44" preserveAspectRatio="none" fill="none">
+            <path d="M0 34 C30 26,55 42,85 30 C115 18,140 38,165 26 C182 18,194 30,200 24 L200 44 L0 44 Z" fill="rgba(74,222,128,0.2)"/>
+            <path d="M0 34 C30 26,55 42,85 30 C115 18,140 38,165 26 C182 18,194 30,200 24" stroke="rgba(74,222,128,0.8)" stroke-width="1.5" fill="none"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- TICKET TABLE -->
+      <div class="tc">
+        <div class="tc-hd">
+          <span class="tc-title">All Concern Tickets</span>
+          <span class="tc-count" id="visibleCount">{{ total }} ticket{{ total|pluralize }}</span>
+          <div class="tc-spacer"></div>
+          <div class="srch">
+            <i class="ti ti-search"></i>
+            <input type="text" id="searchInput" placeholder="Search ID, username, concern..." oninput="filterTable(this.value)">
+          </div>
+          <form method="get" style="display:inline">
+            <select name="department" class="ds" onchange="this.form.submit()">
+              <option value="">All Departments</option>
+              {% for value, label in departments %}
+                <option value="{{ value }}" {% if selected_dept == value %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </form>
+
+          <div style="position:relative" id="calWrap">
+            <div class="btn-cal" id="calBtn" onclick="toggleDatePanel(event)">
+              <i class="ti ti-calendar"></i>
+              <span id="calBtnLabel">Filter by Date</span>
+              <span class="drp-active-badge" id="drpActiveBadge">Active</span>
+            </div>
+            <div class="date-range-panel" id="dateRangePanel">
+              <div class="drp-title">Filter by Date Range</div>
+              <div class="drp-row">
+                <div class="drp-field">
+                  <span class="drp-label">From</span>
+                  <input type="date" class="drp-input" id="drpFrom">
+                </div>
+                <div class="drp-field">
+                  <span class="drp-label">To</span>
+                  <input type="date" class="drp-input" id="drpTo">
+                </div>
+              </div>
+              <div class="drp-actions">
+                <button class="drp-apply" onclick="applyDateFilter()">Apply</button>
+                <button class="drp-clear" onclick="clearDateFilter()">Clear</button>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-new" onclick="openNewTicketModal()"><i class="ti ti-plus"></i> New Ticket</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="tbl" id="ticketTable">
+            <thead>
+              <tr>
+                <th>ID</th><th>User</th><th>Dept</th><th>Category</th><th>Sub-Category</th>
+                <th>Message</th><th>File</th><th>Date</th><th>Status</th>
+                <th>Assigned To</th><th>Remarks</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ticketTableBody">
+              {% for c in concerns %}
+              <tr data-id="{{ c.id }}"
+                  data-user="{{ c.user.get_full_name|default:c.user.username|lower }}"
+                  data-category="{{ c.category|lower }}"
+                  data-subcategory="{{ c.sub_category|lower }}"
+                  data-description="{{ c.description|lower }}"
+                  data-date="{{ c.date_submitted|date:'Y-m-d' }}">
+                <td class="tid">#{{ c.id }}</td>
+                <td class="fw">{{ c.user.get_full_name|default:c.user.username }}</td>
+                <td>
+                  {% with dept=c.user.userprofile.department %}
+                    {% if dept == 'Admin' %}<span class="dp dp-admin">{{ dept }}</span>
+                    {% elif dept == 'Finance' %}<span class="dp dp-finance">{{ dept }}</span>
+                    {% elif dept == 'MIS' or dept == 'Information Technology' %}<span class="dp dp-mis">{{ dept }}</span>
+                    {% elif dept == 'Human Resources' %}<span class="dp dp-hr">{{ dept }}</span>
+                    {% elif dept == 'Security' %}<span class="dp dp-security">{{ dept }}</span>
+                    {% elif dept == 'Operational/General Management' or dept == 'Operations' %}<span class="dp dp-ops">{{ dept }}</span>
+                    {% else %}<span class="dp dp-default">{{ dept }}</span>
+                    {% endif %}
+                  {% endwith %}
+                </td>
+                <td style="font-size:11px;color:var(--text-primary)">{{ c.category }}</td>
+                <td class="muted">{{ c.sub_category }}</td>
+                <td>
+                  {% if c.description %}<span class="trunc" title="{{ c.description }}">{{ c.description }}</span>
+                  {% else %}<span class="muted">—</span>{% endif %}
+                </td>
+                <td style="text-align:center">
+                  {% if c.attachment %}
+                    <a href="{{ c.attachment.url }}" target="_blank" style="color:var(--blue-lt);font-size:15px;text-decoration:none"><i class="ti ti-paperclip"></i></a>
+                  {% else %}<span class="muted">—</span>{% endif %}
+                </td>
+                <td class="muted">{{ c.date_submitted|date:"m/d/Y" }}</td>
+                <td>
+                  {% if c.status == 'Pending' %}<span class="sp sp-p"><span class="sdot"></span>Pending</span>
+                  {% elif c.status == 'In Progress' %}<span class="sp sp-i"><span class="sdot"></span>In Progress</span>
+                  {% else %}<span class="sp sp-r"><span class="sdot"></span>Resolved</span>
+                  {% endif %}
+                </td>
+                <td style="font-size:10px;color:var(--text-secondary)">{{ c.assigned_to|default:"—" }}</td>
+                <td class="muted">{{ c.remarks|default:"—" }}</td>
+                <td style="display:flex;gap:4px;align-items:center">
+                  <button class="eb" onclick="openDrawer({id:{{ c.id }},status:'{{ c.status }}',assigned:'{{ c.assigned_to|default:'' }}',remarks:'{{ c.remarks|default:'' }}',user:'{{ c.user.get_full_name|default:c.user.username }}',dept:'{{ c.user.userprofile.department }}',category:'{{ c.category }}',sub_category:'{{ c.sub_category|default:'' }}',description:'{{ c.description|default:''|escapejs }}',date:'{{ c.date_submitted|date:"m/d/Y" }}',attachment:'{% if c.attachment %}{{ c.attachment.url }}{% endif %}',updateUrl:'{% url "update_concern" c.id %}'})" title="View Details">
+                    <i class="ti ti-layout-sidebar-right-expand"></i>
+                  </button>
+                  <button class="eb" onclick="openModal({{ c.id }},'{{ c.status }}','{{ c.assigned_to|default:'' }}','{{ c.remarks|default:'' }}','{% url 'update_concern' c.id %}','#{{ c.id }} — {{ c.category }}')" title="Quick Edit">
+                    <i class="ti ti-dots-vertical"></i>
+                  </button>
+                </td>
+              </tr>
+              {% empty %}
+              <tr><td colspan="12">
+                <div class="empty-state"><i class="ti ti-inbox"></i><p>No concerns found.</p></div>
+              </td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="tc-foot">
+          <span class="pg-info" id="pgInfo">Showing 1 to {{ total }} of {{ total }} ticket{{ total|pluralize }}</span>
+          <div class="pg-ctrl">
+            <div class="pg-btn"><i class="ti ti-chevron-left"></i></div>
+            <div class="pg-num">1</div>
+            <div class="pg-btn"><i class="ti ti-chevron-right"></i></div>
+          </div>
+          <div class="pg-size">
+            <select><option>10 / page</option><option>25 / page</option><option>50 / page</option></select>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endwith %}
+
+<!-- TICKET DETAIL DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="ticketDrawer">
+  <div class="dr-bar">
+    <div class="dr-back" onclick="closeDrawer()"><i class="ti ti-arrow-left"></i></div>
+    <div class="dr-breadcrumb">
+      <div class="dr-bc-chip"><i class="ti ti-layout-grid"></i> <span id="dr-proj">Project</span></div>
+      <span class="dr-bc-sep">/</span>
+      <div class="dr-bc-chip"><i class="ti ti-ticket"></i> <span id="dr-tid">#—</span></div>
+      <span class="dr-bc-sep">→</span>
+      <div class="dr-bc-chip"><i class="ti ti-building"></i> <span id="dr-dept">Dept</span></div>
+      <span class="dr-bc-sep">/</span>
+      <div class="dr-bc-chip"><i class="ti ti-tag"></i> <span id="dr-cat">Category</span></div>
+    </div>
+    <div class="dr-refresh" onclick="rotateRefresh(this)"><i class="ti ti-refresh"></i></div>
+  </div>
+  <div class="dr-body">
+    <div class="dr-main">
+      <div class="det-grid">
+        <div class="det-field"><div class="det-lbl">Ticket ID</div><div class="det-val" id="dd-id">—</div></div>
+        <div class="det-field"><div class="det-lbl">Submitted</div><div class="det-val" id="dd-date">—</div></div>
+        <div class="det-field"><div class="det-lbl">User</div><div class="det-val" id="dd-user">—</div></div>
+        <div class="det-field"><div class="det-lbl">Department</div><div class="det-val" id="dd-dept">—</div></div>
+        <div class="det-field"><div class="det-lbl">Category</div><div class="det-val" id="dd-cat">—</div></div>
+        <div class="det-field"><div class="det-lbl">Sub-Category</div><div class="det-val" id="dd-subcat">—</div></div>
+        <div class="det-field"><div class="det-lbl">Assigned To</div><div class="det-val" id="dd-assigned">—</div></div>
+        <div class="det-field"><div class="det-lbl">Attachment</div><div class="det-val" id="dd-attachment">—</div></div>
+        <div class="det-field det-full"><div class="det-lbl">Remarks</div><div class="det-val" id="dd-remarks">—</div></div>
+        <div class="det-field det-full"><div class="det-lbl">Description / Message</div><div class="det-val" id="dd-desc" style="color:var(--text-secondary);line-height:1.7">—</div></div>
+      </div>
+    </div>
+    <div class="dr-side">
+      <div class="side-section">
+        <div class="side-label">Status</div>
+        <div class="status-nodes" id="statusNodes" style="margin-bottom:8px"></div>
+        <div class="status-done-lbl" id="statusDoneLabel" style="display:none"><i class="ti ti-circle-check"></i> Done</div>
+        <button class="btn-update" onclick="openModal(currentTicket.id,currentTicket.status,currentTicket.assigned,currentTicket.remarks,currentTicket.updateUrl,'#'+currentTicket.id+' — '+currentTicket.category)">
+          <i class="ti ti-edit"></i> Update Status
+        </button>
+      </div>
+      <div class="side-section">
+        <div class="side-label">Ticket Crew</div>
+        <div style="font-size:9px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.6px;font-family:'Syne',sans-serif;margin-bottom:5px">Current Assignee</div>
+        <select class="crew-select" id="crewAssignee">
+          <option>Unassigned</option>
+          <option>IT Support</option>
+          <option>Finance Team</option>
+          <option>HR Officer</option>
+          <option>Security</option>
+        </select>
+        <div class="crew-field-dr">
+          <div class="crew-field-lbl">Created By</div>
+          <div class="crew-field-val"><div class="crew-av" id="crewAvatar">U</div><span id="crewUser">Unknown</span></div>
+        </div>
+        <div class="crew-field-dr">
+          <div class="crew-field-lbl">Created At</div>
+          <div class="crew-date-val"><i class="ti ti-calendar"></i><span id="crewDate">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT TICKET MODAL -->
+<div class="modal-overlay" id="editModal" onclick="closeModalOutside(event)">
+  <div class="modal">
+    <div class="md-head">
+      <div><div class="md-title">Update Ticket</div><div class="md-id" id="modalId">#—</div></div>
+      <button class="md-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <form method="post" id="modalForm">
+      {% csrf_token %}
+      <div class="field-row">
+        <div class="field">
+          <label for="modalStatus">Status</label>
+          <select name="status" id="modalStatus">
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="modalAssigned">Assigned to</label>
+          <input type="text" name="assigned_to" id="modalAssigned" placeholder="Staff name">
+        </div>
+      </div>
+      <div class="field-full">
+        <label for="modalRemarks">Remarks</label>
+        <input type="text" name="remarks" id="modalRemarks" placeholder="Add a remark...">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-save">Save changes</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- NEW TICKET MODAL -->
+<div class="modal-overlay" id="newTicketModal" onclick="closeNewTicketOutside(event)">
+  <div class="modal" style="width:480px;max-height:90vh;overflow-y:auto">
+    <div class="md-head">
+      <div><div class="md-title">Create New Ticket</div><div class="md-id">Admin — Manual Entry</div></div>
+      <button class="md-close" onclick="closeNewTicketModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <form method="post" action="{% url 'submit_concern' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="nt-section-label">User Info</div>
+      <div class="field-full">
+        <label for="nt-user">Username</label>
+        <input type="text" name="username" id="nt-user" placeholder="Enter the username of the user..." required>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="nt-dept">Department</label>
+          <select name="department" id="nt-dept" required>
+            <option value="" disabled selected>Select department</option>
+            {% for value, label in departments %}
+              <option value="{{ value }}">{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label for="nt-status">Initial Status</label>
+          <select name="status" id="nt-status">
+            <option value="Pending" selected>Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+          </select>
+        </div>
+      </div>
+      <div class="nt-divider"></div>
+      <div class="nt-section-label">Concern Details</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="nt-cat">Category</label>
+          <input type="text" name="category" id="nt-cat" placeholder="e.g. Coaching Support" required>
+        </div>
+        <div class="field">
+          <label for="nt-subcat">Sub-Category</label>
+          <input type="text" name="sub_category" id="nt-subcat" placeholder="e.g. Equipment / Devices">
+        </div>
+      </div>
+      <div class="field-full">
+        <label for="nt-msg">Message / Description</label>
+        <textarea name="description" id="nt-msg" placeholder="Describe the concern in detail..."></textarea>
+      </div>
+      <div class="field-full">
+        <label for="nt-file">Attachment <span style="color:var(--text-secondary);font-weight:400;text-transform:none;font-size:9px">(optional)</span></label>
+        <input type="file" name="attachment" id="nt-file" class="field-file">
+      </div>
+      <div class="nt-divider"></div>
+      <div class="nt-section-label">Assignment</div>
+      <div class="field-row">
+        <div class="field">
+          <label for="nt-assigned">Assign To</label>
+          <input type="text" name="assigned_to" id="nt-assigned" placeholder="Staff name (optional)">
+        </div>
+        <div class="field">
+          <label for="nt-remarks">Remarks</label>
+          <input type="text" name="remarks" id="nt-remarks" placeholder="Optional note...">
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" onclick="closeNewTicketModal()">Cancel</button>
+        <button type="submit" class="btn-save"><i class="ti ti-ticket"></i> Create Ticket</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal" onclick="closeSettingsOutside(event)">
+  <div class="modal settings-modal">
+    <div class="md-head">
+      <div>
+        <div class="md-title">Admin Settings</div>
+        <div class="md-id">lloydguido458@gmail.com — System Configuration</div>
+      </div>
+      <button class="md-close" onclick="closeSettingsModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="settings-section-lbl">Account</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon"><i class="ti ti-user"></i></div>
+        <div>
+          <div class="settings-row-title">Admin Name</div>
+          <div class="settings-row-sub">{{ request.user.get_full_name|default:request.user.username }}</div>
+        </div>
+      </div>
+      <span class="settings-val">{{ request.user.username }}</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-green-sm"><i class="ti ti-mail"></i></div>
+        <div>
+          <div class="settings-row-title">Notification Email</div>
+          <div class="settings-row-sub">User messages are sent to this inbox</div>
+        </div>
+      </div>
+      <span class="settings-val" style="color:var(--green)">lloydguido458@gmail.com</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-red-sm"><i class="ti ti-lock"></i></div>
+        <div>
+          <div class="settings-row-title">Change Password</div>
+          <div class="settings-row-sub">Update your admin login credentials</div>
+        </div>
+      </div>
+      <a href="{% url 'password_change' %}" class="settings-link">Change <i class="ti ti-arrow-right" style="font-size:11px;"></i></a>
+    </div>
+
+    <div class="settings-section-lbl">Notifications</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-gold-sm"><i class="ti ti-bell"></i></div>
+        <div>
+          <div class="settings-row-title">New Ticket Alerts</div>
+          <div class="settings-row-sub">Notify when a user submits a new concern</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="s-toggle on" id="st-newtkt" onclick="sToggle(this,'lbl-newtkt')"></div>
+        <span class="s-toggle-lbl" id="lbl-newtkt">On</span>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-gold-sm"><i class="ti ti-mail-forward"></i></div>
+        <div>
+          <div class="settings-row-title">Email on User Message</div>
+          <div class="settings-row-sub">Forward user messages to Gmail inbox</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="s-toggle on" id="st-emailfwd" onclick="sToggle(this,'lbl-emailfwd')"></div>
+        <span class="s-toggle-lbl" id="lbl-emailfwd">On</span>
+      </div>
+    </div>
+
+    <div class="settings-section-lbl">System</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-purple-sm"><i class="ti ti-layout-dashboard"></i></div>
+        <div>
+          <div class="settings-row-title">Default Dashboard View</div>
+          <div class="settings-row-sub">What loads when admin logs in</div>
+        </div>
+      </div>
+      <select style="background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text-secondary);border-radius:6px;padding:4px 8px;font-size:10px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;">
+        <option>All Departments</option>
+        {% for value, label in departments %}<option>{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon"><i class="ti ti-table"></i></div>
+        <div>
+          <div class="settings-row-title">Rows Per Page</div>
+          <div class="settings-row-sub">Default number of tickets shown</div>
+        </div>
+      </div>
+      <select style="background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--text-secondary);border-radius:6px;padding:4px 8px;font-size:10px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;">
+        <option>10</option><option>25</option><option>50</option><option>100</option>
+      </select>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-purple-sm"><i class="ti ti-eye"></i></div>
+        <div>
+          <div class="settings-row-title">Compact Table Mode</div>
+          <div class="settings-row-sub">Show denser rows for more data</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div class="s-toggle" id="st-compact" onclick="sToggle(this,'lbl-compact')"></div>
+        <span class="s-toggle-lbl" id="lbl-compact">Off</span>
+      </div>
+    </div>
+
+    <div class="settings-section-lbl">About</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon"><i class="ti ti-info-circle"></i></div>
+        <div>
+          <div class="settings-row-title">OPASCOR Admin Panel</div>
+          <div class="settings-row-sub">Internal Concern Management System</div>
+        </div>
+      </div>
+      <span class="settings-val">v1.0.0</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-purple-sm"><i class="ti ti-code"></i></div>
+        <div>
+          <div class="settings-row-title">Maintained By</div>
+          <div class="settings-row-sub">MIS Department — OPASCOR</div>
+        </div>
+      </div>
+      <a href="{% url 'logout' %}" style="font-size:10px;color:#e8304a;text-decoration:none;display:flex;align-items:center;gap:4px;">
+        Logout <i class="ti ti-logout" style="font-size:12px;"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE MODAL -->
+<div class="modal-overlay" id="profileModal" onclick="closeProfileOutside(event)">
+  <div class="modal settings-modal" style="width:420px;">
+    <div class="md-head">
+      <div><div class="md-title">My Profile</div></div>
+      <button class="md-close" onclick="closeProfileModal()"><i class="ti ti-x"></i></button>
+    </div>
+
+    <div class="profile-avatar-lg">{{ request.user.get_full_name|default:request.user.username|slice:":2" }}</div>
+    <div class="profile-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+    <div class="profile-role-badge">Administrator · OPASCOR</div>
+
+    <div class="profile-stats">
+      <div class="profile-stat">
+        <div class="profile-stat-val" style="color:var(--blue-lt)">{{ total }}</div>
+        <div class="profile-stat-lbl">Total Tickets</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val" style="color:#ffb84d">{{ pending }}</div>
+        <div class="profile-stat-lbl">Pending</div>
+      </div>
+      <div class="profile-stat">
+        <div class="profile-stat-val" style="color:var(--green)">{{ resolved }}</div>
+        <div class="profile-stat-lbl">Resolved</div>
+      </div>
+    </div>
+
+    <div class="settings-section-lbl">Account Info</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon"><i class="ti ti-user"></i></div>
+        <div>
+          <div class="settings-row-title">Full Name</div>
+          <div class="settings-row-sub">{{ request.user.get_full_name|default:"Not set" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon"><i class="ti ti-at"></i></div>
+        <div>
+          <div class="settings-row-title">Username</div>
+          <div class="settings-row-sub">{{ request.user.username }}</div>
+        </div>
+      </div>
+      <span class="settings-val" style="font-family:var(--mono)">{{ request.user.username }}</span>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-green-sm"><i class="ti ti-mail"></i></div>
+        <div>
+          <div class="settings-row-title">Email</div>
+          <div class="settings-row-sub">{{ request.user.email|default:"Not set" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-purple-sm"><i class="ti ti-shield-check"></i></div>
+        <div>
+          <div class="settings-row-title">Role</div>
+          <div class="settings-row-sub">Administrator</div>
+        </div>
+      </div>
+      <span class="settings-val" style="color:var(--blue-lt)">Admin</span>
+    </div>
+
+    <div class="settings-section-lbl">Quick Actions</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-red-sm"><i class="ti ti-lock"></i></div>
+        <div>
+          <div class="settings-row-title">Change Password</div>
+          <div class="settings-row-sub">Update your login credentials</div>
+        </div>
+      </div>
+      <a href="{% url 'password_change' %}" class="settings-link">Change <i class="ti ti-arrow-right" style="font-size:11px;"></i></a>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon si-red-sm"><i class="ti ti-logout"></i></div>
+        <div>
+          <div class="settings-row-title">Logout</div>
+          <div class="settings-row-sub">Sign out of your account</div>
+        </div>
+      </div>
+      <a href="{% url 'logout' %}" style="font-size:10px;color:#e8304a;text-decoration:none;display:flex;align-items:center;gap:4px;">
+        Logout <i class="ti ti-arrow-right" style="font-size:12px;"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─── INBOX READ STATE (persisted — badge stays gone after reading) ─── */
+var readThreadIds = new Set(JSON.parse(localStorage.getItem('opascor_read_threads') || '[]'));
+function markRead(userId) {
+  readThreadIds.add(userId);
+  localStorage.setItem('opascor_read_threads', JSON.stringify([...readThreadIds]));
+}
+
+/* ─── USER DROPDOWN ─── */
+function toggleUserDropdown(e) {
+  e.stopPropagation();
+  var dd = document.getElementById('userDropdown');
+  var ch = document.getElementById('udChevron');
+  var isOpen = dd.classList.contains('open');
+  closeAllDropdowns();
+  if (!isOpen) { dd.classList.add('open'); ch.style.transform = 'rotate(180deg)'; }
+}
+document.addEventListener('click', function(e) {
+  if (!document.getElementById('calWrap').contains(e.target)) closeDatePanel();
+  closeAllDropdowns();
+});
+function closeAllDropdowns() {
+  var dd = document.getElementById('userDropdown');
+  var ch = document.getElementById('udChevron');
+  if (dd) dd.classList.remove('open');
+  if (ch) ch.style.transform = '';
+  var ip = document.getElementById('inboxPanel');
+  if (ip) ip.classList.remove('open');
+}
+
+/* ─── SIDEBAR ─── */
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('collapsed'); }
+
+/* ─── INBOX ─── */
+var inboxData = {{ inbox_messages_json|default:"[]"|safe }};
+var currentThread = null;
+
+function renderInboxList() {
+  var el = document.getElementById('inboxUserList');
+  var unread = inboxData.filter(function(u){ return u.unread && !readThreadIds.has(u.id); }).length;
+  var badge = document.getElementById('inboxBadge');
+  badge.textContent = unread || '';
+  badge.style.display = unread ? 'flex' : 'none';
+  document.getElementById('inboxBadgeCount').textContent = unread;
+  if (!inboxData.length) {
+    el.innerHTML = '<div class="inbox-empty">No messages from users yet.</div>';
+    return;
+  }
+  el.innerHTML = inboxData.map(function(u) {
+    var isUnread = u.unread && !readThreadIds.has(u.id);
+    return '<div class="inbox-user-item" onclick="openThread('+u.id+')">' +
+      '<div class="inbox-av">'+(u.initials||u.name.slice(0,2).toUpperCase())+'</div>' +
+      '<div style="flex:1;min-width:0">' +
+        '<div class="inbox-user-name">'+u.name+'</div>' +
+        '<div class="inbox-user-preview">'+u.preview+'</div>' +
+      '</div>' +
+      (isUnread ? '<div class="inbox-unread-dot"></div>' : '') +
+    '</div>';
+  }).join('');
+}
+
+function openThread(userId) {
+  currentThread = inboxData.find(function(u){ return u.id === userId; });
+  if (!currentThread) return;
+  markRead(userId);
+  document.getElementById('threadAvatar').textContent = currentThread.initials || currentThread.name.slice(0,2).toUpperCase();
+  document.getElementById('threadName').textContent = currentThread.name;
+  renderMessages();
+  renderInboxList();
+  document.getElementById('inboxListView').style.display = 'none';
+  var tv = document.getElementById('inboxThreadView');
+  tv.style.display = 'flex';
+  tv.classList.add('active');
+  setTimeout(function(){ var m = document.getElementById('threadMessages'); m.scrollTop = m.scrollHeight; }, 50);
+}
+
+function renderMessages() {
+  if (!currentThread) return;
+  document.getElementById('threadMessages').innerHTML = currentThread.messages.map(function(m) {
+    return '<div style="display:flex;flex-direction:column;align-items:'+(m.from==='admin'?'flex-end':'flex-start')+'">' +
+      '<div class="msg-bubble '+(m.from==='admin'?'outgoing':'incoming')+'">'+m.text+'</div>' +
+      '<div class="msg-time">'+m.time+'</div>' +
+    '</div>';
+  }).join('');
+}
+
+function sendReply() {
+  var inp = document.getElementById('replyInput');
+  var text = inp.value.trim();
+  if (!text || !currentThread) return;
+  currentThread.messages.push({ from: 'admin', text: text, time: 'Just now' });
+  currentThread.preview = text;
+  inp.value = '';
+  renderMessages();
+  setTimeout(function(){ var m = document.getElementById('threadMessages'); m.scrollTop = m.scrollHeight; }, 50);
+}
+
+function backToInboxList() {
+  document.getElementById('inboxListView').style.display = 'block';
+  var tv = document.getElementById('inboxThreadView');
+  tv.style.display = 'none';
+  tv.classList.remove('active');
+  currentThread = null;
+}
+
+function toggleInbox(e) {
+  e.stopPropagation();
+  var panel = document.getElementById('inboxPanel');
+  var isOpen = panel.classList.contains('open');
+  closeAllDropdowns();
+  if (!isOpen) { backToInboxList(); renderInboxList(); panel.classList.add('open'); }
+}
+
+document.getElementById('inboxPanel').addEventListener('click', function(e){ e.stopPropagation(); });
+document.getElementById('topbarUser').addEventListener('click', function(e){ e.stopPropagation(); });
+
+/* ─── DATE RANGE FILTER ─── */
+function toggleDatePanel(e) {
+  e.stopPropagation();
+  var panel = document.getElementById('dateRangePanel');
+  var btn = document.getElementById('calBtn');
+  var isOpen = panel.classList.contains('open');
+  if (isOpen) { closeDatePanel(); }
+  else { closeAllDropdowns(); panel.classList.add('open'); btn.classList.add('active'); }
+}
+function closeDatePanel() {
+  document.getElementById('dateRangePanel').classList.remove('open');
+  var hasFilter = document.getElementById('drpFrom').value || document.getElementById('drpTo').value;
+  if (!hasFilter) document.getElementById('calBtn').classList.remove('active');
+}
+function applyDateFilter() {
+  var from = document.getElementById('drpFrom').value;
+  var to = document.getElementById('drpTo').value;
+  if (!from && !to) { clearDateFilter(); return; }
+  var fromDate = from ? new Date(from) : null;
+  var toDate = to ? new Date(to) : null;
+  if (toDate) toDate.setHours(23,59,59,999);
+  document.querySelectorAll('#ticketTableBody tr[data-date]').forEach(function(row) {
+    var d = new Date(row.dataset.date);
+    var inRange = (!fromDate || d >= fromDate) && (!toDate || d <= toDate);
+    row.classList.toggle('date-hidden', !inRange);
+  });
+  document.getElementById('drpActiveBadge').style.display = 'inline';
+  var label = document.getElementById('calBtnLabel');
+  if (from && to) label.textContent = from.slice(5) + ' → ' + to.slice(5);
+  else if (from)  label.textContent = 'From ' + from.slice(5);
+  else            label.textContent = 'Until ' + to.slice(5);
+  document.getElementById('calBtn').classList.add('active');
+  updateVisibleCount();
+  closeDatePanel();
+}
+function clearDateFilter() {
+  document.getElementById('drpFrom').value = '';
+  document.getElementById('drpTo').value = '';
+  document.querySelectorAll('#ticketTableBody tr[data-date]').forEach(function(row){ row.classList.remove('date-hidden'); });
+  document.getElementById('drpActiveBadge').style.display = 'none';
+  document.getElementById('calBtnLabel').textContent = 'Filter by Date';
+  document.getElementById('calBtn').classList.remove('active');
+  updateVisibleCount();
+  closeDatePanel();
+}
+function updateVisibleCount() {
+  var rows = document.querySelectorAll('#ticketTableBody tr[data-id]');
+  var visible = 0;
+  rows.forEach(function(row){ if (row.style.display !== 'none' && !row.classList.contains('date-hidden')) visible++; });
+  document.getElementById('visibleCount').textContent = visible + ' ticket' + (visible !== 1 ? 's' : '');
+  document.getElementById('pgInfo').textContent = 'Showing ' + visible + ' of ' + rows.length + ' tickets';
+}
+
+/* ─── SEARCH ─── */
+function filterTable(q) {
+  q = (q || '').toLowerCase().trim();
+  var rows = document.querySelectorAll('#ticketTableBody tr');
+  var visible = 0;
+  var noResultsRow = document.getElementById('noResultsRow');
+  if (noResultsRow) noResultsRow.remove();
+  rows.forEach(function(row) {
+    if (!row.dataset.id) return;
+    var match = !q || ('#'+row.dataset.id).includes(q) || (row.dataset.user||'').includes(q) || (row.dataset.category||'').includes(q) || (row.dataset.subcategory||'').includes(q) || (row.dataset.description||'').includes(q);
+    row.style.display = match ? '' : 'none';
+    if (match && !row.classList.contains('date-hidden')) visible++;
+  });
+  if (visible === 0 && q) {
+    var tbody = document.getElementById('ticketTableBody');
+    var tr = document.createElement('tr');
+    tr.id = 'noResultsRow';
+    tr.innerHTML = '<td colspan="12" class="no-results-row"><i class="ti ti-search-off" style="font-size:22px;display:block;margin-bottom:6px;opacity:.3"></i>No results for "<strong>'+q+'</strong>"</td>';
+    tbody.appendChild(tr);
+  }
+  var total = rows.length;
+  document.getElementById('visibleCount').textContent = visible + ' ticket' + (visible !== 1 ? 's' : '');
+  document.getElementById('pgInfo').textContent = q ? 'Showing ' + visible + ' of ' + total + ' tickets' : 'Showing 1 to ' + total + ' of ' + total + ' tickets';
+}
+function handleGlobalSearch(val) {
+  var tableSearch = document.getElementById('searchInput');
+  if (tableSearch) tableSearch.value = val;
+  filterTable(val);
+  var tc = document.querySelector('.tc');
+  if (tc) tc.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+/* ─── MODALS ─── */
+function openModal(id, status, assigned, remarks, actionUrl, subtitle) {
+  document.getElementById('modalId').textContent = subtitle;
+  document.getElementById('modalStatus').value = status;
+  document.getElementById('modalAssigned').value = assigned;
+  document.getElementById('modalRemarks').value = remarks;
+  document.getElementById('modalForm').action = actionUrl;
+  document.getElementById('editModal').classList.add('open');
+}
+function closeModal() { document.getElementById('editModal').classList.remove('open'); }
+function closeModalOutside(e) { if (e.target === document.getElementById('editModal')) closeModal(); }
+function openNewTicketModal() { document.getElementById('newTicketModal').classList.add('open'); }
+function closeNewTicketModal() { document.getElementById('newTicketModal').classList.remove('open'); }
+function closeNewTicketOutside(e) { if (e.target === document.getElementById('newTicketModal')) closeNewTicketModal(); }
+function openSettingsModal() { document.getElementById('settingsModal').classList.add('open'); }
+function closeSettingsModal() { document.getElementById('settingsModal').classList.remove('open'); }
+function closeSettingsOutside(e) { if (e.target === document.getElementById('settingsModal')) closeSettingsModal(); }
+function openProfileModal() { document.getElementById('profileModal').classList.add('open'); }
+function closeProfileModal() { document.getElementById('profileModal').classList.remove('open'); }
+function closeProfileOutside(e) { if (e.target === document.getElementById('profileModal')) closeProfileModal(); }
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeModal(); closeNewTicketModal(); closeDrawer();
+    closeDatePanel(); closeSettingsModal(); closeProfileModal();
+  }
+});
+
+/* ─── SETTINGS TOGGLES ─── */
+function sToggle(el, lblId) {
+  el.classList.toggle('on');
+  var lbl = document.getElementById(lblId);
+  if (lbl) lbl.textContent = el.classList.contains('on') ? 'On' : 'Off';
+}
+
+/* ─── DRAWER ─── */
+var currentTicket = {};
+function openDrawer(t) {
+  currentTicket = t;
+  document.getElementById('dr-tid').textContent      = '#' + t.id;
+  document.getElementById('dr-dept').textContent     = t.dept || '—';
+  document.getElementById('dr-cat').textContent      = t.category || '—';
+  document.getElementById('dd-id').textContent       = '#' + t.id;
+  document.getElementById('dd-date').textContent     = t.date || '—';
+  document.getElementById('dd-user').textContent     = t.user || '—';
+  document.getElementById('dd-dept').textContent     = t.dept || '—';
+  document.getElementById('dd-cat').textContent      = t.category || '—';
+  document.getElementById('dd-subcat').textContent   = t.sub_category || '—';
+  document.getElementById('dd-assigned').textContent = t.assigned || 'Unassigned';
+  document.getElementById('dd-remarks').textContent  = t.remarks || '—';
+  document.getElementById('dd-desc').textContent     = t.description || '—';
+  var attEl = document.getElementById('dd-attachment');
+  if (t.attachment) {
+    attEl.innerHTML = '<a href="'+t.attachment+'" target="_blank" style="color:var(--blue-lt);display:flex;align-items:center;gap:4px"><i class="ti ti-paperclip"></i> View file</a>';
+  } else { attEl.textContent = 'No attachment'; }
+  document.getElementById('crewAvatar').textContent = (t.user||'U').slice(0,2).toUpperCase();
+  document.getElementById('crewUser').textContent   = t.user || '—';
+  document.getElementById('crewDate').textContent   = t.date || '—';
+  var statuses = ['Pending','In Progress','Resolved'];
+  var curIdx = statuses.indexOf(t.status);
+  var pct = curIdx===0?0:curIdx===1?50:100;
+  var nodesEl = document.getElementById('statusNodes');
+  nodesEl.innerHTML = '<div class="status-track"><div class="status-fill-track" style="width:'+pct+'%"></div></div>';
+  statuses.forEach(function(s,i){
+    var cls = i<curIdx?'sn-done':i===curIdx?'sn-curr':'sn-todo';
+    nodesEl.innerHTML += '<div class="status-node '+cls+'" title="'+s+'"></div>';
+  });
+  document.getElementById('statusDoneLabel').style.display = t.status==='Resolved'?'flex':'none';
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.getElementById('ticketDrawer').classList.add('open');
+}
+function closeDrawer() {
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.getElementById('ticketDrawer').classList.remove('open');
+}
+function rotateRefresh(el) {
+  el.querySelector('i').style.transition = 'transform 0.5s ease';
+  el.querySelector('i').style.transform = 'rotate(360deg)';
+  setTimeout(function(){ el.querySelector('i').style.transform = ''; }, 520);
+}
+
+renderInboxList();
+</script>
+
+{% endblock %}

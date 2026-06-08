@@ -1,0 +1,219 @@
+{% extends 'tickets/base.html' %}
+{% load static %}
+{% block content %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800;900&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue:#1c48f5;--blue-lt:#4a7cff;--green:#4ade80;
+  --white:#ffffff;--muted:rgba(255,255,255,0.35);
+  --glass:rgba(255,255,255,0.03);--border:rgba(255,255,255,0.07);
+}
+.dept-page{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:#02040a;font-family:'DM Sans',sans-serif;-webkit-font-smoothing:antialiased;
+  padding:24px;position:relative;overflow:hidden;
+}
+.dept-page::before{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  background-image:linear-gradient(rgba(74,124,255,0.045) 1px,transparent 1px),linear-gradient(90deg,rgba(74,124,255,0.045) 1px,transparent 1px);
+  background-size:44px 44px;animation:gridShift 20s linear infinite;
+}
+@keyframes gridShift{from{background-position:0 0,0 0}to{background-position:44px 44px,44px 44px}}
+.dept-shell{
+  position:relative;z-index:2;width:100%;max-width:520px;
+  background:rgba(4,8,15,0.95);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.1);border-radius:20px;
+  padding:2.8rem 2.5rem;
+  box-shadow:0 50px 120px rgba(0,0,0,0.8),0 0 60px rgba(28,72,245,0.08);
+}
+.glow-top{position:absolute;top:-100px;left:50%;transform:translateX(-50%);width:400px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(28,72,245,0.12) 0%,transparent 70%);pointer-events:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.dept-shell>*{animation:fadeUp 0.55s ease both;}
+.dept-shell>*:nth-child(1){animation-delay:0.05s}
+.dept-shell>*:nth-child(2){animation-delay:0.12s}
+.dept-shell>*:nth-child(3){animation-delay:0.18s}
+.dept-shell>*:nth-child(4){animation-delay:0.24s}
+.top-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.6rem;}
+.new-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(74,124,255,0.07);border:1px solid rgba(74,124,255,0.22);border-radius:50px;padding:5px 12px;}
+.new-badge i{font-size:10px;color:var(--blue-lt);}
+.new-badge span{font-size:9.5px;color:var(--blue-lt);letter-spacing:1px;text-transform:uppercase;font-weight:700;font-family:'Syne',sans-serif;}
+.secure-pill{display:inline-flex;align-items:center;gap:6px;}
+.secure-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulseDot 2.4s ease-in-out infinite;}
+@keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.45)}50%{box-shadow:0 0 0 6px rgba(74,222,128,0)}}
+.secure-pill span{font-size:10px;color:var(--muted);letter-spacing:0.5px;}
+.dept-heading{margin-bottom:1.8rem;}
+.dept-heading h2{font-family:'Syne',sans-serif;font-size:23px;font-weight:800;color:var(--white);margin-bottom:5px;letter-spacing:-0.3px;}
+.dept-heading p{font-size:12px;color:rgba(255,255,255,0.28);line-height:1.65;}
+.dept-list{display:flex;flex-direction:column;gap:10px;margin-bottom:1.4rem;}
+.dept-btn{
+  display:flex;align-items:center;gap:14px;width:100%;
+  padding:13px 16px;background:var(--glass);
+  border:1px solid var(--border);border-radius:12px;
+  color:var(--white);cursor:pointer;text-align:left;
+  transition:background 0.2s,border-color 0.2s,transform 0.15s,box-shadow 0.2s;
+  position:relative;overflow:hidden;
+}
+.dept-btn::after{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent);transition:left 0.5s;}
+.dept-btn:hover{transform:translateX(4px);box-shadow:0 4px 20px rgba(0,0,0,0.3);}
+.dept-btn:hover::after{left:160%;}
+.dept-btn.active{border-color:rgba(74,124,255,0.55);background:rgba(74,124,255,0.08);box-shadow:0 0 0 3px rgba(74,124,255,0.1);}
+.dept-icon-wrap{width:38px;height:38px;border-radius:10px;border:1px solid;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dept-icon-wrap i{font-size:15px;}
+.dept-info{flex:1;}
+.dept-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--white);margin-bottom:2px;}
+.dept-sub{font-size:10.5px;color:rgba(255,255,255,0.28);}
+.dept-arrow{font-size:11px;color:rgba(255,255,255,0.2);transition:color 0.2s,transform 0.2s;}
+.dept-btn:hover .dept-arrow{color:rgba(255,255,255,0.6);transform:translateX(3px);}
+.btn-continue{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,#1c48f5 0%,#1035c8 100%);
+  border:1px solid rgba(255,255,255,0.12);border-radius:10px;
+  color:var(--white);font-size:13px;font-weight:700;font-family:'Syne',sans-serif;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+  letter-spacing:0.6px;transition:transform 0.12s,box-shadow 0.2s,background 0.2s;
+  position:relative;overflow:hidden;
+}
+.btn-continue::after{content:'';position:absolute;top:0;left:-100%;width:55%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.09),transparent);transition:left 0.55s;}
+.btn-continue:hover{background:linear-gradient(135deg,#2550f5 0%,#1742e0 100%);box-shadow:0 6px 28px rgba(28,72,245,0.45);}
+.btn-continue:hover::after{left:160%;}
+.btn-continue:active{transform:scale(0.975);}
+.back-row{display:flex;align-items:center;justify-content:center;gap:5px;margin-top:1rem;}
+.back-row span{font-size:11px;color:rgba(255,255,255,0.22);}
+.back-row a{font-size:11px;color:var(--blue-lt);text-decoration:none;transition:opacity 0.15s;}
+.back-row a:hover{opacity:0.75;}
+</style>
+
+<div class="dept-page">
+  <div class="dept-shell">
+    <div class="glow-top"></div>
+
+    <div class="top-meta">
+      <div class="new-badge"><i class="fa-solid fa-building"></i><span>New Employee</span></div>
+      <div class="secure-pill"><div class="secure-dot"></div><span>Local System</span></div>
+    </div>
+
+    <div class="dept-heading">
+      <h2>Choose Department 🏢</h2>
+      <p>Select your department to continue<br>with account registration.</p>
+    </div>
+
+    <form method="post" id="deptForm">
+      {% csrf_token %}
+      <input type="hidden" name="department" id="selectedDept" value=""/>
+      <div class="dept-list">
+        {% for value, label in departments %}
+          {% if value == 'Admin' %}
+            {% with icon="fa-shield-halved" color="#a78bfa" bg="rgba(167,139,250,0.15)" bc="rgba(167,139,250,0.3)" sub="Administration" %}
+            <button type="button" class="dept-btn" onclick="selectDept(this,'{{ value }}')"
+              data-value="{{ value }}">
+              <div class="dept-icon-wrap" style="background:{{ bg }};border-color:{{ bc }};">
+                <i class="fa-solid {{ icon }}" style="color:{{ color }};"></i>
+              </div>
+              <div class="dept-info">
+                <div class="dept-name">{{ label }}</div>
+                <div class="dept-sub">{{ sub }}</div>
+              </div>
+              <i class="fa-solid fa-chevron-right dept-arrow"></i>
+            </button>
+            {% endwith %}
+          {% elif value == 'Finance' %}
+            {% with icon="fa-coins" color="#fbbf24" bg="rgba(251,191,36,0.15)" bc="rgba(251,191,36,0.3)" sub="Accounting & Finance" %}
+            <button type="button" class="dept-btn" onclick="selectDept(this,'{{ value }}')"
+              data-value="{{ value }}">
+              <div class="dept-icon-wrap" style="background:{{ bg }};border-color:{{ bc }};">
+                <i class="fa-solid {{ icon }}" style="color:{{ color }};"></i>
+              </div>
+              <div class="dept-info">
+                <div class="dept-name">{{ label }}</div>
+                <div class="dept-sub">{{ sub }}</div>
+              </div>
+              <i class="fa-solid fa-chevron-right dept-arrow"></i>
+            </button>
+            {% endwith %}
+          {% elif value == 'MIS' %}
+            {% with icon="fa-desktop" color="#4a7cff" bg="rgba(74,124,255,0.15)" bc="rgba(74,124,255,0.3)" sub="Information Technology" %}
+            <button type="button" class="dept-btn" onclick="selectDept(this,'{{ value }}')"
+              data-value="{{ value }}">
+              <div class="dept-icon-wrap" style="background:{{ bg }};border-color:{{ bc }};">
+                <i class="fa-solid {{ icon }}" style="color:{{ color }};"></i>
+              </div>
+              <div class="dept-info">
+                <div class="dept-name">{{ label }}</div>
+                <div class="dept-sub">{{ sub }}</div>
+              </div>
+              <i class="fa-solid fa-chevron-right dept-arrow"></i>
+            </button>
+            {% endwith %}
+          {% elif value == 'Operational/General Management' %}
+            {% with icon="fa-anchor" color="#34d399" bg="rgba(52,211,153,0.15)" bc="rgba(52,211,153,0.3)" sub="Port & Field Operations" %}
+            <button type="button" class="dept-btn" onclick="selectDept(this,'{{ value }}')"
+              data-value="{{ value }}">
+              <div class="dept-icon-wrap" style="background:{{ bg }};border-color:{{ bc }};">
+                <i class="fa-solid {{ icon }}" style="color:{{ color }};"></i>
+              </div>
+              <div class="dept-info">
+                <div class="dept-name">{{ label }}</div>
+                <div class="dept-sub">{{ sub }}</div>
+              </div>
+              <i class="fa-solid fa-chevron-right dept-arrow"></i>
+            </button>
+            {% endwith %}
+          {% elif value == 'Human Resources' %}
+            {% with icon="fa-users" color="#f472b6" bg="rgba(244,114,182,0.15)" bc="rgba(244,114,182,0.3)" sub="People & Culture" %}
+            <button type="button" class="dept-btn" onclick="selectDept(this,'{{ value }}')"
+              data-value="{{ value }}">
+              <div class="dept-icon-wrap" style="background:{{ bg }};border-color:{{ bc }};">
+                <i class="fa-solid {{ icon }}" style="color:{{ color }};"></i>
+              </div>
+              <div class="dept-info">
+                <div class="dept-name">{{ label }}</div>
+                <div class="dept-sub">{{ sub }}</div>
+              </div>
+              <i class="fa-solid fa-chevron-right dept-arrow"></i>
+            </button>
+            {% endwith %}
+          {% elif value == 'Security' %}
+            {% with icon="fa-lock" color="#fb923c" bg="rgba(251,146,60,0.15)" bc="rgba(251,146,60,0.3)" sub="Safety & Security" %}
+            <button type="button" class="dept-btn" onclick="selectDept(this,'{{ value }}')"
+              data-value="{{ value }}">
+              <div class="dept-icon-wrap" style="background:{{ bg }};border-color:{{ bc }};">
+                <i class="fa-solid {{ icon }}" style="color:{{ color }};"></i>
+              </div>
+              <div class="dept-info">
+                <div class="dept-name">{{ label }}</div>
+                <div class="dept-sub">{{ sub }}</div>
+              </div>
+              <i class="fa-solid fa-chevron-right dept-arrow"></i>
+            </button>
+            {% endwith %}
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <button type="submit" class="btn-continue" id="continueBtn" disabled>
+        <i class="fa-solid fa-check"></i>
+        <span>Create Account</span>
+      </button>
+    </form>
+
+    <div class="back-row">
+      <span>Already have an account?</span>
+      <a href="{% url 'login' %}">← Back to sign in</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function selectDept(btn, value) {
+  document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('selectedDept').value = value;
+  document.getElementById('continueBtn').disabled = false;
+}
+</script>
+{% endblock %}
