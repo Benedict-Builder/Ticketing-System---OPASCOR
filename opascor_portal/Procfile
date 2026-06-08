@@ -1,0 +1,1 @@
+﻿web: gunicorn opascor_portal.wsgi --log-file -
