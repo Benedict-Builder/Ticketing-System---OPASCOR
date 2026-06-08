@@ -60,15 +60,14 @@ WSGI_APPLICATION = 'opascor_portal.wsgi.application'
 
 
 # ── Database ──
-# Uses environment variables on Railway, falls back to local MySQL for development
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME':     os.environ.get('MYSQL_DATABASE', 'opascor_db'),
-        'USER':     os.environ.get('MYSQL_USER',     'root'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD', '#@ACTstudent4'),
-        'HOST':     os.environ.get('MYSQL_HOST',     'localhost'),
-        'PORT':     os.environ.get('MYSQL_PORT',     '3307'),
+        'NAME':     os.environ.get('MYSQL_DATABASE') or os.environ.get('MYSQLDATABASE', 'opascor_db'),
+        'USER':     os.environ.get('MYSQL_USER')     or os.environ.get('MYSQLUSER', 'root'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD') or os.environ.get('MYSQLPASSWORD', '#@ACTstudent4'),
+        'HOST':     os.environ.get('MYSQL_HOST')     or os.environ.get('MYSQLHOST', 'localhost'),
+        'PORT':     os.environ.get('MYSQL_PORT')     or os.environ.get('MYSQLPORT', '3307'),
     }
 }
 
